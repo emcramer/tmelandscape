@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+title: tmelandscape
+message: >-
+  If you use this software, please cite both the software and the
+  associated manuscripts.
+type: software
+authors:
+  - given-names: Eric M.
+    family-names: Cramer
+    email: ericscrum@gmail.com
+    affiliation: Oregon Health & Science University
+repository-code: "https://github.com/emcramer/tmelandscape"
+abstract: >-
+  Python package for generating tumor microenvironment (TME) state
+  landscapes from agent-based model simulation ensembles. Implements
+  parameter sampling, spatial-statistic summarisation, time-delay
+  embedding, and clustering steps of the trajectory-landscape pipeline.
+keywords:
+  - tumor microenvironment
+  - agent-based model
+  - PhysiCell
+  - time-delay embedding
+  - spatial statistics
+license: BSD-3-Clause
+version: 0.0.1

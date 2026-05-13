@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+.uv/
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# Test / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.cache/
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# Docs
+site/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project-specific
+# Reference scripts (read-only oracle, copied locally).
+# Ignore contents but track the README so future agents have provenance + usage instructions.
+reference/*
+!reference/README.md
+
+# Literature PDFs are development references, not part of the published package.
+# Kept on Eric's local machine for context but not committed.
+docs/literature/
+
+# Example PhysiCell outputs (downloaded via scripts/fetch_example_data.py)
+tests/data/example_physicell/sim_*
+
+# Zarr / HDF5 stores produced by the pipeline
+*.zarr/
+*.h5
+*.hdf5
+
+# Landscape bundles
+*.tmelandscape/
+
+# Notebook checkpoints
+.ipynb_checkpoints/
+
+# Profiling
+*.prof

@@ -1,0 +1,102 @@
+# ROADMAP — phased milestones
+
+Each phase ends in a tagged release; CI must be green and `STATUS.md` updated.
+
+## Phase 0 — Bootstrap (v0.0.1) — COMPLETE
+
+- [x] uv project + pyproject.toml + repo layout
+- [x] LICENSE, CITATION.cff, README.md, .gitignore
+- [x] AGENTS.md + CLAUDE.md
+- [x] docs/development/{STATUS,ROADMAP}.md
+- [x] ADRs 0001–0005 in docs/adr/
+- [x] mkdocs scaffolding (mkdocs.yml + docs/index.md + concepts/api/tutorials/mcp pages)
+- [x] fastmcp server stub with `ping` tool
+- [x] .pre-commit-config.yaml + .github/workflows/{ci,docs}.yml
+- [x] scripts/fetch_example_data.py (Zenodo + --from-local)
+- [x] Phase-0 smoke tests (4 passing, 1 deselected real-data)
+- [x] Verified: `uv sync` + `uv run pytest` + `uv run ruff check` + `uv run ruff format --check` + `uv run mypy src` + `uv run mkdocs build --strict` + `tmelandscape version` + `tmelandscape-mcp` ping all green.
+
+**Exit criterion (met):** clean `uv sync` + `uv run pytest` + `uv run mkdocs build --strict` succeed.
+
+## Phase 1 — Reference audit + example data import (no version bump)
+
+- [ ] Eric provides per-step reference-script pointers (Open Q #2 in STATUS.md)
+- [ ] Copy authoritative scripts into gitignored `reference/`
+- [ ] ADR documenting reference oracles
+- [ ] Upload sim_000, sim_003, sim_014 to Zenodo; record DOI in `scripts/fetch_example_data.py`
+- [ ] `uv run python scripts/fetch_example_data.py --from-local …` succeeds locally
+
+## Phase 2 — Synthetic fixture + Step 1 sampling (v0.1.0)
+
+- [ ] Build tiny synthetic PhysiCell-shaped fixture (`tests/data/synthetic_physicell/`)
+- [ ] Implement `tmelandscape.sampling` (LHS + Sobol/Halton + tissue_simulator wrapper + SweepManifest)
+- [ ] CLI: `tmelandscape sample`
+- [ ] MCP tool: `tmelandscape.generate_sweep`
+- [ ] Unit tests pinned vs reference scripts
+
+**Exit criterion:** sweep manifest matches reference output numerically on a fixed seed.
+
+## Phase 3 — Step 3 summarisation (v0.2.0)
+
+- [ ] `tmelandscape.summarize.spatialtissuepy_driver` + Zarr aggregation
+- [ ] Dask-lazy ensemble store
+- [ ] CLI: `tmelandscape summarize`
+- [ ] MCP tool: `tmelandscape.summarize_ensemble`
+- [ ] Integration test: synthetic fixture → Zarr store with known stats
+
+## Phase 3.5 — Step 3.5 normalization (v0.2.5)
+
+> Added 2026-05-12 after the Phase 1 reference audit. See [ADR 0006](../adr/0006-normalize-as-pipeline-step.md).
+
+- [ ] `tmelandscape.normalize.within_timestep` (per-step mean → power transform → z-score → +mean)
+- [ ] `tmelandscape.normalize.feature_filter` (configurable drop of cell-density columns)
+- [ ] `tmelandscape.normalize.alternatives` (global / local-time / feature-distribution variants)
+- [ ] CLI: `tmelandscape normalize`
+- [ ] MCP tool: `tmelandscape.normalize_ensemble`
+- [ ] Numerical agreement vs `reference/00_abm_normalization.py` on the synthetic fixture
+
+## Phase 4 — Step 4 embedding (v0.3.0)
+
+- [ ] `tmelandscape.embedding.delay_embed` (Takens)
+- [ ] FNN dimension search (cross-check vs nolitsa)
+- [ ] Mutual-information lag selection
+- [ ] Joint `optimize_embedding`
+- [ ] Sliding-window construction (`W=50` default per LCSS paper / reference)
+- [ ] Golden-file regression vs reference
+- [ ] CLI: `tmelandscape embed`
+- [ ] MCP tools: `tmelandscape.optimize_embedding`, `tmelandscape.delay_embed`
+
+## Phase 5 — Step 5 clustering + Landscape facade (v0.4.0)
+
+> Reshaped 2026-05-12 after Phase 1. See [ADR 0007](../adr/0007-two-stage-leiden-ward-clustering.md).
+
+- [ ] `tmelandscape.cluster.leiden` — kNN graph + Leiden community detection (stage 1)
+- [ ] `tmelandscape.cluster.meta` — Ward hierarchical clustering on Leiden cluster means (stage 2)
+- [ ] `tmelandscape.cluster.selection` — Leiden resolution sweep + Ward elbow / silhouette
+- [ ] `tmelandscape.cluster.labels` — state-label persistence + interpretable names (Effector-Dominant, etc.)
+- [ ] `Landscape` facade + `.tmelandscape/` bundle format (stores both Leiden labels and Ward final labels)
+- [ ] CLI: `tmelandscape fit`
+- [ ] MCP tools: `tmelandscape.fit_landscape`, `tmelandscape.describe_landscape`
+- [ ] End-to-end integration test on synthetic fixture (Python API + CLI + MCP)
+- [ ] Numerical agreement vs `reference/01_abm_generate_embedding.py` clustering output on the synthetic fixture
+
+## Phase 6 — Visualisation (v0.5.0)
+
+- [ ] `tmelandscape.viz.diagnostics` (FNN curve, elbow, MI-vs-lag)
+- [ ] `tmelandscape.viz.embedding` (UMAP scatter; vector-field-style)
+- [ ] `tmelandscape.viz.trajectories` (state-colored time series, Fig. 2 style)
+- [ ] Notebook tutorials in `docs/tutorials/` executed in CI
+
+## Phase 7 — Release hardening (v1.0.0)
+
+- [ ] `pytest -m real` green against the three Zenodo-fetched sim_xxx directories
+- [ ] mkdocs published to GitHub Pages
+- [ ] PyPI release via trusted publisher
+- [ ] Zenodo DOI for the software + updated CITATION.cff
+
+## Beyond v1.0 (deferred — not v1)
+
+- MSM construction + Markov state model fitting
+- MDP / intervention-design analysis (LCSS paper, sections IV–VI)
+- Landscape projection: mapping new/clinical observations onto a fitted landscape
+- SLURM-specific helpers for HPC consumption

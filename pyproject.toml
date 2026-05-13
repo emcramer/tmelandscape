@@ -1,0 +1,164 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tmelandscape"
+version = "0.0.1"
+description = "Generate tumor microenvironment state landscapes from agent-based model simulation ensembles."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11"
+authors = [
+    { name = "Eric M. Cramer", email = "ericscrum@gmail.com" },
+]
+keywords = ["tumor microenvironment", "agent-based model", "PhysiCell", "spatial statistics", "time-delay embedding", "tumor immune trajectory"]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.2",
+    "scipy>=1.13",
+    "scikit-learn>=1.5",
+    "pyarrow>=16",
+    "zarr>=2.18",
+    "dask[array]>=2024.5",
+    "pyDOE3>=1.0",
+    "pydantic>=2.7",
+    "typer>=0.12",
+    "structlog>=24.1",
+    "kneed>=0.8",
+    # Two-stage clustering: Leiden community detection on a kNN graph,
+    # then Ward on cluster means. See ADR 0007.
+    "leidenalg>=0.10",
+    "python-igraph>=0.11",
+    "networkx>=3.3",
+]
+
+[project.optional-dependencies]
+viz = [
+    "matplotlib>=3.9",
+    "umap-learn>=0.5",
+    "plotly>=5.22",
+]
+mcp = [
+    "fastmcp>=2.0",
+]
+dev = [
+    "pytest>=8.2",
+    "pytest-cov>=5.0",
+    "hypothesis>=6.100",
+    "ruff>=0.4",
+    "mypy>=1.10",
+    "pre-commit>=3.7",
+    "codespell>=2.3",
+]
+docs = [
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.25",
+    "mkdocs-jupyter>=0.24",
+]
+# Convenience meta-extra: everything needed for local development.
+all = [
+    "tmelandscape[viz,mcp,dev,docs]",
+]
+
+[project.urls]
+Homepage = "https://github.com/emcramer/tmelandscape"
+Documentation = "https://emcramer.github.io/tmelandscape/"
+Repository = "https://github.com/emcramer/tmelandscape"
+Issues = "https://github.com/emcramer/tmelandscape/issues"
+
+[project.scripts]
+tmelandscape = "tmelandscape.cli.main:app"
+tmelandscape-mcp = "tmelandscape.mcp.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tmelandscape"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "src/tmelandscape",
+    "tests",
+    "README.md",
+    "LICENSE",
+    "CITATION.cff",
+    "pyproject.toml",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+# Don't lint third-party reference oracle, build artefacts, or example data.
+# `reference/` is gitignored too, but ruff only respects gitignore when run from a
+# git repo. Explicit exclude is robust.
+extend-exclude = [
+    "reference",
+    "tests/data/example_physicell",
+    "tests/data/synthetic_physicell",
+]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",       # pycodestyle / pyflakes
+    "I",                 # isort
+    "B",                 # flake8-bugbear
+    "UP",                # pyupgrade
+    "N",                 # pep8-naming
+    "SIM",               # flake8-simplify
+    "RUF",               # ruff-specific
+]
+ignore = [
+    "E501",              # line length handled by formatter
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["N802", "N803"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+disallow_untyped_decorators = false
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["pyDOE3.*", "umap.*", "zarr.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "-m", "not real",
+]
+markers = [
+    "real: opt-in real-data integration tests (require external example PhysiCell outputs); excluded by default via addopts; run with `pytest -m real`",
+    "slow: tests that take more than a few seconds",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["src/tmelandscape"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]
