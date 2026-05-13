@@ -754,6 +754,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Phase 3 — Step 3 summarisation (v0.2.0) — COMPLETE">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#v030-panel-hardcoding-rollback-post-v020-2026-05-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.3.0 — panel hardcoding rollback (post-v0.2.0, 2026-05-13)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -936,6 +953,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Phase 3 — Step 3 summarisation (v0.2.0) — COMPLETE">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#v030-panel-hardcoding-rollback-post-v020-2026-05-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        v0.3.0 — panel hardcoding rollback (post-v0.2.0, 2026-05-13)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1081,6 +1115,18 @@
 <li>[x] ADR 0008 (dependency pin policy: tag git+URL deps)</li>
 </ul>
 <p><strong>Verification:</strong> 115 tests passing; ruff + format + mypy strict + mkdocs strict all green.</p>
+<h3 id="v030-panel-hardcoding-rollback-post-v020-2026-05-13">v0.3.0 — panel hardcoding rollback (post-v0.2.0, 2026-05-13)<a class="headerlink" href="#v030-panel-hardcoding-rollback-post-v020-2026-05-13" title="Permanent link">&para;</a></h3>
+<p>Project owner directive: never hardcode the spatial-statistics panel; never overwrite raw data; never drop features by default. ADR 0009 documents the rationale.</p>
+<ul>
+<li>[x] <code>SummarizeConfig.statistics</code> is required (no default panel); validated against <code>spatialtissuepy</code>'s live <code>_registry</code>.</li>
+<li>[x] <code>StatisticSpec</code> carries name + per-metric <code>parameters</code> dict for parameterised metrics.</li>
+<li>[x] <code>registry.compute_panel</code> replaces the custom <code>_compute_*</code> dispatch; uses <code>spatialtissuepy.summary.StatisticsPanel.compute()</code> directly.</li>
+<li>[x] Removed <code>KNOWN_STATISTICS</code>, <code>_default_statistics</code>, the rekey helpers for <code>cell_proportions</code>/centrality, and <code>feature_filter.DEFAULT_DROP_COLUMNS</code>.</li>
+<li>[x] Interaction-key <code>|</code> rewrite stays as a vocabulary-aware post-processing pass (vocabulary discovered from <code>spatial_data.cell_types_unique</code>).</li>
+<li>[x] Discovery surfaces: <code>tmelandscape statistics list/describe</code> CLI verbs; MCP tools <code>list_available_statistics</code> and <code>describe_statistic</code>.</li>
+<li>[x] ADR 0009 written; ADR 0006 updated with the "never overwrite, no built-in drop" invariants.</li>
+<li>[x] Tests updated to pass explicit <code>statistics=[...]</code>; 107 tests passing.</li>
+</ul>
 <h2 id="phase-35-step-35-normalization-v025">Phase 3.5 — Step 3.5 normalization (v0.2.5)<a class="headerlink" href="#phase-35-step-35-normalization-v025" title="Permanent link">&para;</a></h2>
 <blockquote>
 <p>Added 2026-05-12 after the Phase 1 reference audit. See <a href="../../adr/0006-normalize-as-pipeline-step/">ADR 0006</a>.</p>

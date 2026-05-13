@@ -777,6 +777,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#update-2026-05-13-project-owner-direction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Update 2026-05-13 (project owner direction)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -806,7 +817,7 @@
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
 <p>Phase 1 reference audit (see <code>tasks/00-reference-audit.md</code>) surfaced that the upstream landscape-generation pipeline includes a <strong>normalization step between summarization (step 3) and embedding (step 4)</strong> that the original development plan omitted. The reference oracle (<code>reference/00_abm_normalization.py</code>) does:</p>
 <ol>
-<li>Drop six cell-density feature columns (<code>M0/M1/M2_macrophage_density</code>, <code>effector/exhausted_T_cell/malignant_epithelial_cell_density</code>).</li>
+<li>Drop six cell-density feature columns. <em>(Application-specific; not a property of the algorithm. See "Update 2026-05-13" below.)</em></li>
 <li>Group rows by <code>time_step</code>; compute per-step feature means.</li>
 <li>Apply <code>sklearn.preprocessing.PowerTransformer</code> per time step.</li>
 <li>Z-score normalize the result.</li>
@@ -835,6 +846,12 @@
 <li><strong>Fold into <code>embedding</code>:</strong> worst separation; the embedding step should consume already-prepared inputs.</li>
 <li><strong>Apply per-feature globally (not per-time-step):</strong> simpler but loses the per-timestep mean-preservation that the reference uses to keep temporal trend information available to the delay embedding.</li>
 </ul>
+<h2 id="update-2026-05-13-project-owner-direction">Update 2026-05-13 (project owner direction)<a class="headerlink" href="#update-2026-05-13-project-owner-direction" title="Permanent link">&para;</a></h2>
+<p>Two binding invariants for the Phase 3.5 implementation, recorded here so they survive the gap between this ADR and the eventual <code>normalize_ensemble</code> code:</p>
+<ol>
+<li><strong>Never overwrite the raw ensemble.</strong> Normalisation always writes to a new variable in the existing Zarr store, or to a new Zarr file. The raw output of step 3 is immutable. This lets users re-run normalisation with different strategies without re-running step 3. Decision is the project owner's (Eric, 2026-05-13).</li>
+<li><strong>Drop no features by default.</strong> The reference's "drop the six cell-density columns" step was specific to the LCSS-paper application, not a property of the algorithm. The default <code>normalize_ensemble</code> behaviour is to operate on every column the user supplies; column dropping is an explicit opt-in (<code>drop_columns: list[str] = []</code>). See <a href="../0009-no-hardcoded-statistics-panel/">ADR 0009</a> for the parallel decision on the summarisation panel.</li>
+</ol>
 
 
 

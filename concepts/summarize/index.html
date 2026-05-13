@@ -481,10 +481,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-gets-computed" class="md-nav__link">
+  <a href="#discovering-available-statistics" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What gets computed
+        Discovering available statistics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#composing-a-panel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Composing a panel
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#empty-timepoint-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty-timepoint contract
       
     </span>
   </a>
@@ -873,10 +895,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-gets-computed" class="md-nav__link">
+  <a href="#discovering-available-statistics" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What gets computed
+        Discovering available statistics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#composing-a-panel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Composing a panel
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#empty-timepoint-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empty-timepoint contract
       
     </span>
   </a>
@@ -959,61 +1003,67 @@
 
 
 <h1 id="concept-spatial-statistic-summarisation-step-3">Concept: spatial-statistic summarisation (step 3)<a class="headerlink" href="#concept-spatial-statistic-summarisation-step-3" title="Permanent link">&para;</a></h1>
-<p>Step 3 takes the manifest produced by step 1 plus a directory of PhysiCell outputs and emits a single chunked Zarr ensemble store. Each cell of the store carries the value of one spatial statistic at one timepoint of one simulation; downstream steps (3.5 normalize, 4 embedding, 5 clustering) read from this store.</p>
+<p>Step 3 takes the manifest produced by step 1 plus a directory of PhysiCell
+outputs and emits a single chunked Zarr ensemble store. Each cell of the
+store carries the value of one spatial statistic at one timepoint of one
+simulation; downstream steps (3.5 normalize, 4 embedding, 5 clustering)
+read from this store.</p>
 <h2 id="inputs">Inputs<a class="headerlink" href="#inputs" title="Permanent link">&para;</a></h2>
 <ul>
 <li>A <a href="../sampling/"><code>SweepManifest</code></a> (the artefact from <code>tmelandscape sample</code>).</li>
 <li>A <code>physicell_root</code> directory containing one PhysiCell output subdirectory per manifest row. The subdirectory name must match <code>row.simulation_id</code> exactly.</li>
-<li>A <code>SummarizeConfig</code> (Pydantic) selecting which statistics to compute. Defaults to the LCSS-paper panel.</li>
+<li>A <strong><code>SummarizeConfig</code></strong> that the user supplies. There is no default panel — see <a href="../../adr/0009-no-hardcoded-statistics-panel/">ADR 0009</a>. Use the discovery surfaces below to pick a panel.</li>
 </ul>
-<h2 id="what-gets-computed">What gets computed<a class="headerlink" href="#what-gets-computed" title="Permanent link">&para;</a></h2>
-<p>The default panel mirrors the LCSS paper. Each statistic is computed per timepoint per simulation, then aggregated.</p>
-<table>
-<thead>
-<tr>
-<th>Statistic name (input)</th>
-<th>Output keys</th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>cell_counts</code></td>
-<td><code>n_cells</code>, <code>n_&lt;type&gt;</code></td>
-<td>Population-level.</td>
-</tr>
-<tr>
-<td><code>cell_type_fractions</code></td>
-<td><code>fraction_&lt;type&gt;</code></td>
-<td>Rekeyed from upstream's <code>prop_&lt;type&gt;</code>.</td>
-</tr>
-<tr>
-<td><code>mean_degree_centrality_by_type</code></td>
-<td><code>degree_centrality_&lt;type&gt;</code></td>
-<td>Built on the prebuilt <code>CellGraph</code>.</td>
-</tr>
-<tr>
-<td><code>mean_closeness_centrality_by_type</code></td>
-<td><code>closeness_centrality_&lt;type&gt;</code></td>
-<td>Same.</td>
-</tr>
-<tr>
-<td><code>mean_betweenness_centrality_by_type</code></td>
-<td><code>betweenness_centrality_&lt;type&gt;</code></td>
-<td>Same.</td>
-</tr>
-<tr>
-<td><code>interaction_strength_matrix</code></td>
-<td><code>interaction_&lt;src&gt;\|&lt;dst&gt;</code></td>
-<td>KDTree-based coords metric — ignores the graph; uses <code>graph_radius_um</code> as the interaction radius. The <code>\|</code> delimiter is used because cell-type names contain underscores (<code>M0_macrophage</code>, <code>effector_T_cell</code>) and a plain <code>_</code> separator would be ambiguous.</td>
-</tr>
-</tbody>
-</table>
-<p>Unknown statistic names are rejected at config-construction time by a Pydantic validator over <code>KNOWN_STATISTICS</code>.</p>
-<div class="admonition note">
-<p class="admonition-title">Empty-timepoint contract</p>
-<p>On a timepoint with zero live cells, only <code>cell_counts</code> emits a row (<code>n_cells = 0</code>). Centrality / fraction / interaction stats emit <em>no rows</em> — the aggregator NaN-fills missing entries from the union schema across simulations. This avoids polluting the <code>statistic</code> coordinate with a placeholder key that disagrees with the non-empty rows' <code>fraction_&lt;type&gt;</code> / <code>interaction_&lt;src&gt;|&lt;dst&gt;</code> schemas.</p>
-</div>
+<h2 id="discovering-available-statistics">Discovering available statistics<a class="headerlink" href="#discovering-available-statistics" title="Permanent link">&para;</a></h2>
+<p><code>spatialtissuepy</code> ships ~68 registered metrics (population counts,
+graph-based centralities, colocalisation, morphology, topology, etc.).
+<code>tmelandscape</code> does not curate or restrict this list; the user picks from
+the live registry.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Print the whole catalogue (one JSON dict per metric)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>tmelandscape<span class="w"> </span>statistics<span class="w"> </span>list
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Filter by category</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>tmelandscape<span class="w"> </span>statistics<span class="w"> </span>list<span class="w"> </span>--category<span class="w"> </span>population
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Inspect one metric in detail (parameter schema, description)</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>tmelandscape<span class="w"> </span>statistics<span class="w"> </span>describe<span class="w"> </span>cell_type_ratio
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tmelandscape.summarize.registry</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="n">list_available_statistics</span><span class="p">,</span> <span class="n">describe_metric</span><span class="p">,</span> <span class="n">available_metric_names</span><span class="p">,</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="p">)</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="n">names</span> <span class="o">=</span> <span class="n">available_metric_names</span><span class="p">()</span>              <span class="c1"># frozenset of metric names</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="n">catalogue</span> <span class="o">=</span> <span class="n">list_available_statistics</span><span class="p">()</span>        <span class="c1"># list of {name, category, description, parameters}</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="n">detail</span> <span class="o">=</span> <span class="n">describe_metric</span><span class="p">(</span><span class="s2">&quot;cell_type_ratio&quot;</span><span class="p">)</span>    <span class="c1"># one metric&#39;s full description</span>
+</code></pre></div>
+<p>MCP agents call the same catalogue via the <code>list_available_statistics</code>
+and <code>describe_statistic</code> tools.</p>
+<h2 id="composing-a-panel">Composing a panel<a class="headerlink" href="#composing-a-panel" title="Permanent link">&para;</a></h2>
+<p><code>SummarizeConfig.statistics</code> is a list. Each entry is either a plain
+string (metric name) or a <code>StatisticSpec</code> (name + per-metric parameters).
+Both forms accept arbitrary parameters that the chosen metric supports:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tmelandscape.config.summarize</span><span class="w"> </span><span class="kn">import</span> <span class="n">StatisticSpec</span><span class="p">,</span> <span class="n">SummarizeConfig</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">config</span> <span class="o">=</span> <span class="n">SummarizeConfig</span><span class="p">(</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="n">statistics</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>        <span class="s2">&quot;cell_counts&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        <span class="s2">&quot;cell_proportions&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        <span class="n">StatisticSpec</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;interaction_strength_matrix&quot;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="mf">30.0</span><span class="p">}),</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        <span class="n">StatisticSpec</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;average_clustering&quot;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="s2">&quot;knn&quot;</span><span class="p">,</span> <span class="s2">&quot;k&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">}),</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>        <span class="n">StatisticSpec</span><span class="p">(</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;cell_type_ratio&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>            <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;numerator&quot;</span><span class="p">:</span> <span class="s2">&quot;tumor&quot;</span><span class="p">,</span> <span class="s2">&quot;denominator&quot;</span><span class="p">:</span> <span class="s2">&quot;M0_macrophage&quot;</span><span class="p">},</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>        <span class="p">),</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    <span class="p">],</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="p">)</span>
+</code></pre></div>
+<p>Construction-time validation rejects unknown metric names against
+<code>spatialtissuepy</code>'s live registry; you cannot ship a misspelled metric
+into an ensemble run.</p>
+<h2 id="empty-timepoint-contract">Empty-timepoint contract<a class="headerlink" href="#empty-timepoint-contract" title="Permanent link">&para;</a></h2>
+<p>A timepoint with zero live cells emits only <code>cell_counts</code> rows (when
+that metric is in the panel) and otherwise emits nothing. The aggregator
+NaN-fills missing entries against the union schema across simulations.</p>
 <h2 id="summarizeconfig-fields"><code>SummarizeConfig</code> fields<a class="headerlink" href="#summarizeconfig-fields" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1027,21 +1077,9 @@
 <tbody>
 <tr>
 <td><code>statistics</code></td>
-<td><code>list[str]</code></td>
-<td>LCSS panel (6 names)</td>
-<td>Names from <code>KNOWN_STATISTICS</code>.</td>
-</tr>
-<tr>
-<td><code>graph_method</code></td>
-<td><code>"proximity" \| "knn" \| "delaunay" \| "gabriel"</code></td>
-<td><code>"proximity"</code></td>
-<td>Method passed to <code>CellGraph.from_spatial_data</code>.</td>
-</tr>
-<tr>
-<td><code>graph_radius_um</code></td>
-<td><code>float &gt; 0</code></td>
-<td><code>30.0</code></td>
-<td>Radius in μm for the proximity graph AND for <code>interaction_strength_matrix</code> (always, regardless of <code>graph_method</code>).</td>
+<td><code>list[StatisticSpec \| str]</code></td>
+<td><strong>required, no default</strong></td>
+<td>The panel to compute.</td>
 </tr>
 <tr>
 <td><code>n_workers</code></td>
@@ -1053,7 +1091,13 @@
 <td><code>include_dead_cells</code></td>
 <td><code>bool</code></td>
 <td><code>False</code></td>
-<td>Whether dead cells participate in stats.</td>
+<td>Whether dead cells participate in metrics.</td>
+</tr>
+<tr>
+<td><code>rewrite_interaction_keys</code></td>
+<td><code>bool</code></td>
+<td><code>True</code></td>
+<td>Rewrite <code>interaction_&lt;src&gt;_&lt;dst&gt;</code> keys to <code>interaction_&lt;src&gt;\|&lt;dst&gt;</code> so pair keys disambiguate when cell-type names contain underscores. Off for byte-for-byte spatialtissuepy parity.</td>
 </tr>
 </tbody>
 </table>
@@ -1065,41 +1109,57 @@
 <li><code>time</code> is a 2D <code>(simulation, timepoint)</code> float coord because different sims may emit different wall-clock times for the same step index.</li>
 <li>Missing entries are NaN (ragged simulations or schema gaps).</li>
 </ul>
-<p>Provenance <code>.zattrs</code> include <code>tmelandscape_version</code>, <code>manifest_hash</code> (sha256 of <code>manifest.model_dump_json()</code>), <code>created_at_utc</code>, and the serialised <code>SummarizeConfig</code>. See <a href="../../adr/0003-zarr-as-ensemble-store/">ADR 0003</a> for the format rationale and the Zarr v3 status note.</p>
+<p>Provenance <code>.zattrs</code> include <code>tmelandscape_version</code>, <code>manifest_hash</code>
+(sha256 of <code>manifest.model_dump_json()</code>), <code>created_at_utc</code>, and the
+serialised <code>SummarizeConfig</code> (panel + parameters). See
+<a href="../../adr/0003-zarr-as-ensemble-store/">ADR 0003</a> for the Zarr v3
+caveat.</p>
 <h2 id="code-example">Code example<a class="headerlink" href="#code-example" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tmelandscape.config.summarize</span><span class="w"> </span><span class="kn">import</span> <span class="n">SummarizeConfig</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tmelandscape.sampling.manifest</span><span class="w"> </span><span class="kn">import</span> <span class="n">SweepManifest</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tmelandscape.summarize</span><span class="w"> </span><span class="kn">import</span> <span class="n">summarize_ensemble</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">manifest</span> <span class="o">=</span> <span class="n">SweepManifest</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;sweep_manifest.json&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="n">summarize_ensemble</span><span class="p">(</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="n">manifest</span><span class="p">,</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="n">physicell_root</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/scratch/sims/&quot;</span><span class="p">),</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">output_zarr</span><span class="o">=</span><span class="s2">&quot;ensemble.zarr&quot;</span><span class="p">,</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">config</span><span class="o">=</span><span class="n">SummarizeConfig</span><span class="p">(</span><span class="n">graph_radius_um</span><span class="o">=</span><span class="mf">25.0</span><span class="p">),</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="p">)</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_zarr</span><span class="p">(</span><span class="s2">&quot;ensemble.zarr&quot;</span><span class="p">,</span> <span class="n">consolidated</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="c1"># Slice: degree centrality of tumour cells across the ensemble.</span>
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="n">tumour_degree</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">statistic</span><span class="o">=</span><span class="s2">&quot;degree_centrality_tumor&quot;</span><span class="p">)</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="c1"># Slice by parameter value: simulations with the highest r_exh.</span>
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="n">high_exh</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;parameter_r_exh&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tmelandscape.config.summarize</span><span class="w"> </span><span class="kn">import</span> <span class="n">StatisticSpec</span><span class="p">,</span> <span class="n">SummarizeConfig</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tmelandscape.sampling.manifest</span><span class="w"> </span><span class="kn">import</span> <span class="n">SweepManifest</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tmelandscape.summarize</span><span class="w"> </span><span class="kn">import</span> <span class="n">summarize_ensemble</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="n">manifest</span> <span class="o">=</span> <span class="n">SweepManifest</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;sweep_manifest.json&quot;</span><span class="p">)</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="n">config</span> <span class="o">=</span> <span class="n">SummarizeConfig</span><span class="p">(</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>    <span class="n">statistics</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>        <span class="s2">&quot;cell_counts&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>        <span class="n">StatisticSpec</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;interaction_strength_matrix&quot;</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;radius&quot;</span><span class="p">:</span> <span class="mf">25.0</span><span class="p">}),</span>
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    <span class="p">],</span>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="p">)</span>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="n">summarize_ensemble</span><span class="p">(</span>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>    <span class="n">manifest</span><span class="p">,</span>
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>    <span class="n">physicell_root</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/scratch/sims/&quot;</span><span class="p">),</span>
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>    <span class="n">output_zarr</span><span class="o">=</span><span class="s2">&quot;ensemble.zarr&quot;</span><span class="p">,</span>
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>    <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="p">)</span>
+<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>
+<a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a><span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_zarr</span><span class="p">(</span><span class="s2">&quot;ensemble.zarr&quot;</span><span class="p">,</span> <span class="n">consolidated</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a><span class="n">n_cells</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">statistic</span><span class="o">=</span><span class="s2">&quot;n_cells&quot;</span><span class="p">)</span>
+<a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a><span class="n">high_exh</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="s2">&quot;parameter_r_exh&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="cli">CLI<a class="headerlink" href="#cli" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>tmelandscape<span class="w"> </span>summarize<span class="w"> </span>sweep_manifest.json<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span>--physicell-root<span class="w"> </span>/scratch/sims/<span class="w"> </span><span class="se">\</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span>--output-zarr<span class="w"> </span>ensemble.zarr
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>tmelandscape<span class="w"> </span>statistics<span class="w"> </span>list<span class="w">                  </span><span class="c1"># discover available metrics</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>tmelandscape<span class="w"> </span>summarize<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">    </span>sweep_manifest.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">    </span>summarize_config.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">    </span>--physicell-root<span class="w"> </span>/scratch/sims/<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">    </span>--output-zarr<span class="w"> </span>ensemble.zarr
 </code></pre></div>
-<p>A JSON summary (Zarr path, simulation count, applied statistics list) is printed to stdout. Progress from <code>spatialtissuepy</code> is routed to stderr so the JSON stays parseable.</p>
+<p>The summarise CLI requires both a sweep manifest <em>and</em> a JSON file
+holding a <code>SummarizeConfig</code>. A JSON summary (Zarr path, simulation
+count, applied statistics list) is printed to stdout. Progress from
+<code>spatialtissuepy</code> is routed to stderr so the JSON stays parseable.</p>
 <h2 id="whats-not-in-step-3">What's <em>not</em> in step 3<a class="headerlink" href="#whats-not-in-step-3" title="Permanent link">&para;</a></h2>
 <p>Step 3 stops at the Zarr ensemble.</p>
 <ul>
 <li><strong>Running the PhysiCell simulations</strong> is the external step 2 (out of scope for tmelandscape).</li>
-<li><strong>Within-time-step normalisation</strong> of the spatial statistics is the upcoming step 3.5; see <a href="../../adr/0006-normalize-as-pipeline-step/">ADR 0006</a>.</li>
-<li><strong>Time-delay embedding</strong> (step 4) and <strong>two-stage clustering</strong> (step 5) consume the normalized ensemble; see the <a href="../../development/ROADMAP/">roadmap</a>.</li>
+<li><strong>Within-time-step normalisation</strong> of the spatial statistics is the upcoming step 3.5; see <a href="../../adr/0006-normalize-as-pipeline-step/">ADR 0006</a>. Normalisation always writes to a <em>new</em> variable / store — never overwrites the raw ensemble.</li>
+<li><strong>No feature dropping by default.</strong> If you want to exclude features before normalisation or embedding, supply an explicit list at that step. tmelandscape ships no <code>DEFAULT_DROP_COLUMNS</code>.</li>
+<li><strong>Time-delay embedding</strong> (step 4) and <strong>two-stage clustering</strong> (step 5) consume the normalised ensemble; see the <a href="../../development/ROADMAP/">roadmap</a>.</li>
 </ul>
 
 
