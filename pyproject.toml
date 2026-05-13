@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tmelandscape"
-version = "0.1.1"
+version = "0.2.0"
 description = "Generate tumor microenvironment state landscapes from agent-based model simulation ensembles."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -31,6 +31,7 @@ dependencies = [
     "scikit-learn>=1.5",
     "pyarrow>=16",
     "zarr>=2.18",
+    "xarray>=2024.5",
     "dask[array]>=2024.5",
     "pyDOE3>=1.0",
     "pydantic>=2.7",
@@ -44,8 +45,13 @@ dependencies = [
     "networkx>=3.3",
     # Initial-condition generation: replicates of cell starting positions
     # with similar spatial statistics (~10% error per metric).
-    # No PyPI release; installed from GitHub. Pin a commit/tag before v1.0.
+    # No PyPI release; installed from GitHub. Pin to a tag/commit; ADR 0008
+    # covers the policy. Currently floating on default branch — uv.lock pins.
     "tissue_simulator @ git+https://github.com/emcramer/tissue_simulator.git",
+    # Spatial-statistic summarisation of PhysiCell outputs. No PyPI release;
+    # pinned to a commit until upstream tags. Brings native PhysiCell parser
+    # and the StatisticsPanel registry used in Step 3 (Phase 3).
+    "spatialtissuepy[network] @ git+https://github.com/emcramer/spatialtissuepy.git@c03cfa4",
 ]
 
 [project.optional-dependencies]
@@ -63,6 +69,7 @@ dev = [
     "hypothesis>=6.100",
     "ruff>=0.4",
     "mypy>=1.10",
+    "pandas-stubs>=2.2",
     "pre-commit>=3.7",
     "codespell>=2.3",
 ]
@@ -144,7 +151,15 @@ disallow_untyped_decorators = false
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["pyDOE3.*", "umap.*", "zarr.*", "tissue_simulator.*", "scipy.stats.*"]
+module = [
+    "pyDOE3.*",
+    "umap.*",
+    "zarr.*",
+    "tissue_simulator.*",
+    "spatialtissuepy.*",
+    "scipy.stats.*",
+    "scipy.io.*",
+]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
@@ -159,6 +174,15 @@ addopts = [
 markers = [
     "real: opt-in real-data integration tests (require external example PhysiCell outputs); excluded by default via addopts; run with `pytest -m real`",
     "slow: tests that take more than a few seconds",
+]
+filterwarnings = [
+    # Zarr v3 has not yet finalised a spec for fixed-length unicode string dtypes;
+    # xarray writes string coords (simulation_id, statistic names) as `FixedLengthUTF32`
+    # which triggers this warning. Cross-library reads (zarr.js, future zarr-python)
+    # may need to revisit; ADR 0003 tracks the broader Zarr v2->v3 migration.
+    "ignore::zarr.core.dtype.common.UnstableSpecificationWarning",
+    # xarray emits this for consolidated metadata in Zarr v3 (also pre-spec).
+    "ignore:Consolidated metadata is currently not part in the Zarr format:UserWarning",
 ]
 
 [tool.coverage.run]

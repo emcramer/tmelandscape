@@ -25,3 +25,13 @@ Aggregate per-simulation tabular summaries into a single chunked **Zarr** store 
 - Single HDF5 per ensemble — single-writer limitation; harder parallel ingest from many simulation directories.
 - Parquet per simulation, no aggregate — keeps each simulation isolated but step 4 needs to load everything; lots of small-file overhead.
 - AnnData per simulation + a top-level catalogue — idiomatic for single-cell but awkward for time-series ensembles; AnnData's strength is single (cells × features) tables, not time-stacks.
+
+## Update 2026-05-13 (Zarr v3)
+
+The original decision was written when Zarr v2 was the stable target. As of `uv sync` on 2026-05-13, the resolved version is `zarr 3.1.6` (the `>=2.18` constraint matched v3). Practical implications:
+
+- xarray writes via `Dataset.to_zarr` and reads via `xarray.open_zarr` work cleanly in both directions.
+- String coords (e.g. `simulation_id`, `statistic`) are stored as `FixedLengthUTF32`, which does not yet have a finalised v3 spec. Zarr 3.x emits `UnstableSpecificationWarning`; tmelandscape's `pyproject.toml` filters this in pytest so test output stays readable. Cross-library reads (zarr.js, future zarr-python releases) may need to revisit string-coord encoding.
+- Consolidated metadata is also pre-spec on v3; same filter handling.
+
+No action required for v0.2.x. Revisit before v1.0 release if Zarr v3 string-dtype spec lands.

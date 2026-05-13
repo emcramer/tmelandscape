@@ -44,13 +44,21 @@ Deferred from this phase (rolled into later phases or follow-ups):
 
 **Exit criterion met:** end-to-end `tmelandscape sample <cfg.json>` produces a `SweepManifest` consumable by the (future) step-2 runner.
 
-## Phase 3 — Step 3 summarisation (v0.2.0)
+## Phase 3 — Step 3 summarisation (v0.2.0) — COMPLETE
 
-- [ ] `tmelandscape.summarize.spatialtissuepy_driver` + Zarr aggregation
-- [ ] Dask-lazy ensemble store
-- [ ] CLI: `tmelandscape summarize`
-- [ ] MCP tool: `tmelandscape.summarize_ensemble`
-- [ ] Integration test: synthetic fixture → Zarr store with known stats
+- [x] `tmelandscape.summarize.spatialtissuepy_driver` + Zarr aggregation
+- [x] `tmelandscape.summarize.aggregate.build_ensemble_zarr` (xarray-on-zarr, chunked)
+- [x] `tmelandscape.summarize.registry` (LCSS-default panel: cell counts, fractions, three centrality metrics, interaction matrix)
+- [x] `tmelandscape.config.summarize.SummarizeConfig` (Pydantic; validates against `KNOWN_STATISTICS`)
+- [x] Synthetic PhysiCell-shaped fixture in `tests/data/synthetic_physicell/` (3 sims × 3 timepoints × 21 cells, 112 KB)
+- [x] CLI: `tmelandscape summarize`
+- [x] MCP tool: `tmelandscape.summarize_ensemble`
+- [x] Integration test: Python API + CLI + MCP all produce equivalent Zarr stores
+- [x] Buddy-pair team: 3 Implementer agents + 3 Reviewer agents, 5 RISKs surfaced and fixed before integration
+- [x] Sweep-scoped IC subdirectories added to `generate_sweep` (Phase 2 audit follow-up)
+- [x] ADR 0008 (dependency pin policy: tag git+URL deps)
+
+**Verification:** 115 tests passing; ruff + format + mypy strict + mkdocs strict all green.
 
 ## Phase 3.5 — Step 3.5 normalization (v0.2.5)
 

@@ -53,11 +53,28 @@ class SweepManifest(BaseModel):
     config: SweepConfig
     initial_conditions_dir: str = Field(
         ...,
-        description="Path containing IC CSVs, relative to manifest file.",
+        description=(
+            "Directory containing the IC CSVs. When `sweep_id` is set the actual "
+            "CSVs live under `<initial_conditions_dir>/<sweep_id>/`."
+        ),
+    )
+    sweep_id: str | None = Field(
+        default=None,
+        description=(
+            "Optional sweep-scoped subdirectory name under `initial_conditions_dir`. "
+            "Set by `generate_sweep` to `sweep_<config_hash[:8]>_<utc_timestamp>`, "
+            "letting multiple sweeps coexist in one parent IC directory and avoiding "
+            "stale-file confusion. `None` means CSVs live directly in `initial_conditions_dir`."
+        ),
     )
     rows: list[SweepRow]
     created_at: datetime = Field(default_factory=_utc_now)
     tmelandscape_version: str = Field(default_factory=_default_version)
+
+    def ic_root(self) -> Path:
+        """Return the directory that actually contains the IC CSV files."""
+        base = Path(self.initial_conditions_dir)
+        return base / self.sweep_id if self.sweep_id is not None else base
 
     def save(self, path: str | Path) -> None:
         """Persist to disk. Writes both ``<path>.json`` and ``<path>.parquet``.

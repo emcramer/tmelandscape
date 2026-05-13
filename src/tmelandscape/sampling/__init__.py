@@ -14,6 +14,7 @@ agent consumes.
 
 from __future__ import annotations
 
+import hashlib
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
@@ -110,7 +111,16 @@ def generate_sweep(
     SweepManifest
         In-memory manifest. Persist via :meth:`SweepManifest.save`.
     """
-    ic_dir = Path(initial_conditions_dir).resolve()
+    parent_ic_dir = Path(initial_conditions_dir).resolve()
+    parent_ic_dir.mkdir(parents=True, exist_ok=True)
+    created_at = datetime.now(UTC)
+    # Scope each sweep's ICs to its own subdirectory so multiple sweeps share
+    # one parent directory without name collisions and stale files. The hash
+    # over the config makes idempotent reruns of the same config deduplicable
+    # by inspection; the timestamp keeps two truly-different sweeps separate.
+    config_hash = hashlib.sha256(config.model_dump_json().encode()).hexdigest()[:8]
+    sweep_id = f"sweep_{config_hash}_{created_at.strftime('%Y%m%dT%H%M%S')}"
+    ic_dir = parent_ic_dir / sweep_id
 
     n_dims = len(config.parameters)
     unit = draw_unit_hypercube(
@@ -148,8 +158,9 @@ def generate_sweep(
 
     return SweepManifest(
         config=config,
-        initial_conditions_dir=str(ic_dir),
+        initial_conditions_dir=str(parent_ic_dir),
+        sweep_id=sweep_id,
         rows=rows,
-        created_at=datetime.now(UTC),
+        created_at=created_at,
         tmelandscape_version=__version__,
     )

@@ -43,11 +43,14 @@ def test_python_api_produces_expected_manifest(tmp_path: Path) -> None:
     sim_ids = [row.simulation_id for row in manifest.rows]
     assert len(set(sim_ids)) == len(sim_ids), "simulation_ids must be unique"
 
+    ic_root = manifest.ic_root()
+    assert ic_root.is_dir()
+    assert manifest.sweep_id is not None and manifest.sweep_id.startswith("sweep_")
     for row in manifest.rows:
         assert set(row.parameter_values) == {"r_exh", "r_adh"}
         assert 1e-4 <= row.parameter_values["r_exh"] <= 1e-2
         assert 0.1 <= row.parameter_values["r_adh"] <= 5.0
-        assert (ic_dir / row.ic_path).is_file()
+        assert (ic_root / row.ic_path).is_file()
 
 
 @pytest.mark.slow

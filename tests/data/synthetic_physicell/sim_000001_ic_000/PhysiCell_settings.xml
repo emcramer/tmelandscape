@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<PhysiCell_settings version="1.10.0">
+  <cell_definitions>
+    <cell_definition name="tumor" ID="0"/>
+    <cell_definition name="effector_T_cell" ID="1"/>
+    <cell_definition name="M0_macrophage" ID="2"/>
+  </cell_definitions>
+</PhysiCell_settings>

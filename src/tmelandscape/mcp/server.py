@@ -11,7 +11,7 @@ from typing import Any
 from fastmcp import FastMCP
 
 from tmelandscape import __version__
-from tmelandscape.mcp.tools import generate_sweep_tool
+from tmelandscape.mcp.tools import generate_sweep_tool, summarize_ensemble_tool
 
 mcp: FastMCP = FastMCP(
     name="tmelandscape",
@@ -32,6 +32,7 @@ def ping() -> dict[str, Any]:
 
 
 mcp.tool(generate_sweep_tool, name="generate_sweep")
+mcp.tool(summarize_ensemble_tool, name="summarize_ensemble")
 
 
 def main() -> None:

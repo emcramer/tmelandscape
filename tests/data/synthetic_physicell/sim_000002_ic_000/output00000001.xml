@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<MultiCellDS version="0.5.0">
+  <metadata>
+    <current_time units="min">60.000000</current_time>
+    <current_runtime units="sec">0.0</current_runtime>
+  </metadata>
+  <microenvironment>
+    <domain>
+      <mesh units="micron">
+        <bounding_box units="micron">0.0 0.0 0.0 100.0 100.0 0.0</bounding_box>
+      </mesh>
+    </domain>
+  </microenvironment>
+  <cellular_information>
+    <simplified_data>
+      <cell_types>
+        <type ID="0">tumor</type>
+        <type ID="1">effector_T_cell</type>
+        <type ID="2">M0_macrophage</type>
+      </cell_types>
+    </simplified_data>
+  </cellular_information>
+</MultiCellDS>

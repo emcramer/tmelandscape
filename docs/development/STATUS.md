@@ -4,38 +4,47 @@
 
 ## Current focus
 
-**Phase 2 — Step 1 sampling: complete (v0.1.0).** `tmelandscape.sampling` is implemented end-to-end (samplers, scaling, tissue_simulator wrapper, manifest persistence), exposed through Python API, CLI verb, and MCP tool. 53 tests passing (49 unit + 4 integration); docs and roadmap updated. Ready to proceed to **Phase 3 (Step 3 summarisation via `spatialtissuepy`)**.
+**Phase 3 — Step 3 summarisation: complete (v0.2.0).** spatialtissuepy is driven end-to-end across an ensemble, producing a chunked Zarr store. Three public surfaces (Python API, CLI, MCP). 115 tests passing; ruff/format/mypy/mkdocs all clean. Ready to proceed to **Phase 3.5 (Step 3.5 normalisation)** per [ADR 0006](../adr/0006-normalize-as-pipeline-step.md).
 
 ## In-flight tasks
 
-_None._ (`tasks/02-sampling-implementation.md` closed 2026-05-13.)
+_None._ (`tasks/03-summarize-implementation.md` closed 2026-05-13.)
 
-## Recently completed (Phase 2, 2026-05-13)
+## Recently completed (Phase 3, 2026-05-13)
 
-- Reconnoitred `physim-calibration` (working sampling oracle) and `tissue_simulator` (initial-condition replicates); confirmed `00/01/02_abm_*` scripts are not the sampling oracle, that lives in `/tmp/physim-calibration/code/sampling.py`.
-- Added `tissue_simulator @ git+...` to core deps with `[tool.hatch.metadata] allow-direct-references = true`.
-- Drafted `tasks/02-sampling-implementation.md` with frozen Pydantic schemas and signatures for the three streams.
-- **Delegated three parallel implementation streams** to general-purpose agents:
-  - **Stream A** (config + manifest): `src/tmelandscape/config/sweep.py`, `src/tmelandscape/sampling/manifest.py`, 20 unit tests.
-  - **Stream B** (samplers): `src/tmelandscape/sampling/lhs.py` (pyDOE3, maximin criterion), `src/tmelandscape/sampling/alternatives.py` (scipy.qmc LHS/Sobol/Halton), 22 unit tests.
-  - **Stream C** (tissue_simulator wrapper): `src/tmelandscape/sampling/tissue_init.py` — wraps `ReplicateGenerator`, monkey-patches `np.random.default_rng()` in upstream packing + tissue modules to honour the AGENTS.md seed-discipline invariant.
-- **Integrated** (orchestrator):
-  - `src/tmelandscape/sampling/__init__.py` — `draw_unit_hypercube` dispatcher + top-level `generate_sweep()`.
-  - `src/tmelandscape/cli/sample.py` + wired into `cli/main.py` (`tmelandscape sample <cfg.json>`).
-  - `src/tmelandscape/mcp/tools.py` (`generate_sweep_tool`) registered on the MCP server.
-  - `tests/integration/test_sample_end_to_end.py` — 4 tests covering Python API, CLI, MCP, and save/load round-trip.
-  - Delegated `docs/concepts/sampling.md` fill-out (160 lines).
-- Routed tissue_simulator's chatty stdout to stderr inside `generate_initial_conditions` so the CLI's JSON output is parseable.
-- Bumped version to `0.1.0` in `pyproject.toml`, `__init__.py`, `CITATION.cff`.
+- **Recon**: cloned and inspected `spatialtissuepy` (`emcramer/spatialtissuepy`, commit `c03cfa4`). Native PhysiCell parser, no `pcdl` dep. Confirmed install via `git+URL`.
+- **Added core deps**: `spatialtissuepy[network] @ git+...@c03cfa4` and `xarray>=2024.5`. Added `pandas-stubs>=2.2` to dev. Widened mypy overrides to cover `spatialtissuepy.*`, `scipy.io.*`.
+- **Drafted** `tasks/03-summarize-implementation.md` with frozen Pydantic / function-signature contracts.
+- **Buddy-pair team** (3 Implementer + 3 Reviewer agents):
+  - **Stream A** (Implementer A1 + Reviewer A2): `summarize_simulation` + synthetic PhysiCell-shaped fixture (3 sims × 3 timepoints × 21 cells, deterministic rebuild via `build.py`, 112 KB).
+  - **Stream B** (Implementer B1 + Reviewer B2): `build_ensemble_zarr` (xarray-on-zarr, chunked, NaN-filled for ragged timepoints, provenance .zattrs).
+  - **Stream C** (Implementer C1 + Reviewer C2): `SummarizeConfig` (Pydantic, validator against `KNOWN_STATISTICS`) + `registry.compute_statistic` (the only file that knows how spatialtissuepy is organised).
+- **5 RISKs surfaced by reviewers, all fixed before integration**:
+  - A1: interaction-matrix key separator (cell-type names contain underscores) → rekey to `interaction_<src>|<dst>`.
+  - A2: empty-timepoint schema drift → empty-cell timepoints emit no rows except `cell_counts`.
+  - B8: silent first-frame-wins for `time` coord → made `time` a 2D `(simulation, timepoint)` coord.
+  - B11: Zarr v3 install vs ADR 0003 v2 spec → ADR 0003 update + pytest `filterwarnings` for unstable-spec warnings.
+  - C4 / C13: `graph_radius_um` doubles as interaction radius → docstring note; ditto units (μm).
+  - C11: SummarizeConfig JSON round-trip (not just dict) → added test.
+- **Integration** (orchestrator):
+  - `src/tmelandscape/summarize/__init__.py` — top-level `summarize_ensemble`.
+  - `src/tmelandscape/cli/summarize.py` + wired into `cli/main.py` (`tmelandscape summarize`).
+  - `src/tmelandscape/mcp/tools.py` — `summarize_ensemble_tool` registered on the MCP server.
+  - `tests/integration/test_summarize_end_to_end.py` — 5 tests: Python API + CLI + MCP + missing-dir error + API↔CLI equality.
+  - `docs/concepts/summarize.md` filled in (88 lines).
+- **Phase 2 polish from audit**:
+  - Sweep-scoped IC subdirectories: `generate_sweep` now writes ICs under `<initial_conditions_dir>/sweep_<config_hash[:8]>_<timestamp>/`. `SweepManifest` gained `sweep_id` field and `ic_root()` helper. Multiple sweeps coexist without collisions; stale ICs from prior runs no longer haunt the parent dir.
+- **ADR 0008**: dependency pin policy (tag git+URL deps; move to PyPI before v1.0).
 
-**Phase 2 verification (all green):**
+**Phase 3 verification (all green):**
 
-- `uv run pytest -q` — 53 passed, 1 deselected.
+- `uv run pytest -q` — 115 passed, 1 deselected.
 - `uv run ruff check .` + `uv run ruff format --check .` — clean.
-- `uv run mypy src` — clean (30 source files, strict mode).
+- `uv run mypy src` — clean (36 source files, strict mode).
 - `uv run mkdocs build --strict` — exit 0.
-- `tmelandscape sample <cfg.json>` — works end-to-end against a real `SweepConfig`.
-- `tmelandscape-mcp` boots; `generate_sweep` tool callable via MCP.
+- `tmelandscape version` — prints `0.2.0`.
+- `tmelandscape summarize <manifest.json> --physicell-root <dir>` — end-to-end against the synthetic fixture; emits a clean JSON summary.
+- `tmelandscape-mcp` — boots; `generate_sweep` and `summarize_ensemble` tools both callable.
 
 ## Blockers
 
@@ -43,34 +52,30 @@ _None._
 
 ## Open questions (for Eric)
 
-All Phase 1 and Phase 2 questions are resolved. New ones for Phase 3:
-
-1. **`spatialtissuepy` install method.** PyPI release, git+URL, or already core dep? Mirror the `tissue_simulator` pattern (git+URL + `allow-direct-references`)?
-2. **PhysiCell-output adapter.** What's the directory layout `spatialtissuepy` expects per simulation? Single `output/` dir per sim, with the standard `output%08d.xml` + `cells_%08d.mat` files? Or is there a pre-processing step?
-3. **Synthetic fixture sizing.** For `tests/data/synthetic_physicell/`, what's the minimum shape `spatialtissuepy` will accept? (e.g., 3 timepoints × 20 cells × 3 cell types). Phase 3 needs a CI-fast fixture.
-4. **Spatial statistics selection.** Which subset of `spatialtissuepy`'s output should `tmelandscape.summarize` materialise into the ensemble Zarr by default? (cell-type composition, graph centrality, interaction frequency are mentioned in the LCSS paper; should we expose a configurable selector or hard-code the LCSS set?)
+1. **Tag `tissue_simulator` v0.1.0 and `spatialtissuepy` v0.2.0.** Per ADR 0008, both upstream repos should be tagged at the commits captured in tmelandscape v0.2.0's lockfile (`tissue_simulator @ 67becc1`, `spatialtissuepy @ c03cfa4`). Once tagged, I'll update the pyproject pins from commit SHAs to tags.
+2. **Normalisation source data.** Phase 3.5 takes the Zarr from step 3 and applies within-time-step normalisation (per ADR 0006). The reference oracle is `reference/00_abm_normalization.py`. Should the normalisation step write a _second_ Zarr (preserving the raw ensemble for re-runs) or overwrite the value array in place? My recommendation: second Zarr (or new variable in the same store), keep raw immutable.
+3. **Drop the six density columns at normalise step?** The reference drops them right before normalisation. Confirm this is where the drop should live in tmelandscape too (vs at summarize time).
 
 ## Quirks worth knowing (for the next agent)
 
-- **tissue_simulator monkey-patch.** `tmelandscape.sampling.tissue_init` patches `tissue_simulator.{packing,tissue}.np.random.default_rng` for the duration of `generate_initial_conditions` calls because upstream instantiates `default_rng()` with no argument. Scoped via `ExitStack`, doesn't leak. Worth filing an upstream issue eventually.
-- **tissue_simulator stdout.** Upstream prints progress to stdout; we redirect to stderr in our wrapper so structured stdout (CLI JSON, MCP tool returns) stays clean.
-- **`TargetStatistics.target_density`.** Upstream rejects density > 1; our wrapper clears the field after bootstrapping because the upstream estimator counts boundary cells as fully inside the tissue.
-- **pyDOE3 vs scipy.qmc.** Default sampler is `pyDOE3` (per user preference) with `criterion="maximin"`. The working physim-calibration oracle uses `scipy.stats.qmc.LatinHypercube(optimization='random-cd')` — exposed as `sampler="scipy-lhs"` for users who want byte-for-byte reproducibility against that oracle.
+- **interaction-matrix keys use `|`.** Pair keys are `interaction_<src>|<dst>` (not `_`), because cell-type names contain underscores. Stream A's test fixture uses the three types `tumor`, `effector_T_cell`, `M0_macrophage`.
+- **Empty-timepoint policy.** A timepoint with zero live cells emits only the `cell_counts` row; centrality / fraction / interaction stats are silent. Aggregator NaN-fills the resulting Zarr cells.
+- **`time` is 2D.** Coord shape is `(simulation, timepoint)`, not just `(timepoint,)`. Each sim can have its own time array at the same step index.
+- **Zarr v3 strings.** xarray writes string coords as `FixedLengthUTF32` which is pre-spec on Zarr v3. Test warnings are filtered via `pyproject.toml.[tool.pytest.ini_options].filterwarnings`. Cross-library reads (zarr.js, future zarr-python) may need to revisit.
+- **Sweep-scoped IC dirs.** `generate_sweep` now writes ICs under a `sweep_<hash>_<timestamp>/` subdirectory; manifests gained a `sweep_id` and `ic_root()` helper. The synthetic-fixture tests use `manifest.ic_root()` to find the CSVs.
+- **tissue_simulator monkey-patch.** Still in place (see Phase 2 STATUS). Once upstream fixes the unseeded `default_rng()` call, the patch can come out.
 
 ## Next agent's first actions
 
 1. Read this file + `AGENTS.md`.
-2. Confirm Open Questions 1–4 above with Eric.
-3. Open `tasks/03-summarize-implementation.md` and design Phase 3 (Step 3 summarisation). Key decisions:
-   - `spatialtissuepy` integration (similar pattern to `tissue_init.py`?)
-   - Ensemble Zarr schema (dims, coords, chunking)
-   - Synthetic PhysiCell-shaped fixture for fast CI
-4. Consider delegating Phase 3 streams analogously to Phase 2 (recon → frozen contract → parallel implementation streams → integration).
-5. Push commits + tag at end of Phase 3 (target: `v0.2.0`).
+2. Confirm Open Questions 1–3 above with Eric.
+3. Open `tasks/04-normalize-implementation.md` and design Phase 3.5 (within-time-step normalisation). Reference oracle: `reference/00_abm_normalization.py` (already in `reference/`, gitignored).
+4. Consider the same buddy-pair pattern (Implementer + Reviewer per stream). Streams might be: (a) within-time-step normalisation algorithm, (b) feature-filter (cell-density drop), (c) Zarr read-modify-write or write-new-store driver.
+5. Final verify + tag `v0.3.0` after Phase 3.5 ships.
 
 ## Last-session handoff
 
 **Session date:** 2026-05-13  
-**Agent:** Claude Code (claude-opus-4-7) orchestrator + 3 delegated general-purpose agents + 1 docs agent
+**Agent:** Claude Code (claude-opus-4-7) orchestrator + 6 buddy-pair agents (3 Implementers + 3 Reviewers) + 1 docs agent (timed out, orchestrator finished docs).
 
-Phase 2 **complete** and **verified**. Repo is ready to tag `v0.1.0` and push. Phase 3 is unblocked except for Open Questions 1–4 (spatialtissuepy install + fixture sizing).
+Phase 3 **complete** and **verified**. Repo is ready to tag `v0.2.0` and push. Phase 3.5 (normalisation) is unblocked except for Open Questions 1-3.

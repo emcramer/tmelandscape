@@ -10,6 +10,7 @@ import typer
 
 from tmelandscape import __version__
 from tmelandscape.cli.sample import sample
+from tmelandscape.cli.summarize import summarize
 
 app = typer.Typer(
     name="tmelandscape",
@@ -31,6 +32,7 @@ def version() -> None:
 
 
 app.command(name="sample")(sample)
+app.command(name="summarize")(summarize)
 
 
 if __name__ == "__main__":  # pragma: no cover

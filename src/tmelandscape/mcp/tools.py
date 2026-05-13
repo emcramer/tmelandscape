@@ -8,8 +8,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from tmelandscape.config.summarize import SummarizeConfig
 from tmelandscape.config.sweep import SweepConfig
 from tmelandscape.sampling import generate_sweep
+from tmelandscape.sampling.manifest import SweepManifest
+from tmelandscape.summarize import summarize_ensemble
 
 
 def generate_sweep_tool(
@@ -55,4 +58,56 @@ def generate_sweep_tool(
         "n_rows": len(manifest.rows),
         "n_parameter_combinations": sweep_cfg.n_parameter_samples,
         "n_initial_conditions": sweep_cfg.n_initial_conditions,
+    }
+
+
+def summarize_ensemble_tool(
+    manifest_path: str,
+    *,
+    physicell_root: str,
+    output_zarr: str,
+    summarize_config: dict[str, Any] | None = None,
+    chunk_simulations: int = 32,
+    chunk_timepoints: int = -1,
+    chunk_statistics: int = -1,
+) -> dict[str, Any]:
+    """Run step 3: spatialtissuepy summarisation + ensemble Zarr aggregation.
+
+    Parameters
+    ----------
+    manifest_path
+        Path to a SweepManifest JSON (the artefact emitted by ``generate_sweep``).
+    physicell_root
+        Directory containing one PhysiCell output subdirectory per manifest row.
+        The subdirectory name must match ``row.simulation_id``.
+    output_zarr
+        Path of the Zarr store to write.
+    summarize_config
+        Optional serialised :class:`SummarizeConfig` dict. Defaults to the
+        LCSS-paper panel.
+    chunk_simulations, chunk_timepoints, chunk_statistics
+        Per-axis Zarr chunk size; ``-1`` means "one chunk for the whole axis".
+
+    Returns
+    -------
+    dict
+        Summary with the Zarr path and the panel that was applied.
+    """
+    manifest = SweepManifest.load(manifest_path)
+    cfg = (
+        SummarizeConfig.model_validate(summarize_config) if summarize_config else SummarizeConfig()
+    )
+    zarr_path = summarize_ensemble(
+        manifest,
+        physicell_root=physicell_root,
+        output_zarr=output_zarr,
+        config=cfg,
+        chunk_simulations=chunk_simulations,
+        chunk_timepoints=chunk_timepoints,
+        chunk_statistics=chunk_statistics,
+    )
+    return {
+        "zarr_path": str(zarr_path),
+        "n_simulations": len({row.simulation_id for row in manifest.rows}),
+        "statistics": list(cfg.statistics),
     }
