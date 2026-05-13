@@ -763,10 +763,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#recently-completed-this-session-2026-05-12" class="md-nav__link">
+  <a href="#recently-completed-phase-2-2026-05-13" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Recently completed (this session, 2026-05-12)
+        Recently completed (Phase 2, 2026-05-13)
       
     </span>
   </a>
@@ -793,33 +793,16 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Open questions (for Eric)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#resolved-this-session" class="md-nav__link">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quirks-worth-knowing-for-the-next-agent" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Resolved this session
+        Quirks worth knowing (for the next agent)
       
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#still-open" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Still open
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -912,10 +895,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#recently-completed-this-session-2026-05-12" class="md-nav__link">
+  <a href="#recently-completed-phase-2-2026-05-13" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Recently completed (this session, 2026-05-12)
+        Recently completed (Phase 2, 2026-05-13)
       
     </span>
   </a>
@@ -942,33 +925,16 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Open questions (for Eric)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#resolved-this-session" class="md-nav__link">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quirks-worth-knowing-for-the-next-agent" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Resolved this session
+        Quirks worth knowing (for the next agent)
       
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#still-open" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Still open
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -1019,63 +985,68 @@
 <p>Updated at the <strong>end</strong> of every agent session. New agents read this <strong>first</strong>.</p>
 </blockquote>
 <h2 id="current-focus">Current focus<a class="headerlink" href="#current-focus" title="Permanent link">&para;</a></h2>
-<p><strong>Phase 1 — Reference audit: complete.</strong> All four architectural questions resolved; ADRs 0006 + 0007 written; <code>normalize/</code> + reshaped <code>cluster/</code> submodules scaffolded; deps added. Ready to tag <code>v0.0.1</code> and proceed to Phase 2 (sampling).</p>
+<p><strong>Phase 2 — Step 1 sampling: complete (v0.1.0).</strong> <code>tmelandscape.sampling</code> is implemented end-to-end (samplers, scaling, tissue_simulator wrapper, manifest persistence), exposed through Python API, CLI verb, and MCP tool. 53 tests passing (49 unit + 4 integration); docs and roadmap updated. Ready to proceed to <strong>Phase 3 (Step 3 summarisation via <code>spatialtissuepy</code>)</strong>.</p>
 <h2 id="in-flight-tasks">In-flight tasks<a class="headerlink" href="#in-flight-tasks" title="Permanent link">&para;</a></h2>
-<p><em>None.</em> (<code>tasks/00-reference-audit.md</code> closed 2026-05-12; see repo <code>tasks/</code> directory.)</p>
-<h2 id="recently-completed-this-session-2026-05-12">Recently completed (this session, 2026-05-12)<a class="headerlink" href="#recently-completed-this-session-2026-05-12" title="Permanent link">&para;</a></h2>
+<p><em>None.</em> (<code>tasks/02-sampling-implementation.md</code> closed 2026-05-13.)</p>
+<h2 id="recently-completed-phase-2-2026-05-13">Recently completed (Phase 2, 2026-05-13)<a class="headerlink" href="#recently-completed-phase-2-2026-05-13" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Wrote and approved the development plan.</li>
-<li>Created repo directory skeleton (<code>src/tmelandscape/{config,sampling,summarize,embedding,cluster,landscape,viz,io,cli,mcp,utils}/</code>, <code>tests/</code>, <code>docs/</code>, <code>tasks/</code>, <code>examples/</code>, <code>scripts/</code>, <code>.github/workflows/</code>).</li>
-<li>Wrote <code>pyproject.toml</code> (uv + hatchling), <code>LICENSE</code> (BSD-3-Clause), <code>CITATION.cff</code>, <code>README.md</code>, <code>.gitignore</code>, <code>.python-version</code>.</li>
-<li>Wrote <code>AGENTS.md</code> (cross-tool contract) and <code>CLAUDE.md</code> (Claude-specific stub).</li>
-<li>Wrote ADRs 0001–0005 + <code>docs/adr/README.md</code>.</li>
-<li>Scaffolded mkdocs site (<code>mkdocs.yml</code>, <code>docs/index.md</code>, <code>docs/getting-started.md</code>, <code>docs/concepts/*</code>, <code>docs/api/index.md</code>, <code>docs/tutorials/index.md</code>, <code>docs/mcp/index.md</code>).</li>
-<li>Scaffolded library entry points: <code>src/tmelandscape/__init__.py</code>, CLI (<code>tmelandscape</code> with <code>version</code> subcommand), MCP server (<code>tmelandscape-mcp</code> with <code>ping</code> tool), structlog-based logging utility.</li>
-<li>Wrote <code>scripts/fetch_example_data.py</code> (Zenodo-stub + <code>--from-local</code> mode) and <code>tests/data/example_physicell/README.md</code>.</li>
-<li>Wrote <code>.pre-commit-config.yaml</code>, <code>.github/workflows/ci.yml</code>, <code>.github/workflows/docs.yml</code>.</li>
-<li>Wrote Phase 0 smoke tests (4 passing: version constant, CLI version command, MCP server name, MCP ping).</li>
-<li>Wrote <code>tasks/README.md</code> (template for per-task work-files).</li>
+<li>Reconnoitred <code>physim-calibration</code> (working sampling oracle) and <code>tissue_simulator</code> (initial-condition replicates); confirmed <code>00/01/02_abm_*</code> scripts are not the sampling oracle, that lives in <code>/tmp/physim-calibration/code/sampling.py</code>.</li>
+<li>Added <code>tissue_simulator @ git+...</code> to core deps with <code>[tool.hatch.metadata] allow-direct-references = true</code>.</li>
+<li>Drafted <code>tasks/02-sampling-implementation.md</code> with frozen Pydantic schemas and signatures for the three streams.</li>
+<li><strong>Delegated three parallel implementation streams</strong> to general-purpose agents:</li>
+<li><strong>Stream A</strong> (config + manifest): <code>src/tmelandscape/config/sweep.py</code>, <code>src/tmelandscape/sampling/manifest.py</code>, 20 unit tests.</li>
+<li><strong>Stream B</strong> (samplers): <code>src/tmelandscape/sampling/lhs.py</code> (pyDOE3, maximin criterion), <code>src/tmelandscape/sampling/alternatives.py</code> (scipy.qmc LHS/Sobol/Halton), 22 unit tests.</li>
+<li><strong>Stream C</strong> (tissue_simulator wrapper): <code>src/tmelandscape/sampling/tissue_init.py</code> — wraps <code>ReplicateGenerator</code>, monkey-patches <code>np.random.default_rng()</code> in upstream packing + tissue modules to honour the AGENTS.md seed-discipline invariant.</li>
+<li><strong>Integrated</strong> (orchestrator):</li>
+<li><code>src/tmelandscape/sampling/__init__.py</code> — <code>draw_unit_hypercube</code> dispatcher + top-level <code>generate_sweep()</code>.</li>
+<li><code>src/tmelandscape/cli/sample.py</code> + wired into <code>cli/main.py</code> (<code>tmelandscape sample &lt;cfg.json&gt;</code>).</li>
+<li><code>src/tmelandscape/mcp/tools.py</code> (<code>generate_sweep_tool</code>) registered on the MCP server.</li>
+<li><code>tests/integration/test_sample_end_to_end.py</code> — 4 tests covering Python API, CLI, MCP, and save/load round-trip.</li>
+<li>Delegated <code>docs/concepts/sampling.md</code> fill-out (160 lines).</li>
+<li>Routed tissue_simulator's chatty stdout to stderr inside <code>generate_initial_conditions</code> so the CLI's JSON output is parseable.</li>
+<li>Bumped version to <code>0.1.0</code> in <code>pyproject.toml</code>, <code>__init__.py</code>, <code>CITATION.cff</code>.</li>
 </ul>
-<p><strong>Bootstrap verification (all green):</strong></p>
+<p><strong>Phase 2 verification (all green):</strong></p>
 <ul>
-<li><code>uv sync --all-extras</code> — succeeds.</li>
-<li><code>uv run pytest -q</code> — 4 passed, 1 deselected (<code>-m "not real"</code> excludes real-data test).</li>
-<li><code>uv run ruff check .</code> — clean.</li>
-<li><code>uv run ruff format --check .</code> — clean (21 files formatted).</li>
-<li><code>uv run mypy src</code> — clean (15 source files, strict mode).</li>
+<li><code>uv run pytest -q</code> — 53 passed, 1 deselected.</li>
+<li><code>uv run ruff check .</code> + <code>uv run ruff format --check .</code> — clean.</li>
+<li><code>uv run mypy src</code> — clean (30 source files, strict mode).</li>
 <li><code>uv run mkdocs build --strict</code> — exit 0.</li>
-<li><code>uv run tmelandscape version</code> — prints <code>0.0.1</code>.</li>
-<li><code>uv run tmelandscape-mcp</code> — boots; <code>ping()</code> returns <code>{'status': 'ok', 'version': '0.0.1'}</code>.</li>
+<li><code>tmelandscape sample &lt;cfg.json&gt;</code> — works end-to-end against a real <code>SweepConfig</code>.</li>
+<li><code>tmelandscape-mcp</code> boots; <code>generate_sweep</code> tool callable via MCP.</li>
 </ul>
 <h2 id="blockers">Blockers<a class="headerlink" href="#blockers" title="Permanent link">&para;</a></h2>
 <p><em>None.</em></p>
 <h2 id="open-questions-for-eric">Open questions (for Eric)<a class="headerlink" href="#open-questions-for-eric" title="Permanent link">&para;</a></h2>
-<h3 id="resolved-this-session">Resolved this session<a class="headerlink" href="#resolved-this-session" title="Permanent link">&para;</a></h3>
-<ul>
-<li>~~Reference scripts inventory~~ → <code>00/01/02_abm_*</code> are the landscape-generation oracles; <code>03_abm+</code> is downstream analysis. Plain <code>utils.py</code> is also required.</li>
-<li>~~Zenodo upload~~ → Live at <a href="https://doi.org/10.5281/zenodo.20148946">10.5281/zenodo.20148946</a>; fetch script downloads + MD5-verifies + extracts.</li>
-<li>~~Clustering pipeline~~ → Two-stage Leiden + Ward-on-means as default (<a href="../../adr/0007-two-stage-leiden-ward-clustering/">ADR 0007</a>).</li>
-<li>~~Normalization placement~~ → New <code>tmelandscape.normalize</code> submodule between summarize and embedding (<a href="../../adr/0006-normalize-as-pipeline-step/">ADR 0006</a>).</li>
-<li>~~Reference script format~~ → Marimo notebooks stay as the oracle in <code>reference/</code>; port relevant cells directly into <code>tmelandscape</code> modules during each phase.</li>
-<li>~~Missing dependencies~~ → <code>leidenalg</code>, <code>python-igraph</code>, <code>networkx</code>, <code>scikit-learn</code> added to core deps in <code>pyproject.toml</code>.</li>
-</ul>
-<h3 id="still-open">Still open<a class="headerlink" href="#still-open" title="Permanent link">&para;</a></h3>
+<p>All Phase 1 and Phase 2 questions are resolved. New ones for Phase 3:</p>
 <ol>
-<li><strong>Python version baseline.</strong> <code>pyproject.toml</code> requires <code>&gt;=3.11</code>; CI matrix tests 3.11 + 3.12. Confirm matches your HPC/cluster Python availability.</li>
-<li><strong>GitHub repo creation.</strong> Assumed <code>github.com/emcramer/tmelandscape</code>. Create the empty repo there so we can push the initial commit.</li>
+<li><strong><code>spatialtissuepy</code> install method.</strong> PyPI release, git+URL, or already core dep? Mirror the <code>tissue_simulator</code> pattern (git+URL + <code>allow-direct-references</code>)?</li>
+<li><strong>PhysiCell-output adapter.</strong> What's the directory layout <code>spatialtissuepy</code> expects per simulation? Single <code>output/</code> dir per sim, with the standard <code>output%08d.xml</code> + <code>cells_%08d.mat</code> files? Or is there a pre-processing step?</li>
+<li><strong>Synthetic fixture sizing.</strong> For <code>tests/data/synthetic_physicell/</code>, what's the minimum shape <code>spatialtissuepy</code> will accept? (e.g., 3 timepoints × 20 cells × 3 cell types). Phase 3 needs a CI-fast fixture.</li>
+<li><strong>Spatial statistics selection.</strong> Which subset of <code>spatialtissuepy</code>'s output should <code>tmelandscape.summarize</code> materialise into the ensemble Zarr by default? (cell-type composition, graph centrality, interaction frequency are mentioned in the LCSS paper; should we expose a configurable selector or hard-code the LCSS set?)</li>
 </ol>
+<h2 id="quirks-worth-knowing-for-the-next-agent">Quirks worth knowing (for the next agent)<a class="headerlink" href="#quirks-worth-knowing-for-the-next-agent" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>tissue_simulator monkey-patch.</strong> <code>tmelandscape.sampling.tissue_init</code> patches <code>tissue_simulator.{packing,tissue}.np.random.default_rng</code> for the duration of <code>generate_initial_conditions</code> calls because upstream instantiates <code>default_rng()</code> with no argument. Scoped via <code>ExitStack</code>, doesn't leak. Worth filing an upstream issue eventually.</li>
+<li><strong>tissue_simulator stdout.</strong> Upstream prints progress to stdout; we redirect to stderr in our wrapper so structured stdout (CLI JSON, MCP tool returns) stays clean.</li>
+<li><strong><code>TargetStatistics.target_density</code>.</strong> Upstream rejects density &gt; 1; our wrapper clears the field after bootstrapping because the upstream estimator counts boundary cells as fully inside the tissue.</li>
+<li><strong>pyDOE3 vs scipy.qmc.</strong> Default sampler is <code>pyDOE3</code> (per user preference) with <code>criterion="maximin"</code>. The working physim-calibration oracle uses <code>scipy.stats.qmc.LatinHypercube(optimization='random-cd')</code> — exposed as <code>sampler="scipy-lhs"</code> for users who want byte-for-byte reproducibility against that oracle.</li>
+</ul>
 <h2 id="next-agents-first-actions">Next agent's first actions<a class="headerlink" href="#next-agents-first-actions" title="Permanent link">&para;</a></h2>
 <ol>
 <li>Read this file + <code>AGENTS.md</code>.</li>
-<li>Confirm with Eric on the four new open questions (Q3–Q6 above).</li>
-<li>If Q3 (clustering pipeline) confirms Leiden+Ward, write ADRs 0006 (normalization step) and 0007 (two-stage clustering), then revise the development plan and the <code>cluster/</code> submodule layout.</li>
-<li>Initialise git and commit Phase 0 + Phase 1 (reference audit) as the first commits. Tag <code>v0.0.1</code>.</li>
-<li>Once GitHub repo exists (Q2), push.</li>
+<li>Confirm Open Questions 1–4 above with Eric.</li>
+<li>Open <code>tasks/03-summarize-implementation.md</code> and design Phase 3 (Step 3 summarisation). Key decisions:</li>
+<li><code>spatialtissuepy</code> integration (similar pattern to <code>tissue_init.py</code>?)</li>
+<li>Ensemble Zarr schema (dims, coords, chunking)</li>
+<li>Synthetic PhysiCell-shaped fixture for fast CI</li>
+<li>Consider delegating Phase 3 streams analogously to Phase 2 (recon → frozen contract → parallel implementation streams → integration).</li>
+<li>Push commits + tag at end of Phase 3 (target: <code>v0.2.0</code>).</li>
 </ol>
 <h2 id="last-session-handoff">Last-session handoff<a class="headerlink" href="#last-session-handoff" title="Permanent link">&para;</a></h2>
-<p><strong>Session date:</strong> 2026-05-12<br />
-<strong>Agent:</strong> Claude Code (claude-opus-4-7)</p>
-<p>Bootstrap is <strong>complete</strong> and <strong>verified</strong>. All Phase-0 exit criteria met. Phase 1 is unblocked except for Open Q #2 (reference scripts inventory).</p>
+<p><strong>Session date:</strong> 2026-05-13<br />
+<strong>Agent:</strong> Claude Code (claude-opus-4-7) orchestrator + 3 delegated general-purpose agents + 1 docs agent</p>
+<p>Phase 2 <strong>complete</strong> and <strong>verified</strong>. Repo is ready to tag <code>v0.1.0</code> and push. Phase 3 is unblocked except for Open Questions 1–4 (spatialtissuepy install + fixture sizing).</p>
 
 
 

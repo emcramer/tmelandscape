@@ -391,6 +391,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concept: parameter sampling (step 1)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -407,6 +425,102 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-gets-sampled" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What gets sampled
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sampler-backends" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sampler backends
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#initial-condition-replicates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Initial-condition replicates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-sweep-manifest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The sweep manifest
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-not-in-step-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's not in step 1
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -741,6 +855,91 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-gets-sampled" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What gets sampled
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sampler-backends" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sampler backends
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#initial-condition-replicates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Initial-condition replicates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-sweep-manifest" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The sweep manifest
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-not-in-step-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's not in step 1
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -760,11 +959,201 @@
 
 
 <h1 id="concept-parameter-sampling-step-1">Concept: parameter sampling (step 1)<a class="headerlink" href="#concept-parameter-sampling-step-1" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p><em>Placeholder — will be filled in during Phase 2.</em></p>
-</blockquote>
-<p>Step 1 of the pipeline samples the ABM parameter space and pairs each combination with initial cell positions from <a href="https://github.com/emcramer/tissue_simulator"><code>tissue_simulator</code></a>. The output is a <strong>sweep manifest</strong> that the external simulation runner consumes.</p>
-<p>Default sampler: Latin Hypercube (<code>pyDOE3</code>). Alternatives: Sobol, Halton (via <code>scipy.stats.qmc</code>).</p>
+<p>Step 1 draws a low-discrepancy sample of ABM parameter combinations and
+pairs each combination with a small bank of spatially comparable initial
+conditions. The output is a single <strong>sweep manifest</strong> (JSON + Parquet)
+that the external step-2 (PhysiCell-running) agent consumes — one row per
+simulation it needs to run.</p>
+<h2 id="what-gets-sampled">What gets sampled<a class="headerlink" href="#what-gets-sampled" title="Permanent link">&para;</a></h2>
+<p>Sampling is a two-stage process:</p>
+<ol>
+<li><strong>Unit-hypercube draw.</strong> The chosen backend produces an
+   <code>(n_parameter_samples, n_dims)</code> array of points in <code>[0, 1]^d</code>, where
+   <code>d</code> is the number of <code>ParameterSpec</code> entries in the config.</li>
+<li><strong>Per-parameter scaling.</strong> Each column <code>u</code> is mapped into the
+   parameter's <code>[low, high]</code> bounds using the spec's <code>scale</code>:</li>
+<li><code>scale="linear"</code>: <code>value = low + u * (high - low)</code>.</li>
+<li><code>scale="log10"</code>: <code>value = 10 ** (log10(low) + u * (log10(high) - log10(low)))</code>.</li>
+</ol>
+<p>Log scaling is the right choice for parameters that span orders of
+magnitude (rate constants, concentrations).</p>
+<p><strong>Worked example.</strong> A spec
+<code>ParameterSpec(name="r_exh", low=1e-4, high=1e-2, scale="log10")</code>
+maps unit values as follows:</p>
+<table>
+<thead>
+<tr>
+<th><code>u</code></th>
+<th>scaled value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.0</td>
+<td>1.0e-4</td>
+</tr>
+<tr>
+<td>0.5</td>
+<td>1.0e-3</td>
+</tr>
+<tr>
+<td>1.0</td>
+<td>1.0e-2</td>
+</tr>
+</tbody>
+</table>
+<p>Each row's distance is uniform in <code>log10</code> space, so the sample covers
+all three decades evenly rather than crowding into the upper one.</p>
+<h2 id="sampler-backends">Sampler backends<a class="headerlink" href="#sampler-backends" title="Permanent link">&para;</a></h2>
+<p>Set <code>SweepConfig.sampler</code> to one of:</p>
+<table>
+<thead>
+<tr>
+<th>Backend</th>
+<th>When to pick it</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pyDOE3</code></td>
+<td>Default. Classic Latin Hypercube; matches the reference scripts and the LCSS manuscript's methodology.</td>
+</tr>
+<tr>
+<td><code>scipy-lhs</code></td>
+<td>LHS with <code>scipy.stats.qmc.LatinHypercube</code> (centred / strength-2 variants available upstream).</td>
+</tr>
+<tr>
+<td><code>scipy-sobol</code></td>
+<td>Low-discrepancy quasi-random sequence. Best for very high <code>n_parameter_samples</code> with <code>d &lt;= 21</code>.</td>
+</tr>
+<tr>
+<td><code>scipy-halton</code></td>
+<td>Alternative quasi-random sequence. Cheap and deterministic; fine for small sweeps and quick sanity checks.</td>
+</tr>
+</tbody>
+</table>
+<p>All four backends are seeded from <code>SweepConfig.seed</code>; the same seed and
+backend always yield the same draw.</p>
+<h2 id="initial-condition-replicates">Initial-condition replicates<a class="headerlink" href="#initial-condition-replicates" title="Permanent link">&para;</a></h2>
+<p>Every parameter combination is paired with <code>n_initial_conditions</code>
+<strong>spatially comparable</strong> starting tissues, generated by
+<a href="https://github.com/emcramer/tissue_simulator"><code>tissue_simulator.ReplicateGenerator</code></a>. The generator first packs a
+bootstrap tissue, then resamples replicates until each one's pairwise
+spatial-interaction statistics fall within <code>similarity_tolerance</code>
+(~10% by default) of the bootstrap.</p>
+<p>Why this matters: the LCSS manuscript constrains initial conditions to
+"preserve comparable spatial organization, ensuring that trajectory
+differences reflected parameter effects rather than spatial artefacts
+introduced by initial conditions." Without this constraint, two
+simulations under the same parameter combination could diverge simply
+because their starting tissues were structurally different — and the
+landscape would conflate parameter sensitivity with spatial noise.</p>
+<div class="admonition note">
+<p class="admonition-title">Reproducibility patch</p>
+<p>Upstream <code>tissue_simulator</code> instantiates <code>numpy.random.default_rng()</code>
+with no argument inside its packer and tissue classes, so it ignores
+the seed passed into <code>ReplicateGenerator</code>. <code>generate_initial_conditions</code>
+monkey-patches those call sites for the duration of the call with a
+<code>SeedSequence</code>-derived wrapper, so the whole sweep is reproducible
+from a single integer seed. See the docstring on
+<code>tmelandscape.sampling.tissue_init</code> for the full mechanism.</p>
+</div>
+<p>The generator writes one CSV per replicate
+(<code>ic_0000.csv</code>, <code>ic_0001.csv</code>, ...) with columns
+<code>x, y, z, radius, cell_type, is_boundary</code>, into the
+<code>initial_conditions_dir</code> passed to <code>generate_sweep</code>.</p>
+<h2 id="the-sweep-manifest">The sweep manifest<a class="headerlink" href="#the-sweep-manifest" title="Permanent link">&para;</a></h2>
+<p><code>SweepManifest.save(stem)</code> writes two sibling files:</p>
+<ul>
+<li><strong><code>&lt;stem&gt;.json</code></strong> — full Pydantic dump: the originating <code>SweepConfig</code>,
+  the <code>initial_conditions_dir</code>, every <code>SweepRow</code>, the creation timestamp,
+  and the <code>tmelandscape</code> version that produced it. This is the canonical
+  artefact and the only one <code>SweepManifest.load</code> reads.</li>
+<li><strong><code>&lt;stem&gt;.parquet</code></strong> — the rows table only, flattened so each
+  parameter becomes its own <code>float64</code> column. Provided for cheap
+  downstream analytics (pandas, DuckDB, Polars). The schema is fixed
+  even when <code>rows</code> is empty.</li>
+</ul>
+<p>The Parquet columns are:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>simulation_id</code></td>
+<td>string</td>
+<td>Unique id, e.g. <code>sim_000042_ic_007</code>.</td>
+</tr>
+<tr>
+<td><code>parameter_combination_id</code></td>
+<td>int64</td>
+<td>Index into the parameter-combination set (<code>0 .. n_parameter_samples</code>).</td>
+</tr>
+<tr>
+<td><code>ic_id</code></td>
+<td>int64</td>
+<td>Index of the IC replicate (<code>0 .. n_initial_conditions</code>).</td>
+</tr>
+<tr>
+<td><code>ic_path</code></td>
+<td>string</td>
+<td>Relative path of the IC CSV under <code>initial_conditions_dir</code>.</td>
+</tr>
+<tr>
+<td><em>one per parameter</em></td>
+<td>float64</td>
+<td>Scaled parameter value for this row.</td>
+</tr>
+</tbody>
+</table>
+<p>Total row count is <code>n_parameter_samples * n_initial_conditions</code> — the
+full Cartesian product. This Parquet file is what the external step-2
+agent reads to enumerate the simulations it needs to run.</p>
+<h2 id="code-example">Code example<a class="headerlink" href="#code-example" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tmelandscape.config.sweep</span><span class="w"> </span><span class="kn">import</span> <span class="n">ParameterSpec</span><span class="p">,</span> <span class="n">SweepConfig</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tmelandscape.sampling</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_sweep</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="n">config</span> <span class="o">=</span> <span class="n">SweepConfig</span><span class="p">(</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="n">parameters</span><span class="o">=</span><span class="p">[</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        <span class="n">ParameterSpec</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;r_exh&quot;</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">1e-2</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="s2">&quot;log10&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="n">ParameterSpec</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;r_kill&quot;</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">1e-1</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="s2">&quot;log10&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        <span class="n">ParameterSpec</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;t_div_hours&quot;</span><span class="p">,</span> <span class="n">low</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">48.0</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">),</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="p">],</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    <span class="n">n_parameter_samples</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    <span class="n">n_initial_conditions</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>    <span class="n">sampler</span><span class="o">=</span><span class="s2">&quot;pyDOE3&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>    <span class="n">seed</span><span class="o">=</span><span class="mi">20260513</span><span class="p">,</span>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="p">)</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="n">manifest</span> <span class="o">=</span> <span class="n">generate_sweep</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">initial_conditions_dir</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;ics&quot;</span><span class="p">))</span>
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="n">manifest</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;sweep_manifest&quot;</span><span class="p">)</span>  <span class="c1"># writes sweep_manifest.json + .parquet</span>
+</code></pre></div>
+<p>This yields 15 rows (<code>5 * 3</code>), 3 CSVs under <code>ics/</code>, and the manifest
+pair next to the working directory.</p>
+<h2 id="cli">CLI<a class="headerlink" href="#cli" title="Permanent link">&para;</a></h2>
+<p>The same call from the shell:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>tmelandscape<span class="w"> </span>sample<span class="w"> </span>sweep_config.json<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span>--manifest-out<span class="w"> </span>sweep_manifest<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">    </span>--ic-dir<span class="w"> </span>ics<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">    </span>--target-n-cells<span class="w"> </span><span class="m">500</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span>--similarity-tolerance<span class="w"> </span><span class="m">0</span>.10
+</code></pre></div>
+<p><code>sweep_config.json</code> is a JSON dump of a <code>SweepConfig</code>. The command
+prints a JSON summary (manifest paths, row count, IC count) on stdout.</p>
+<h2 id="whats-not-in-step-1">What's <em>not</em> in step 1<a class="headerlink" href="#whats-not-in-step-1" title="Permanent link">&para;</a></h2>
+<p>Step 1 stops at the manifest. <strong>Running the PhysiCell simulations
+listed in it is the external step 2</strong>, which is intentionally out of
+scope for <code>tmelandscape</code> (see the <a href="../../development/ROADMAP/">roadmap</a>).
+The manifest is the contract: hand the JSON + Parquet pair plus the IC
+directory to the simulation runner, and step 3 picks back up from the
+resulting PhysiCell output directories.</p>
 
 
 

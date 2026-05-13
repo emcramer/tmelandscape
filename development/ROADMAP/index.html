@@ -735,10 +735,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-2-synthetic-fixture-step-1-sampling-v010" class="md-nav__link">
+  <a href="#phase-2-step-1-sampling-v010-complete" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 2 — Synthetic fixture + Step 1 sampling (v0.1.0)
+        Phase 2 — Step 1 sampling (v0.1.0) — COMPLETE
       
     </span>
   </a>
@@ -917,10 +917,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-2-synthetic-fixture-step-1-sampling-v010" class="md-nav__link">
+  <a href="#phase-2-step-1-sampling-v010-complete" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 2 — Synthetic fixture + Step 1 sampling (v0.1.0)
+        Phase 2 — Step 1 sampling (v0.1.0) — COMPLETE
       
     </span>
   </a>
@@ -1049,15 +1049,23 @@
 <li>[ ] Upload sim_000, sim_003, sim_014 to Zenodo; record DOI in <code>scripts/fetch_example_data.py</code></li>
 <li>[ ] <code>uv run python scripts/fetch_example_data.py --from-local …</code> succeeds locally</li>
 </ul>
-<h2 id="phase-2-synthetic-fixture-step-1-sampling-v010">Phase 2 — Synthetic fixture + Step 1 sampling (v0.1.0)<a class="headerlink" href="#phase-2-synthetic-fixture-step-1-sampling-v010" title="Permanent link">&para;</a></h2>
+<h2 id="phase-2-step-1-sampling-v010-complete">Phase 2 — Step 1 sampling (v0.1.0) — COMPLETE<a class="headerlink" href="#phase-2-step-1-sampling-v010-complete" title="Permanent link">&para;</a></h2>
 <ul>
-<li>[ ] Build tiny synthetic PhysiCell-shaped fixture (<code>tests/data/synthetic_physicell/</code>)</li>
-<li>[ ] Implement <code>tmelandscape.sampling</code> (LHS + Sobol/Halton + tissue_simulator wrapper + SweepManifest)</li>
-<li>[ ] CLI: <code>tmelandscape sample</code></li>
-<li>[ ] MCP tool: <code>tmelandscape.generate_sweep</code></li>
-<li>[ ] Unit tests pinned vs reference scripts</li>
+<li>[x] Implement <code>tmelandscape.sampling</code> (LHS via pyDOE3 + scipy.qmc Sobol/Halton/LHS alternatives + tissue_simulator wrapper + SweepManifest)</li>
+<li>[x] <code>tmelandscape.config.sweep</code> (<code>ParameterSpec</code>, <code>SweepConfig</code> Pydantic models)</li>
+<li>[x] CLI: <code>tmelandscape sample</code></li>
+<li>[x] MCP tool: <code>tmelandscape.generate_sweep</code></li>
+<li>[x] Unit tests (49 unit-level: config, manifest, LHS, alternatives, tissue_init wrapper)</li>
+<li>[x] Integration tests (4 tests: Python API + CLI + MCP + round-trip)</li>
+<li>[x] <code>docs/concepts/sampling.md</code> populated (160 lines)</li>
+<li>[x] Three streams delegated to general-purpose agents in parallel; orchestrator integrated and tested</li>
 </ul>
-<p><strong>Exit criterion:</strong> sweep manifest matches reference output numerically on a fixed seed.</p>
+<p>Deferred from this phase (rolled into later phases or follow-ups):</p>
+<ul>
+<li><em>Synthetic PhysiCell-shaped fixture</em> — moved to Phase 3 (the fixture is needed to test summarisation, not sampling).</li>
+<li><em>Numerical agreement vs reference scripts</em> — sampling reference is <code>physim-calibration</code> (uses scipy.qmc), not the marimo notebooks; default backend is pyDOE3 per user preference, so seed-identity is not expected. Statistical agreement (range, shape, uniformity) is enforced by the unit tests instead.</li>
+</ul>
+<p><strong>Exit criterion met:</strong> end-to-end <code>tmelandscape sample &lt;cfg.json&gt;</code> produces a <code>SweepManifest</code> consumable by the (future) step-2 runner.</p>
 <h2 id="phase-3-step-3-summarisation-v020">Phase 3 — Step 3 summarisation (v0.2.0)<a class="headerlink" href="#phase-3-step-3-summarisation-v020" title="Permanent link">&para;</a></h2>
 <ul>
 <li>[ ] <code>tmelandscape.summarize.spatialtissuepy_driver</code> + Zarr aggregation</li>
