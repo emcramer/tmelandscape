@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from importlib.metadata import version as _installed_version
+
 from typer.testing import CliRunner
 
 import tmelandscape
@@ -9,9 +11,9 @@ from tmelandscape.cli.main import app
 from tmelandscape.mcp.server import mcp, ping
 
 
-def test_version_is_a_string() -> None:
+def test_version_agrees_with_installed_metadata() -> None:
     assert isinstance(tmelandscape.__version__, str)
-    assert tmelandscape.__version__ == "0.1.0"
+    assert tmelandscape.__version__ == _installed_version("tmelandscape")
 
 
 def test_cli_version_command() -> None:

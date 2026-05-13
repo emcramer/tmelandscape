@@ -26,12 +26,6 @@ from typing import Any
 from unittest.mock import patch
 
 import numpy as np
-import tissue_simulator  # type: ignore[import-untyped]
-from tissue_simulator import (
-    ReplicateGenerator,
-    TissueSection,
-    load_target_statistics_from_tissue,
-)
 
 
 def _seeded_default_rng_factory(
@@ -113,6 +107,23 @@ def generate_initial_conditions(
     """
     if n_replicates <= 0:
         raise ValueError(f"n_replicates must be positive, got {n_replicates}")
+
+    # Defer the tissue_simulator imports so an upstream API change (renamed
+    # submodule, missing symbol) raises an informative error from this function
+    # rather than breaking `import tmelandscape` at module-load time.
+    try:
+        import tissue_simulator
+        from tissue_simulator import (
+            ReplicateGenerator,
+            TissueSection,
+            load_target_statistics_from_tissue,
+        )
+    except ImportError as exc:  # pragma: no cover - exercised only on upstream drift
+        raise ImportError(
+            "tissue_simulator is required for generate_initial_conditions; install with "
+            "`uv sync` (it is a core dep pinned via git+URL in pyproject.toml). "
+            f"Underlying error: {exc}"
+        ) from exc
 
     out = Path(output_dir).resolve()
     out.mkdir(parents=True, exist_ok=True)

@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field, ValidationInfo, field_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
 
 
 class ParameterSpec(BaseModel):
@@ -30,6 +30,16 @@ class ParameterSpec(BaseModel):
         if "low" in info.data and v <= info.data["low"]:
             raise ValueError("high must be strictly greater than low")
         return v
+
+    @model_validator(mode="after")
+    def _log10_bounds_positive(self) -> ParameterSpec:
+        # log10 of a non-positive number is -inf / NaN and silently corrupts the
+        # scaled samples downstream in `tmelandscape.sampling._scale`.
+        if self.scale == "log10" and (self.low <= 0 or self.high <= 0):
+            raise ValueError(
+                f"scale='log10' requires low > 0 and high > 0; got low={self.low}, high={self.high}"
+            )
+        return self
 
 
 class SweepConfig(BaseModel):

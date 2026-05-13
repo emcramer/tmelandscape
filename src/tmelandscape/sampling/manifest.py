@@ -14,7 +14,7 @@ version). Persistence is dual:
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -28,6 +28,10 @@ from tmelandscape.config.sweep import SweepConfig
 
 def _default_version() -> str:
     return tmelandscape.__version__
+
+
+def _utc_now() -> datetime:
+    return datetime.now(UTC)
 
 
 class SweepRow(BaseModel):
@@ -52,7 +56,7 @@ class SweepManifest(BaseModel):
         description="Path containing IC CSVs, relative to manifest file.",
     )
     rows: list[SweepRow]
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=_utc_now)
     tmelandscape_version: str = Field(default_factory=_default_version)
 
     def save(self, path: str | Path) -> None:

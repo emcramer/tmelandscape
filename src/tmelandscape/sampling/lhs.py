@@ -29,10 +29,14 @@ def lhs_unit_hypercube(n_samples: int, n_dims: int, seed: int) -> np.ndarray:
         Array of shape ``(n_samples, n_dims)`` with values in ``[0, 1]``.
     """
     rng = np.random.default_rng(seed)
+    # The maximin criterion maximises minimum pairwise distance; it requires
+    # at least 2 points to have a pairwise distance to optimise. Fall back to
+    # an un-optimised draw for the degenerate n=1 case (still a valid LHS).
+    criterion = "maximin" if n_samples >= 2 else None
     samples: np.ndarray = lhs(
         n_dims,
         samples=n_samples,
-        criterion="maximin",
+        criterion=criterion,
         seed=rng,
     )
     return samples

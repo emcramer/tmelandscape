@@ -10,7 +10,7 @@ from __future__ import annotations
 import warnings
 
 import numpy as np
-from scipy.stats import qmc  # type: ignore[import-untyped]
+from scipy.stats import qmc
 
 
 def scipy_lhs_unit_hypercube(n_samples: int, n_dims: int, seed: int) -> np.ndarray:

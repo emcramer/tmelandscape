@@ -17,8 +17,10 @@ mcp: FastMCP = FastMCP(
     name="tmelandscape",
     instructions=(
         "Tumor microenvironment state-landscape generation. "
-        "v0.1.0 (Phase 2): step 1 (parameter sampling) is available; "
-        "summarize/normalize/embed/cluster land in later phases."
+        "Available tools: ping (health check), generate_sweep (step 1 — "
+        "parameter sampling + IC replicate generation). Step 3 "
+        "(spatialtissuepy summarisation), normalize, embed, cluster land in "
+        "later releases."
     ),
 )
 

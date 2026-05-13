@@ -34,3 +34,12 @@ def test_different_seeds_produce_different_samples() -> None:
     a = lhs_unit_hypercube(n_samples=50, n_dims=3, seed=1)
     b = lhs_unit_hypercube(n_samples=50, n_dims=3, seed=2)
     assert not np.array_equal(a, b)
+
+
+def test_degenerate_n_samples_one() -> None:
+    # Regression: pyDOE3 with criterion="maximin" needs >= 2 points to optimise;
+    # the degenerate n=1 case used to crash with a numpy reduction error.
+    samples = lhs_unit_hypercube(n_samples=1, n_dims=3, seed=42)
+    assert samples.shape == (1, 3)
+    assert samples.min() >= 0.0
+    assert samples.max() <= 1.0

@@ -36,6 +36,21 @@ class TestParameterSpec:
         assert ParameterSpec(name="foo", low=0.1, high=1.0, scale="linear").scale == "linear"
         assert ParameterSpec(name="foo", low=0.1, high=1.0, scale="log10").scale == "log10"
 
+    def test_log10_rejects_nonpositive_low(self) -> None:
+        # Regression: log10 of 0 or negative silently produced NaN downstream.
+        with pytest.raises(ValidationError, match="log10"):
+            ParameterSpec(name="foo", low=0.0, high=1.0, scale="log10")
+        with pytest.raises(ValidationError, match="log10"):
+            ParameterSpec(name="foo", low=-1e-4, high=1.0, scale="log10")
+
+    def test_log10_accepts_strictly_positive_bounds(self) -> None:
+        spec = ParameterSpec(name="foo", low=1e-6, high=1.0, scale="log10")
+        assert spec.scale == "log10"
+
+    def test_linear_still_allows_nonpositive_low(self) -> None:
+        spec = ParameterSpec(name="foo", low=-1.0, high=1.0, scale="linear")
+        assert spec.low == -1.0
+
     def test_scale_rejects_other_strings(self) -> None:
         with pytest.raises(ValidationError):
             ParameterSpec(name="foo", low=0.1, high=1.0, scale="logarithmic")  # type: ignore[arg-type]

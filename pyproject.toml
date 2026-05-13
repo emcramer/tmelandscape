@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tmelandscape"
-version = "0.1.0"
+version = "0.1.1"
 description = "Generate tumor microenvironment state landscapes from agent-based model simulation ensembles."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -144,7 +144,7 @@ disallow_untyped_decorators = false
 plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
-module = ["pyDOE3.*", "umap.*", "zarr.*"]
+module = ["pyDOE3.*", "umap.*", "zarr.*", "tissue_simulator.*", "scipy.stats.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
