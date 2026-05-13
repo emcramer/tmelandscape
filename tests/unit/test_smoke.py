@@ -11,7 +11,7 @@ from tmelandscape.mcp.server import mcp, ping
 
 def test_version_is_a_string() -> None:
     assert isinstance(tmelandscape.__version__, str)
-    assert tmelandscape.__version__ == "0.0.1"
+    assert tmelandscape.__version__ == "0.1.0"
 
 
 def test_cli_version_command() -> None:

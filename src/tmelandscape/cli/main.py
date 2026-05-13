@@ -9,6 +9,7 @@ from __future__ import annotations
 import typer
 
 from tmelandscape import __version__
+from tmelandscape.cli.sample import sample
 
 app = typer.Typer(
     name="tmelandscape",
@@ -27,6 +28,9 @@ def _root() -> None:
 def version() -> None:
     """Print the tmelandscape version."""
     typer.echo(__version__)
+
+
+app.command(name="sample")(sample)
 
 
 if __name__ == "__main__":  # pragma: no cover

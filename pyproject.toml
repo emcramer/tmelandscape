@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tmelandscape"
-version = "0.0.1"
+version = "0.1.0"
 description = "Generate tumor microenvironment state landscapes from agent-based model simulation ensembles."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -42,6 +42,10 @@ dependencies = [
     "leidenalg>=0.10",
     "python-igraph>=0.11",
     "networkx>=3.3",
+    # Initial-condition generation: replicates of cell starting positions
+    # with similar spatial statistics (~10% error per metric).
+    # No PyPI release; installed from GitHub. Pin a commit/tag before v1.0.
+    "tissue_simulator @ git+https://github.com/emcramer/tissue_simulator.git",
 ]
 
 [project.optional-dependencies]
@@ -82,6 +86,11 @@ Issues = "https://github.com/emcramer/tmelandscape/issues"
 [project.scripts]
 tmelandscape = "tmelandscape.cli.main:app"
 tmelandscape-mcp = "tmelandscape.mcp.server:main"
+
+[tool.hatch.metadata]
+# Required so the `tissue_simulator @ git+https://...` core dep is accepted by
+# hatchling. Drop this once tissue_simulator is on PyPI.
+allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/tmelandscape"]

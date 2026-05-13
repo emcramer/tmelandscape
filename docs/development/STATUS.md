@@ -4,36 +4,38 @@
 
 ## Current focus
 
-**Phase 1 — Reference audit: complete.** All four architectural questions resolved; ADRs 0006 + 0007 written; `normalize/` + reshaped `cluster/` submodules scaffolded; deps added. Ready to tag `v0.0.1` and proceed to Phase 2 (sampling).
+**Phase 2 — Step 1 sampling: complete (v0.1.0).** `tmelandscape.sampling` is implemented end-to-end (samplers, scaling, tissue_simulator wrapper, manifest persistence), exposed through Python API, CLI verb, and MCP tool. 53 tests passing (49 unit + 4 integration); docs and roadmap updated. Ready to proceed to **Phase 3 (Step 3 summarisation via `spatialtissuepy`)**.
 
 ## In-flight tasks
 
-_None._ (`tasks/00-reference-audit.md` closed 2026-05-12; see repo `tasks/` directory.)
+_None._ (`tasks/02-sampling-implementation.md` closed 2026-05-13.)
 
-## Recently completed (this session, 2026-05-12)
+## Recently completed (Phase 2, 2026-05-13)
 
-- Wrote and approved the development plan.
-- Created repo directory skeleton (`src/tmelandscape/{config,sampling,summarize,embedding,cluster,landscape,viz,io,cli,mcp,utils}/`, `tests/`, `docs/`, `tasks/`, `examples/`, `scripts/`, `.github/workflows/`).
-- Wrote `pyproject.toml` (uv + hatchling), `LICENSE` (BSD-3-Clause), `CITATION.cff`, `README.md`, `.gitignore`, `.python-version`.
-- Wrote `AGENTS.md` (cross-tool contract) and `CLAUDE.md` (Claude-specific stub).
-- Wrote ADRs 0001–0005 + `docs/adr/README.md`.
-- Scaffolded mkdocs site (`mkdocs.yml`, `docs/index.md`, `docs/getting-started.md`, `docs/concepts/*`, `docs/api/index.md`, `docs/tutorials/index.md`, `docs/mcp/index.md`).
-- Scaffolded library entry points: `src/tmelandscape/__init__.py`, CLI (`tmelandscape` with `version` subcommand), MCP server (`tmelandscape-mcp` with `ping` tool), structlog-based logging utility.
-- Wrote `scripts/fetch_example_data.py` (Zenodo-stub + `--from-local` mode) and `tests/data/example_physicell/README.md`.
-- Wrote `.pre-commit-config.yaml`, `.github/workflows/ci.yml`, `.github/workflows/docs.yml`.
-- Wrote Phase 0 smoke tests (4 passing: version constant, CLI version command, MCP server name, MCP ping).
-- Wrote `tasks/README.md` (template for per-task work-files).
+- Reconnoitred `physim-calibration` (working sampling oracle) and `tissue_simulator` (initial-condition replicates); confirmed `00/01/02_abm_*` scripts are not the sampling oracle, that lives in `/tmp/physim-calibration/code/sampling.py`.
+- Added `tissue_simulator @ git+...` to core deps with `[tool.hatch.metadata] allow-direct-references = true`.
+- Drafted `tasks/02-sampling-implementation.md` with frozen Pydantic schemas and signatures for the three streams.
+- **Delegated three parallel implementation streams** to general-purpose agents:
+  - **Stream A** (config + manifest): `src/tmelandscape/config/sweep.py`, `src/tmelandscape/sampling/manifest.py`, 20 unit tests.
+  - **Stream B** (samplers): `src/tmelandscape/sampling/lhs.py` (pyDOE3, maximin criterion), `src/tmelandscape/sampling/alternatives.py` (scipy.qmc LHS/Sobol/Halton), 22 unit tests.
+  - **Stream C** (tissue_simulator wrapper): `src/tmelandscape/sampling/tissue_init.py` — wraps `ReplicateGenerator`, monkey-patches `np.random.default_rng()` in upstream packing + tissue modules to honour the AGENTS.md seed-discipline invariant.
+- **Integrated** (orchestrator):
+  - `src/tmelandscape/sampling/__init__.py` — `draw_unit_hypercube` dispatcher + top-level `generate_sweep()`.
+  - `src/tmelandscape/cli/sample.py` + wired into `cli/main.py` (`tmelandscape sample <cfg.json>`).
+  - `src/tmelandscape/mcp/tools.py` (`generate_sweep_tool`) registered on the MCP server.
+  - `tests/integration/test_sample_end_to_end.py` — 4 tests covering Python API, CLI, MCP, and save/load round-trip.
+  - Delegated `docs/concepts/sampling.md` fill-out (160 lines).
+- Routed tissue_simulator's chatty stdout to stderr inside `generate_initial_conditions` so the CLI's JSON output is parseable.
+- Bumped version to `0.1.0` in `pyproject.toml`, `__init__.py`, `CITATION.cff`.
 
-**Bootstrap verification (all green):**
+**Phase 2 verification (all green):**
 
-- `uv sync --all-extras` — succeeds.
-- `uv run pytest -q` — 4 passed, 1 deselected (`-m "not real"` excludes real-data test).
-- `uv run ruff check .` — clean.
-- `uv run ruff format --check .` — clean (21 files formatted).
-- `uv run mypy src` — clean (15 source files, strict mode).
+- `uv run pytest -q` — 53 passed, 1 deselected.
+- `uv run ruff check .` + `uv run ruff format --check .` — clean.
+- `uv run mypy src` — clean (30 source files, strict mode).
 - `uv run mkdocs build --strict` — exit 0.
-- `uv run tmelandscape version` — prints `0.0.1`.
-- `uv run tmelandscape-mcp` — boots; `ping()` returns `{'status': 'ok', 'version': '0.0.1'}`.
+- `tmelandscape sample <cfg.json>` — works end-to-end against a real `SweepConfig`.
+- `tmelandscape-mcp` boots; `generate_sweep` tool callable via MCP.
 
 ## Blockers
 
@@ -41,31 +43,34 @@ _None._
 
 ## Open questions (for Eric)
 
-### Resolved this session
+All Phase 1 and Phase 2 questions are resolved. New ones for Phase 3:
 
-- ~~Reference scripts inventory~~ → `00/01/02_abm_*` are the landscape-generation oracles; `03_abm+` is downstream analysis. Plain `utils.py` is also required.
-- ~~Zenodo upload~~ → Live at [10.5281/zenodo.20148946](https://doi.org/10.5281/zenodo.20148946); fetch script downloads + MD5-verifies + extracts.
-- ~~Clustering pipeline~~ → Two-stage Leiden + Ward-on-means as default ([ADR 0007](../adr/0007-two-stage-leiden-ward-clustering.md)).
-- ~~Normalization placement~~ → New `tmelandscape.normalize` submodule between summarize and embedding ([ADR 0006](../adr/0006-normalize-as-pipeline-step.md)).
-- ~~Reference script format~~ → Marimo notebooks stay as the oracle in `reference/`; port relevant cells directly into `tmelandscape` modules during each phase.
-- ~~Missing dependencies~~ → `leidenalg`, `python-igraph`, `networkx`, `scikit-learn` added to core deps in `pyproject.toml`.
+1. **`spatialtissuepy` install method.** PyPI release, git+URL, or already core dep? Mirror the `tissue_simulator` pattern (git+URL + `allow-direct-references`)?
+2. **PhysiCell-output adapter.** What's the directory layout `spatialtissuepy` expects per simulation? Single `output/` dir per sim, with the standard `output%08d.xml` + `cells_%08d.mat` files? Or is there a pre-processing step?
+3. **Synthetic fixture sizing.** For `tests/data/synthetic_physicell/`, what's the minimum shape `spatialtissuepy` will accept? (e.g., 3 timepoints × 20 cells × 3 cell types). Phase 3 needs a CI-fast fixture.
+4. **Spatial statistics selection.** Which subset of `spatialtissuepy`'s output should `tmelandscape.summarize` materialise into the ensemble Zarr by default? (cell-type composition, graph centrality, interaction frequency are mentioned in the LCSS paper; should we expose a configurable selector or hard-code the LCSS set?)
 
-### Still open
+## Quirks worth knowing (for the next agent)
 
-1. **Python version baseline.** `pyproject.toml` requires `>=3.11`; CI matrix tests 3.11 + 3.12. Confirm matches your HPC/cluster Python availability.
-2. **GitHub repo creation.** Assumed `github.com/emcramer/tmelandscape`. Create the empty repo there so we can push the initial commit.
+- **tissue_simulator monkey-patch.** `tmelandscape.sampling.tissue_init` patches `tissue_simulator.{packing,tissue}.np.random.default_rng` for the duration of `generate_initial_conditions` calls because upstream instantiates `default_rng()` with no argument. Scoped via `ExitStack`, doesn't leak. Worth filing an upstream issue eventually.
+- **tissue_simulator stdout.** Upstream prints progress to stdout; we redirect to stderr in our wrapper so structured stdout (CLI JSON, MCP tool returns) stays clean.
+- **`TargetStatistics.target_density`.** Upstream rejects density > 1; our wrapper clears the field after bootstrapping because the upstream estimator counts boundary cells as fully inside the tissue.
+- **pyDOE3 vs scipy.qmc.** Default sampler is `pyDOE3` (per user preference) with `criterion="maximin"`. The working physim-calibration oracle uses `scipy.stats.qmc.LatinHypercube(optimization='random-cd')` — exposed as `sampler="scipy-lhs"` for users who want byte-for-byte reproducibility against that oracle.
 
 ## Next agent's first actions
 
 1. Read this file + `AGENTS.md`.
-2. Confirm with Eric on the four new open questions (Q3–Q6 above).
-3. If Q3 (clustering pipeline) confirms Leiden+Ward, write ADRs 0006 (normalization step) and 0007 (two-stage clustering), then revise the development plan and the `cluster/` submodule layout.
-4. Initialise git and commit Phase 0 + Phase 1 (reference audit) as the first commits. Tag `v0.0.1`.
-5. Once GitHub repo exists (Q2), push.
+2. Confirm Open Questions 1–4 above with Eric.
+3. Open `tasks/03-summarize-implementation.md` and design Phase 3 (Step 3 summarisation). Key decisions:
+   - `spatialtissuepy` integration (similar pattern to `tissue_init.py`?)
+   - Ensemble Zarr schema (dims, coords, chunking)
+   - Synthetic PhysiCell-shaped fixture for fast CI
+4. Consider delegating Phase 3 streams analogously to Phase 2 (recon → frozen contract → parallel implementation streams → integration).
+5. Push commits + tag at end of Phase 3 (target: `v0.2.0`).
 
 ## Last-session handoff
 
-**Session date:** 2026-05-12  
-**Agent:** Claude Code (claude-opus-4-7)
+**Session date:** 2026-05-13  
+**Agent:** Claude Code (claude-opus-4-7) orchestrator + 3 delegated general-purpose agents + 1 docs agent
 
-Bootstrap is **complete** and **verified**. All Phase-0 exit criteria met. Phase 1 is unblocked except for Open Q #2 (reference scripts inventory).
+Phase 2 **complete** and **verified**. Repo is ready to tag `v0.1.0` and push. Phase 3 is unblocked except for Open Questions 1–4 (spatialtissuepy install + fixture sizing).

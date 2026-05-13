@@ -26,15 +26,23 @@ Each phase ends in a tagged release; CI must be green and `STATUS.md` updated.
 - [ ] Upload sim_000, sim_003, sim_014 to Zenodo; record DOI in `scripts/fetch_example_data.py`
 - [ ] `uv run python scripts/fetch_example_data.py --from-local …` succeeds locally
 
-## Phase 2 — Synthetic fixture + Step 1 sampling (v0.1.0)
+## Phase 2 — Step 1 sampling (v0.1.0) — COMPLETE
 
-- [ ] Build tiny synthetic PhysiCell-shaped fixture (`tests/data/synthetic_physicell/`)
-- [ ] Implement `tmelandscape.sampling` (LHS + Sobol/Halton + tissue_simulator wrapper + SweepManifest)
-- [ ] CLI: `tmelandscape sample`
-- [ ] MCP tool: `tmelandscape.generate_sweep`
-- [ ] Unit tests pinned vs reference scripts
+- [x] Implement `tmelandscape.sampling` (LHS via pyDOE3 + scipy.qmc Sobol/Halton/LHS alternatives + tissue_simulator wrapper + SweepManifest)
+- [x] `tmelandscape.config.sweep` (`ParameterSpec`, `SweepConfig` Pydantic models)
+- [x] CLI: `tmelandscape sample`
+- [x] MCP tool: `tmelandscape.generate_sweep`
+- [x] Unit tests (49 unit-level: config, manifest, LHS, alternatives, tissue_init wrapper)
+- [x] Integration tests (4 tests: Python API + CLI + MCP + round-trip)
+- [x] `docs/concepts/sampling.md` populated (160 lines)
+- [x] Three streams delegated to general-purpose agents in parallel; orchestrator integrated and tested
 
-**Exit criterion:** sweep manifest matches reference output numerically on a fixed seed.
+Deferred from this phase (rolled into later phases or follow-ups):
+
+- _Synthetic PhysiCell-shaped fixture_ — moved to Phase 3 (the fixture is needed to test summarisation, not sampling).
+- _Numerical agreement vs reference scripts_ — sampling reference is `physim-calibration` (uses scipy.qmc), not the marimo notebooks; default backend is pyDOE3 per user preference, so seed-identity is not expected. Statistical agreement (range, shape, uniformity) is enforced by the unit tests instead.
+
+**Exit criterion met:** end-to-end `tmelandscape sample <cfg.json>` produces a `SweepManifest` consumable by the (future) step-2 runner.
 
 ## Phase 3 — Step 3 summarisation (v0.2.0)
 
