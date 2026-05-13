@@ -10,13 +10,9 @@
       
       
       
-        <link rel="canonical" href="https://emcramer.github.io/tmelandscape/development/ROADMAP/">
+        <link rel="canonical" href="https://emcramer.github.io/tmelandscape/adr/0008-dependency-pin-policy/">
       
       
-        <link rel="prev" href="../../mcp/">
-      
-      
-        <link rel="next" href="../STATUS/">
       
       
         
@@ -27,7 +23,7 @@
     
     
       
-        <title>Roadmap - tmelandscape</title>
+        <title>0008 — Dependency pin policy for git-only upstreams - tmelandscape</title>
       
     
     
@@ -80,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#roadmap-phased-milestones" class="md-skip">
+        <a href="#0008-dependency-pin-policy-for-git-only-upstreams" class="md-skip">
           Skip to content
         </a>
       
@@ -116,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Roadmap
+              0008 — Dependency pin policy for git-only upstreams
             
           </span>
         </div>
@@ -579,8 +575,6 @@
       
   
   
-    
-  
   
   
     
@@ -603,15 +597,17 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
         
           
           <div class="md-nav__link md-nav__container">
-            <a href="../../adr/" class="md-nav__link ">
+            <a href="../" class="md-nav__link ">
               
   
   
@@ -635,7 +631,7 @@
             
           </div>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             
@@ -650,37 +646,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Roadmap
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../development/ROADMAP/" class="md-nav__link">
         
   
   
@@ -696,136 +665,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#phase-0-bootstrap-v001-complete" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Phase 0 — Bootstrap (v0.0.1) — COMPLETE
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#phase-1-reference-audit-example-data-import-no-version-bump" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Phase 1 — Reference audit + example data import (no version bump)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#phase-2-step-1-sampling-v010-complete" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Phase 2 — Step 1 sampling (v0.1.0) — COMPLETE
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#phase-3-step-3-summarisation-v020-complete" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Phase 3 — Step 3 summarisation (v0.2.0) — COMPLETE
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#phase-35-step-35-normalization-v025" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Phase 3.5 — Step 3.5 normalization (v0.2.5)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#phase-4-step-4-embedding-v030" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Phase 4 — Step 4 embedding (v0.3.0)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#phase-5-step-5-clustering-landscape-facade-v040" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Phase 5 — Step 5 clustering + Landscape facade (v0.4.0)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#phase-6-visualisation-v050" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Phase 6 — Visualisation (v0.5.0)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#phase-7-release-hardening-v100" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Phase 7 — Release hardening (v1.0.0)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#beyond-v10-deferred-not-v1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Beyond v1.0 (deferred — not v1)
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -838,7 +677,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../STATUS/" class="md-nav__link">
+      <a href="../../development/STATUS/" class="md-nav__link">
         
   
   
@@ -895,10 +734,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#phase-0-bootstrap-v001-complete" class="md-nav__link">
+  <a href="#context" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 0 — Bootstrap (v0.0.1) — COMPLETE
+        Context
       
     </span>
   </a>
@@ -906,10 +745,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-1-reference-audit-example-data-import-no-version-bump" class="md-nav__link">
+  <a href="#decision" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 1 — Reference audit + example data import (no version bump)
+        Decision
       
     </span>
   </a>
@@ -917,10 +756,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-2-step-1-sampling-v010-complete" class="md-nav__link">
+  <a href="#action-items-at-the-time-of-writing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 2 — Step 1 sampling (v0.1.0) — COMPLETE
+        Action items at the time of writing
       
     </span>
   </a>
@@ -928,10 +767,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-3-step-3-summarisation-v020-complete" class="md-nav__link">
+  <a href="#consequences" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 3 — Step 3 summarisation (v0.2.0) — COMPLETE
+        Consequences
       
     </span>
   </a>
@@ -939,65 +778,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-35-step-35-normalization-v025" class="md-nav__link">
+  <a href="#alternatives-considered" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 3.5 — Step 3.5 normalization (v0.2.5)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#phase-4-step-4-embedding-v030" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Phase 4 — Step 4 embedding (v0.3.0)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#phase-5-step-5-clustering-landscape-facade-v040" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Phase 5 — Step 5 clustering + Landscape facade (v0.4.0)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#phase-6-visualisation-v050" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Phase 6 — Visualisation (v0.5.0)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#phase-7-release-hardening-v100" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Phase 7 — Release hardening (v1.0.0)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#beyond-v10-deferred-not-v1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Beyond v1.0 (deferred — not v1)
+        Alternatives considered
       
     </span>
   </a>
@@ -1024,121 +808,43 @@
   
 
 
-<h1 id="roadmap-phased-milestones">ROADMAP — phased milestones<a class="headerlink" href="#roadmap-phased-milestones" title="Permanent link">&para;</a></h1>
-<p>Each phase ends in a tagged release; CI must be green and <code>STATUS.md</code> updated.</p>
-<h2 id="phase-0-bootstrap-v001-complete">Phase 0 — Bootstrap (v0.0.1) — COMPLETE<a class="headerlink" href="#phase-0-bootstrap-v001-complete" title="Permanent link">&para;</a></h2>
+<h1 id="0008-dependency-pin-policy-for-git-only-upstreams">0008 — Dependency pin policy for git-only upstreams<a class="headerlink" href="#0008-dependency-pin-policy-for-git-only-upstreams" title="Permanent link">&para;</a></h1>
 <ul>
-<li>[x] uv project + pyproject.toml + repo layout</li>
-<li>[x] LICENSE, CITATION.cff, README.md, .gitignore</li>
-<li>[x] AGENTS.md + CLAUDE.md</li>
-<li>[x] docs/development/{STATUS,ROADMAP}.md</li>
-<li>[x] ADRs 0001–0005 in docs/adr/</li>
-<li>[x] mkdocs scaffolding (mkdocs.yml + docs/index.md + concepts/api/tutorials/mcp pages)</li>
-<li>[x] fastmcp server stub with <code>ping</code> tool</li>
-<li>[x] .pre-commit-config.yaml + .github/workflows/{ci,docs}.yml</li>
-<li>[x] scripts/fetch_example_data.py (Zenodo + --from-local)</li>
-<li>[x] Phase-0 smoke tests (4 passing, 1 deselected real-data)</li>
-<li>[x] Verified: <code>uv sync</code> + <code>uv run pytest</code> + <code>uv run ruff check</code> + <code>uv run ruff format --check</code> + <code>uv run mypy src</code> + <code>uv run mkdocs build --strict</code> + <code>tmelandscape version</code> + <code>tmelandscape-mcp</code> ping all green.</li>
+<li><strong>Status:</strong> Accepted</li>
+<li><strong>Date:</strong> 2026-05-13</li>
+<li><strong>Deciders:</strong> Eric, Claude</li>
 </ul>
-<p><strong>Exit criterion (met):</strong> clean <code>uv sync</code> + <code>uv run pytest</code> + <code>uv run mkdocs build --strict</code> succeed.</p>
-<h2 id="phase-1-reference-audit-example-data-import-no-version-bump">Phase 1 — Reference audit + example data import (no version bump)<a class="headerlink" href="#phase-1-reference-audit-example-data-import-no-version-bump" title="Permanent link">&para;</a></h2>
+<h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
+<p>Two of tmelandscape's core dependencies — <code>tissue_simulator</code> and <code>spatialtissuepy</code> — are installed directly from GitHub (<code>pip install git+...</code>) because neither has a PyPI release yet. As of v0.1.x both were pinned to <em>the default branch</em>, which means a <code>uv lock</code> re-run could silently pull in an upstream change without the version number moving. The post-v0.1.0 audit also surfaced fragility from this: any breaking API change upstream would bypass our test suite until the next CI run.</p>
+<p>Both packages are also single-author and pre-release; the working commit is what was tested, not "main yesterday."</p>
+<h2 id="decision">Decision<a class="headerlink" href="#decision" title="Permanent link">&para;</a></h2>
+<p>For every core dep installed from git+URL, we pin to <strong>a tag</strong> (annotated, signed if possible), not to <code>main</code>. The <code>uv.lock</code> is the deterministic guarantor <em>inside</em> a given tag — it pins to a specific commit — but the human-readable surface is the tag, which is the unit of intent.</p>
+<p>Workflow:</p>
+<ol>
+<li>On the upstream repo, the maintainer (currently Eric for both packages) tags a release: <code>git tag -a v0.x.y -m "..." &amp;&amp; git push --tags</code>.</li>
+<li>tmelandscape's <code>pyproject.toml</code> references the tag: <code>package @ git+https://github.com/owner/repo.git@v0.x.y</code>.</li>
+<li><code>uv lock</code> resolves to whatever commit the tag points to; <code>uv sync</code> reproduces deterministically across machines.</li>
+<li>An ADR-worthy bump (new tag) is captured in tmelandscape's CHANGELOG / commit history.</li>
+</ol>
+<p>For dual-published upstreams (a PyPI release exists), prefer PyPI and drop the git+URL entirely. Target: both <code>tissue_simulator</code> and <code>spatialtissuepy</code> on PyPI before tmelandscape v1.0 ships.</p>
+<h2 id="action-items-at-the-time-of-writing">Action items at the time of writing<a class="headerlink" href="#action-items-at-the-time-of-writing" title="Permanent link">&para;</a></h2>
 <ul>
-<li>[ ] Eric provides per-step reference-script pointers (Open Q #2 in STATUS.md)</li>
-<li>[ ] Copy authoritative scripts into gitignored <code>reference/</code></li>
-<li>[ ] ADR documenting reference oracles</li>
-<li>[ ] Upload sim_000, sim_003, sim_014 to Zenodo; record DOI in <code>scripts/fetch_example_data.py</code></li>
-<li>[ ] <code>uv run python scripts/fetch_example_data.py --from-local …</code> succeeds locally</li>
+<li><code>tissue_simulator</code> is currently pinned to floating <code>main</code>. Maintainer should tag <code>v0.1.0</code> at commit <code>67becc12576d76e56be29ac612f55101df878b62</code> (the commit <code>uv</code> resolved into tmelandscape v0.1.0's lockfile). tmelandscape's pyproject pin will then change to <code>@v0.1.0</code>.</li>
+<li><code>spatialtissuepy</code> is currently pinned to commit <code>c03cfa4</code>. Maintainer should tag <code>v0.2.0</code> at that commit. tmelandscape pin updates to <code>@v0.2.0</code>.</li>
+<li>Until tags exist, the commit-pinned form is acceptable as a temporary measure; the policy is "tagged unless impossible right now."</li>
 </ul>
-<h2 id="phase-2-step-1-sampling-v010-complete">Phase 2 — Step 1 sampling (v0.1.0) — COMPLETE<a class="headerlink" href="#phase-2-step-1-sampling-v010-complete" title="Permanent link">&para;</a></h2>
+<h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
 <ul>
-<li>[x] Implement <code>tmelandscape.sampling</code> (LHS via pyDOE3 + scipy.qmc Sobol/Halton/LHS alternatives + tissue_simulator wrapper + SweepManifest)</li>
-<li>[x] <code>tmelandscape.config.sweep</code> (<code>ParameterSpec</code>, <code>SweepConfig</code> Pydantic models)</li>
-<li>[x] CLI: <code>tmelandscape sample</code></li>
-<li>[x] MCP tool: <code>tmelandscape.generate_sweep</code></li>
-<li>[x] Unit tests (49 unit-level: config, manifest, LHS, alternatives, tissue_init wrapper)</li>
-<li>[x] Integration tests (4 tests: Python API + CLI + MCP + round-trip)</li>
-<li>[x] <code>docs/concepts/sampling.md</code> populated (160 lines)</li>
-<li>[x] Three streams delegated to general-purpose agents in parallel; orchestrator integrated and tested</li>
+<li>Drift risk eliminated: a <code>uv lock --upgrade</code> on an unchanged tag does nothing.</li>
+<li>Human-readable provenance: looking at <code>pyproject.toml</code> tells you the upstream version, not just a commit hash.</li>
+<li>Slight friction on the upstream side: maintainers have to remember to tag. Mitigation: document the tag-on-release habit in upstream READMEs and / or automate via release-please / a release script.</li>
+<li>Once upstreams ship to PyPI, this ADR is largely retired in favour of the standard semver dependency style.</li>
 </ul>
-<p>Deferred from this phase (rolled into later phases or follow-ups):</p>
+<h2 id="alternatives-considered">Alternatives considered<a class="headerlink" href="#alternatives-considered" title="Permanent link">&para;</a></h2>
 <ul>
-<li><em>Synthetic PhysiCell-shaped fixture</em> — moved to Phase 3 (the fixture is needed to test summarisation, not sampling).</li>
-<li><em>Numerical agreement vs reference scripts</em> — sampling reference is <code>physim-calibration</code> (uses scipy.qmc), not the marimo notebooks; default backend is pyDOE3 per user preference, so seed-identity is not expected. Statistical agreement (range, shape, uniformity) is enforced by the unit tests instead.</li>
-</ul>
-<p><strong>Exit criterion met:</strong> end-to-end <code>tmelandscape sample &lt;cfg.json&gt;</code> produces a <code>SweepManifest</code> consumable by the (future) step-2 runner.</p>
-<h2 id="phase-3-step-3-summarisation-v020-complete">Phase 3 — Step 3 summarisation (v0.2.0) — COMPLETE<a class="headerlink" href="#phase-3-step-3-summarisation-v020-complete" title="Permanent link">&para;</a></h2>
-<ul>
-<li>[x] <code>tmelandscape.summarize.spatialtissuepy_driver</code> + Zarr aggregation</li>
-<li>[x] <code>tmelandscape.summarize.aggregate.build_ensemble_zarr</code> (xarray-on-zarr, chunked)</li>
-<li>[x] <code>tmelandscape.summarize.registry</code> (LCSS-default panel: cell counts, fractions, three centrality metrics, interaction matrix)</li>
-<li>[x] <code>tmelandscape.config.summarize.SummarizeConfig</code> (Pydantic; validates against <code>KNOWN_STATISTICS</code>)</li>
-<li>[x] Synthetic PhysiCell-shaped fixture in <code>tests/data/synthetic_physicell/</code> (3 sims × 3 timepoints × 21 cells, 112 KB)</li>
-<li>[x] CLI: <code>tmelandscape summarize</code></li>
-<li>[x] MCP tool: <code>tmelandscape.summarize_ensemble</code></li>
-<li>[x] Integration test: Python API + CLI + MCP all produce equivalent Zarr stores</li>
-<li>[x] Buddy-pair team: 3 Implementer agents + 3 Reviewer agents, 5 RISKs surfaced and fixed before integration</li>
-<li>[x] Sweep-scoped IC subdirectories added to <code>generate_sweep</code> (Phase 2 audit follow-up)</li>
-<li>[x] ADR 0008 (dependency pin policy: tag git+URL deps)</li>
-</ul>
-<p><strong>Verification:</strong> 115 tests passing; ruff + format + mypy strict + mkdocs strict all green.</p>
-<h2 id="phase-35-step-35-normalization-v025">Phase 3.5 — Step 3.5 normalization (v0.2.5)<a class="headerlink" href="#phase-35-step-35-normalization-v025" title="Permanent link">&para;</a></h2>
-<blockquote>
-<p>Added 2026-05-12 after the Phase 1 reference audit. See <a href="../../adr/0006-normalize-as-pipeline-step/">ADR 0006</a>.</p>
-</blockquote>
-<ul>
-<li>[ ] <code>tmelandscape.normalize.within_timestep</code> (per-step mean → power transform → z-score → +mean)</li>
-<li>[ ] <code>tmelandscape.normalize.feature_filter</code> (configurable drop of cell-density columns)</li>
-<li>[ ] <code>tmelandscape.normalize.alternatives</code> (global / local-time / feature-distribution variants)</li>
-<li>[ ] CLI: <code>tmelandscape normalize</code></li>
-<li>[ ] MCP tool: <code>tmelandscape.normalize_ensemble</code></li>
-<li>[ ] Numerical agreement vs <code>reference/00_abm_normalization.py</code> on the synthetic fixture</li>
-</ul>
-<h2 id="phase-4-step-4-embedding-v030">Phase 4 — Step 4 embedding (v0.3.0)<a class="headerlink" href="#phase-4-step-4-embedding-v030" title="Permanent link">&para;</a></h2>
-<ul>
-<li>[ ] <code>tmelandscape.embedding.delay_embed</code> (Takens)</li>
-<li>[ ] FNN dimension search (cross-check vs nolitsa)</li>
-<li>[ ] Mutual-information lag selection</li>
-<li>[ ] Joint <code>optimize_embedding</code></li>
-<li>[ ] Sliding-window construction (<code>W=50</code> default per LCSS paper / reference)</li>
-<li>[ ] Golden-file regression vs reference</li>
-<li>[ ] CLI: <code>tmelandscape embed</code></li>
-<li>[ ] MCP tools: <code>tmelandscape.optimize_embedding</code>, <code>tmelandscape.delay_embed</code></li>
-</ul>
-<h2 id="phase-5-step-5-clustering-landscape-facade-v040">Phase 5 — Step 5 clustering + Landscape facade (v0.4.0)<a class="headerlink" href="#phase-5-step-5-clustering-landscape-facade-v040" title="Permanent link">&para;</a></h2>
-<blockquote>
-<p>Reshaped 2026-05-12 after Phase 1. See <a href="../../adr/0007-two-stage-leiden-ward-clustering/">ADR 0007</a>.</p>
-</blockquote>
-<ul>
-<li>[ ] <code>tmelandscape.cluster.leiden</code> — kNN graph + Leiden community detection (stage 1)</li>
-<li>[ ] <code>tmelandscape.cluster.meta</code> — Ward hierarchical clustering on Leiden cluster means (stage 2)</li>
-<li>[ ] <code>tmelandscape.cluster.selection</code> — Leiden resolution sweep + Ward elbow / silhouette</li>
-<li>[ ] <code>tmelandscape.cluster.labels</code> — state-label persistence + interpretable names (Effector-Dominant, etc.)</li>
-<li>[ ] <code>Landscape</code> facade + <code>.tmelandscape/</code> bundle format (stores both Leiden labels and Ward final labels)</li>
-<li>[ ] CLI: <code>tmelandscape fit</code></li>
-<li>[ ] MCP tools: <code>tmelandscape.fit_landscape</code>, <code>tmelandscape.describe_landscape</code></li>
-<li>[ ] End-to-end integration test on synthetic fixture (Python API + CLI + MCP)</li>
-<li>[ ] Numerical agreement vs <code>reference/01_abm_generate_embedding.py</code> clustering output on the synthetic fixture</li>
-</ul>
-<h2 id="phase-6-visualisation-v050">Phase 6 — Visualisation (v0.5.0)<a class="headerlink" href="#phase-6-visualisation-v050" title="Permanent link">&para;</a></h2>
-<ul>
-<li>[ ] <code>tmelandscape.viz.diagnostics</code> (FNN curve, elbow, MI-vs-lag)</li>
-<li>[ ] <code>tmelandscape.viz.embedding</code> (UMAP scatter; vector-field-style)</li>
-<li>[ ] <code>tmelandscape.viz.trajectories</code> (state-colored time series, Fig. 2 style)</li>
-<li>[ ] Notebook tutorials in <code>docs/tutorials/</code> executed in CI</li>
-</ul>
-<h2 id="phase-7-release-hardening-v100">Phase 7 — Release hardening (v1.0.0)<a class="headerlink" href="#phase-7-release-hardening-v100" title="Permanent link">&para;</a></h2>
-<ul>
-<li>[ ] <code>pytest -m real</code> green against the three Zenodo-fetched sim_xxx directories</li>
-<li>[ ] mkdocs published to GitHub Pages</li>
-<li>[ ] PyPI release via trusted publisher</li>
-<li>[ ] Zenodo DOI for the software + updated CITATION.cff</li>
-</ul>
-<h2 id="beyond-v10-deferred-not-v1">Beyond v1.0 (deferred — not v1)<a class="headerlink" href="#beyond-v10-deferred-not-v1" title="Permanent link">&para;</a></h2>
-<ul>
-<li>MSM construction + Markov state model fitting</li>
-<li>MDP / intervention-design analysis (LCSS paper, sections IV–VI)</li>
-<li>Landscape projection: mapping new/clinical observations onto a fitted landscape</li>
-<li>SLURM-specific helpers for HPC consumption</li>
+<li><strong>Commit-SHA pinning only:</strong> maximum determinism but no human-readable version. Loses release-note context.</li>
+<li><strong>Floating <code>main</code>:</strong> the status quo before this ADR. Trivial, but breaks reproducibility on any <code>uv lock</code> re-run that crosses an upstream commit.</li>
+<li><strong>Git submodule + local <code>pip install -e</code>:</strong> works for development but breaks <code>pip install tmelandscape</code> for users.</li>
 </ul>
 
 
@@ -1170,44 +876,6 @@
       
         <footer class="md-footer">
   
-    
-      
-      <nav class="md-footer__inner md-grid" aria-label="Footer" >
-        
-          
-          <a href="../../mcp/" class="md-footer__link md-footer__link--prev" aria-label="Previous: MCP for agents">
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-            </div>
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              <div class="md-ellipsis">
-                MCP for agents
-              </div>
-            </div>
-          </a>
-        
-        
-          
-          <a href="../STATUS/" class="md-footer__link md-footer__link--next" aria-label="Next: Status">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                Status
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
-            </div>
-          </a>
-        
-      </nav>
     
   
   <div class="md-footer-meta md-typeset">

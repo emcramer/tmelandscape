@@ -777,6 +777,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#update-2026-05-13-zarr-v3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Update 2026-05-13 (Zarr v3)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -821,6 +832,14 @@
 <li>Parquet per simulation, no aggregate — keeps each simulation isolated but step 4 needs to load everything; lots of small-file overhead.</li>
 <li>AnnData per simulation + a top-level catalogue — idiomatic for single-cell but awkward for time-series ensembles; AnnData's strength is single (cells × features) tables, not time-stacks.</li>
 </ul>
+<h2 id="update-2026-05-13-zarr-v3">Update 2026-05-13 (Zarr v3)<a class="headerlink" href="#update-2026-05-13-zarr-v3" title="Permanent link">&para;</a></h2>
+<p>The original decision was written when Zarr v2 was the stable target. As of <code>uv sync</code> on 2026-05-13, the resolved version is <code>zarr 3.1.6</code> (the <code>&gt;=2.18</code> constraint matched v3). Practical implications:</p>
+<ul>
+<li>xarray writes via <code>Dataset.to_zarr</code> and reads via <code>xarray.open_zarr</code> work cleanly in both directions.</li>
+<li>String coords (e.g. <code>simulation_id</code>, <code>statistic</code>) are stored as <code>FixedLengthUTF32</code>, which does not yet have a finalised v3 spec. Zarr 3.x emits <code>UnstableSpecificationWarning</code>; tmelandscape's <code>pyproject.toml</code> filters this in pytest so test output stays readable. Cross-library reads (zarr.js, future zarr-python releases) may need to revisit string-coord encoding.</li>
+<li>Consolidated metadata is also pre-spec on v3; same filter handling.</li>
+</ul>
+<p>No action required for v0.2.x. Revisit before v1.0 release if Zarr v3 string-dtype spec lands.</p>
 
 
 
