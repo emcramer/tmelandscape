@@ -13,6 +13,10 @@ from tmelandscape.config.sweep import SweepConfig
 from tmelandscape.sampling import generate_sweep
 from tmelandscape.sampling.manifest import SweepManifest
 from tmelandscape.summarize import summarize_ensemble
+from tmelandscape.summarize.registry import (
+    describe_metric,
+    list_available_statistics,
+)
 
 
 def generate_sweep_tool(
@@ -66,7 +70,7 @@ def summarize_ensemble_tool(
     *,
     physicell_root: str,
     output_zarr: str,
-    summarize_config: dict[str, Any] | None = None,
+    summarize_config: dict[str, Any],
     chunk_simulations: int = 32,
     chunk_timepoints: int = -1,
     chunk_statistics: int = -1,
@@ -83,8 +87,10 @@ def summarize_ensemble_tool(
     output_zarr
         Path of the Zarr store to write.
     summarize_config
-        Optional serialised :class:`SummarizeConfig` dict. Defaults to the
-        LCSS-paper panel.
+        Required serialised :class:`SummarizeConfig` dict. The ``statistics``
+        field must be supplied — tmelandscape does not ship a default panel.
+        Call :func:`list_available_statistics_tool` first to discover which
+        metric names are available.
     chunk_simulations, chunk_timepoints, chunk_statistics
         Per-axis Zarr chunk size; ``-1`` means "one chunk for the whole axis".
 
@@ -94,9 +100,7 @@ def summarize_ensemble_tool(
         Summary with the Zarr path and the panel that was applied.
     """
     manifest = SweepManifest.load(manifest_path)
-    cfg = (
-        SummarizeConfig.model_validate(summarize_config) if summarize_config else SummarizeConfig()
-    )
+    cfg = SummarizeConfig.model_validate(summarize_config)
     zarr_path = summarize_ensemble(
         manifest,
         physicell_root=physicell_root,
@@ -109,5 +113,36 @@ def summarize_ensemble_tool(
     return {
         "zarr_path": str(zarr_path),
         "n_simulations": len({row.simulation_id for row in manifest.rows}),
-        "statistics": list(cfg.statistics),
+        "statistics": [spec.name for spec in cfg.statistics],
     }
+
+
+def list_available_statistics_tool() -> list[dict[str, Any]]:
+    """List every spatial statistic registered in ``spatialtissuepy``.
+
+    Returns a list of metric descriptions (name, category, description,
+    parameter schema). Use this to discover legal values for the
+    ``statistics`` field of :class:`SummarizeConfig` before calling
+    :func:`summarize_ensemble_tool`.
+
+    There is no default panel: the user (or agent) must explicitly choose
+    which metrics to compute for their TME landscape. See ADR 0009.
+    """
+    return list_available_statistics()
+
+
+def describe_statistic_tool(name: str) -> dict[str, Any]:
+    """Return the full description of one spatial-statistic metric.
+
+    Parameters
+    ----------
+    name
+        Metric name. Must appear in :func:`list_available_statistics_tool`.
+
+    Returns
+    -------
+    dict
+        Keys: ``name``, ``category``, ``description``, ``custom``,
+        ``parameters`` (map of parameter name to type name).
+    """
+    return describe_metric(name)

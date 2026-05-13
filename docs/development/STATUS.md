@@ -4,7 +4,7 @@
 
 ## Current focus
 
-**Phase 3 — Step 3 summarisation: complete (v0.2.0).** spatialtissuepy is driven end-to-end across an ensemble, producing a chunked Zarr store. Three public surfaces (Python API, CLI, MCP). 115 tests passing; ruff/format/mypy/mkdocs all clean. Ready to proceed to **Phase 3.5 (Step 3.5 normalisation)** per [ADR 0006](../adr/0006-normalize-as-pipeline-step.md).
+**Phase 3 panel rollback: complete (v0.3.0).** Per the project owner's directive, the LCSS-default statistics panel has been removed and replaced with dynamic discovery from `spatialtissuepy`'s live registry; the `normalize.feature_filter` hardcoded density-column drop has been removed; ADRs 0006 + 0009 now document the "never overwrite, no built-in drop, no hardcoded panel" invariants. 107 tests pass; the system is ready for Phase 3.5 normalisation, which will write to new variables/files only.
 
 ## In-flight tasks
 

@@ -60,6 +60,19 @@ Deferred from this phase (rolled into later phases or follow-ups):
 
 **Verification:** 115 tests passing; ruff + format + mypy strict + mkdocs strict all green.
 
+### v0.3.0 — panel hardcoding rollback (post-v0.2.0, 2026-05-13)
+
+Project owner directive: never hardcode the spatial-statistics panel; never overwrite raw data; never drop features by default. ADR 0009 documents the rationale.
+
+- [x] `SummarizeConfig.statistics` is required (no default panel); validated against `spatialtissuepy`'s live `_registry`.
+- [x] `StatisticSpec` carries name + per-metric `parameters` dict for parameterised metrics.
+- [x] `registry.compute_panel` replaces the custom `_compute_*` dispatch; uses `spatialtissuepy.summary.StatisticsPanel.compute()` directly.
+- [x] Removed `KNOWN_STATISTICS`, `_default_statistics`, the rekey helpers for `cell_proportions`/centrality, and `feature_filter.DEFAULT_DROP_COLUMNS`.
+- [x] Interaction-key `|` rewrite stays as a vocabulary-aware post-processing pass (vocabulary discovered from `spatial_data.cell_types_unique`).
+- [x] Discovery surfaces: `tmelandscape statistics list/describe` CLI verbs; MCP tools `list_available_statistics` and `describe_statistic`.
+- [x] ADR 0009 written; ADR 0006 updated with the "never overwrite, no built-in drop" invariants.
+- [x] Tests updated to pass explicit `statistics=[...]`; 107 tests passing.
+
 ## Phase 3.5 — Step 3.5 normalization (v0.2.5)
 
 > Added 2026-05-12 after the Phase 1 reference audit. See [ADR 0006](../adr/0006-normalize-as-pipeline-step.md).

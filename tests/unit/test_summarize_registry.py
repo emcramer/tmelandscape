@@ -1,163 +1,125 @@
-"""Unit tests for ``tmelandscape.summarize.registry``.
+"""Unit tests for ``tmelandscape.summarize.registry`` (post ADR 0009).
 
-These tests exercise :func:`compute_statistic` against a tiny synthetic
-``SpatialTissueData``. If a particular ``spatialtissuepy`` submodule is
-missing (optional extras not installed), the affected statistic is skipped
-via :func:`pytest.importorskip`.
+The registry no longer hardcodes a panel. It queries ``spatialtissuepy``'s
+global registry dynamically and dispatches via ``StatisticsPanel.compute``.
 """
 
 from __future__ import annotations
 
-from typing import Any
-
 import numpy as np
-import pytest
 
 from tmelandscape.config.summarize import SummarizeConfig
-from tmelandscape.summarize.registry import KNOWN_STATISTICS, compute_statistic
+from tmelandscape.summarize.registry import (
+    available_metric_names,
+    compute_panel,
+    describe_metric,
+    list_available_statistics,
+    rewrite_interaction_keys_with_types,
+)
 
-# ---------------------------------------------------------------------------
-# Fixtures
-# ---------------------------------------------------------------------------
 
-
-@pytest.fixture(scope="module")
-def spatial_data() -> Any:
-    """Return a tiny three-cell-type ``SpatialTissueData``.
-
-    Skips the test module if ``spatialtissuepy`` cannot be imported (e.g.
-    upstream dep gap during CI bring-up).
-    """
-    pytest.importorskip("spatialtissuepy.core.spatial_data")
-    from spatialtissuepy.core.spatial_data import SpatialTissueData
+def _tiny_spatial_data() -> object:
+    """Build a 6-cell, 3-type SpatialTissueData for tests."""
+    from spatialtissuepy.core import SpatialTissueData
 
     rng = np.random.default_rng(0)
-    # 12 cells, 4 per type, scattered in a 100um x 100um box. Small enough
-    # to stay well under the 2s-per-test budget but large enough that each
-    # cell type has > 1 cell (needed for centrality-by-type and the
-    # interaction matrix).
-    coords = rng.uniform(0.0, 100.0, size=(12, 2))
-    cell_types = np.array(["tumor"] * 4 + ["effector_T_cell"] * 4 + ["M0_macrophage"] * 4)
-    return SpatialTissueData(coordinates=coords, cell_types=cell_types)
-
-
-@pytest.fixture(scope="module")
-def cell_graph(spatial_data: Any) -> Any:
-    """Return a proximity ``CellGraph`` built once for the module."""
-    pytest.importorskip("spatialtissuepy.network.cell_graph")
-    from spatialtissuepy.network.cell_graph import CellGraph
-
-    return CellGraph.from_spatial_data(spatial_data, method="proximity", radius=30.0)
-
-
-@pytest.fixture(scope="module")
-def default_config() -> SummarizeConfig:
-    return SummarizeConfig()
-
-
-# ---------------------------------------------------------------------------
-# Tests
-# ---------------------------------------------------------------------------
-
-
-class TestKnownStatistics:
-    def test_known_statistics_is_frozenset_of_str(self) -> None:
-        assert isinstance(KNOWN_STATISTICS, frozenset)
-        assert all(isinstance(name, str) for name in KNOWN_STATISTICS)
-
-    def test_known_statistics_covers_lcss_default(self) -> None:
-        for name in SummarizeConfig().statistics:
-            assert name in KNOWN_STATISTICS
-
-
-class TestComputeStatistic:
-    @pytest.mark.parametrize(
-        "stat_name",
-        # Parametrise over the LCSS-default panel so a missing handler
-        # surfaces here rather than at runtime in the driver.
-        SummarizeConfig().statistics,
+    coords = rng.uniform(0.0, 50.0, size=(6, 2))
+    types = np.array(
+        [
+            "tumor",
+            "tumor",
+            "M0_macrophage",
+            "M0_macrophage",
+            "effector_T_cell",
+            "effector_T_cell",
+        ]
     )
-    def test_default_statistic_returns_nonempty_float_dict(
-        self,
-        stat_name: str,
-        spatial_data: Any,
-        cell_graph: Any,
-        default_config: SummarizeConfig,
-    ) -> None:
-        result = compute_statistic(
-            stat_name,
-            spatial_data=spatial_data,
-            graph=cell_graph,
-            config=default_config,
-        )
-        assert isinstance(result, dict)
-        assert len(result) > 0, f"{stat_name} produced no outputs"
-        for key, value in result.items():
-            assert isinstance(key, str)
-            # All outputs must be plain Python floats so downstream Zarr /
-            # pandas code doesn't have to handle numpy scalars.
-            assert isinstance(value, float), f"{stat_name}[{key!r}] is {type(value)}"
+    return SpatialTissueData(coordinates=coords, cell_types=types)
 
-    def test_unknown_name_raises_keyerror(
-        self,
-        spatial_data: Any,
-        cell_graph: Any,
-        default_config: SummarizeConfig,
-    ) -> None:
-        with pytest.raises(KeyError, match="totally_made_up_stat"):
-            compute_statistic(
-                "totally_made_up_stat",
-                spatial_data=spatial_data,
-                graph=cell_graph,
-                config=default_config,
-            )
 
-    def test_cell_counts_total_matches_n_cells(
-        self,
-        spatial_data: Any,
-        cell_graph: Any,
-        default_config: SummarizeConfig,
-    ) -> None:
-        out = compute_statistic(
-            "cell_counts",
-            spatial_data=spatial_data,
-            graph=cell_graph,
-            config=default_config,
-        )
-        # Sanity check: cell_counts always reports the grand total under
-        # the key ``n_cells``.
-        assert out["n_cells"] == float(spatial_data.n_cells)
+class TestAvailableMetricNames:
+    def test_returns_a_frozenset(self) -> None:
+        names = available_metric_names()
+        assert isinstance(names, frozenset)
 
-    def test_cell_type_fractions_sum_to_one(
-        self,
-        spatial_data: Any,
-        cell_graph: Any,
-        default_config: SummarizeConfig,
-    ) -> None:
-        out = compute_statistic(
-            "cell_type_fractions",
-            spatial_data=spatial_data,
-            graph=cell_graph,
-            config=default_config,
-        )
-        # Every output key from this stat should start with the renamed
-        # ``fraction_`` prefix (not the upstream ``prop_`` prefix).
-        assert all(k.startswith("fraction_") for k in out)
-        assert sum(out.values()) == pytest.approx(1.0)
+    def test_includes_classic_metrics(self) -> None:
+        names = available_metric_names()
+        for n in ("cell_counts", "cell_proportions", "interaction_strength_matrix"):
+            assert n in names, f"{n!r} should be in spatialtissuepy's registry"
 
-    def test_interaction_strength_matrix_has_pair_keys(
-        self,
-        spatial_data: Any,
-        cell_graph: Any,
-        default_config: SummarizeConfig,
-    ) -> None:
-        out = compute_statistic(
-            "interaction_strength_matrix",
-            spatial_data=spatial_data,
-            graph=cell_graph,
-            config=default_config,
+    def test_idempotent(self) -> None:
+        a = available_metric_names()
+        b = available_metric_names()
+        assert a == b
+
+
+class TestDescribeMetric:
+    def test_returns_json_friendly_dict(self) -> None:
+        info = describe_metric("cell_counts")
+        assert info["name"] == "cell_counts"
+        assert isinstance(info["category"], str)
+        assert isinstance(info["description"], str)
+        assert isinstance(info["parameters"], dict)
+
+    def test_parameter_types_are_strings(self) -> None:
+        info = describe_metric("cell_type_ratio")
+        for _key, type_name in info["parameters"].items():
+            assert isinstance(type_name, str)
+
+
+class TestListAvailableStatistics:
+    def test_returns_a_list_of_dicts(self) -> None:
+        catalogue = list_available_statistics()
+        assert isinstance(catalogue, list)
+        assert all(isinstance(m, dict) for m in catalogue)
+        names = {m["name"] for m in catalogue}
+        assert "cell_counts" in names
+
+
+class TestComputePanel:
+    def test_default_panel_against_tiny_data(self) -> None:
+        cfg = SummarizeConfig(statistics=["cell_counts", "cell_proportions"])
+        out = compute_panel(spatial_data=_tiny_spatial_data(), config=cfg)
+        assert isinstance(out, dict)
+        assert all(isinstance(v, float) for v in out.values())
+        assert "n_cells" in out
+
+    def test_interaction_key_rewrite(self) -> None:
+        cfg = SummarizeConfig(
+            statistics=[{"name": "interaction_strength_matrix", "parameters": {"radius": 25.0}}],
+            rewrite_interaction_keys=True,
         )
-        # Three cell types -> upper triangle including diagonal -> 6 pairs.
-        assert len(out) == 6
-        for key in out:
-            assert key.startswith("interaction_")
+        out = compute_panel(spatial_data=_tiny_spatial_data(), config=cfg)
+        pair_keys = [k for k in out if k.startswith("interaction_") and "|" in k]
+        assert pair_keys
+        for k in out:
+            if k.startswith("interaction_"):
+                assert "|" in k, f"interaction key without `|` separator: {k!r}"
+
+    def test_rewrite_disabled_preserves_upstream_keys(self) -> None:
+        cfg = SummarizeConfig(
+            statistics=[{"name": "interaction_strength_matrix", "parameters": {"radius": 25.0}}],
+            rewrite_interaction_keys=False,
+        )
+        out = compute_panel(spatial_data=_tiny_spatial_data(), config=cfg)
+        assert any(k.startswith("interaction_") and "|" not in k for k in out)
+
+
+class TestRewriteInteractionKeysWithTypes:
+    def test_vocabulary_aware_rewrite(self) -> None:
+        cell_types = ["tumor", "M0_macrophage", "effector_T_cell"]
+        raw = {
+            "interaction_tumor_M0_macrophage": 1.0,
+            "interaction_M0_macrophage_effector_T_cell": 2.0,
+            "interaction_tumor_tumor": 3.0,
+            "n_cells": 10.0,
+        }
+        out = rewrite_interaction_keys_with_types(raw, cell_types)
+        assert out["interaction_tumor|M0_macrophage"] == 1.0
+        assert out["interaction_M0_macrophage|effector_T_cell"] == 2.0
+        assert out["interaction_tumor|tumor"] == 3.0
+        assert out["n_cells"] == 10.0
+
+    def test_unknown_pair_falls_back_to_heuristic(self) -> None:
+        out = rewrite_interaction_keys_with_types({"interaction_alpha_beta": 1.0}, [])
+        assert "interaction_alpha|beta" in out

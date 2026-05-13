@@ -1,108 +1,111 @@
-"""Pydantic config for the spatialtissuepy-driven summarisation step.
+"""Pydantic configs for the spatial-statistic summarisation step.
 
-`SummarizeConfig` is the frozen public contract for Phase 3 (step 3 of the
-pipeline). It is consumed by:
+The :class:`SummarizeConfig` is the public contract between the driver
+(:mod:`tmelandscape.summarize.spatialtissuepy_driver`) and its callers. It
+carries the user-chosen list of spatial statistics to compute per timepoint.
 
-* ``tmelandscape.summarize.spatialtissuepy_driver.summarize_simulation``
-  (Stream A) — per-simulation driver,
-* ``tmelandscape.summarize.aggregate.build_ensemble_zarr`` (Stream B) —
-  ensemble aggregator,
-* ``tmelandscape.summarize.registry.compute_statistic`` (this stream) —
-  the only module that knows how ``spatialtissuepy`` is organised.
-
-The ``statistics`` list is validated at construction time against the
-registry's ``KNOWN_STATISTICS`` set so callers learn about typos via a
-``pydantic.ValidationError`` rather than a ``KeyError`` deep inside a
-worker.
+There is **no default statistics panel**. The user (or agent) must specify
+which metrics to compute — the package neither restricts nor presupposes the
+LCSS-paper panel or any other. The list of legal metric names is discovered
+dynamically from ``spatialtissuepy``'s registry at validation time so the
+contract automatically tracks upstream additions. See ADR 0009.
 """
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Any
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
-def _default_statistics() -> list[str]:
-    """Return the LCSS-paper default panel.
+class StatisticSpec(BaseModel):
+    """One spatial-statistic to compute per timepoint.
 
-    Mirrors the panel listed in ``tasks/03-summarize-implementation.md``.
-    Defined as a module-level helper rather than an inline ``lambda`` so the
-    default is introspectable and reusable from tests.
+    Attributes
+    ----------
+    name
+        Metric name. Must match a metric registered in ``spatialtissuepy``'s
+        global registry (queried at config-validation time).
+    parameters
+        Per-metric kwargs (e.g. ``radius`` for spatial metrics, ``type_a`` /
+        ``type_b`` for pairwise colocalisation). Default ``{}`` falls back
+        to the metric's own defaults.
     """
-    return [
-        # Cell-type composition
-        "cell_counts",
-        "cell_type_fractions",
-        # Graph-based centrality (mean by cell type)
-        "mean_degree_centrality_by_type",
-        "mean_closeness_centrality_by_type",
-        "mean_betweenness_centrality_by_type",
-        # Cell-cell interactions
-        "interaction_strength_matrix",
-    ]
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: str = Field(..., min_length=1)
+    parameters: dict[str, Any] = Field(default_factory=dict)
 
 
 class SummarizeConfig(BaseModel):
-    """Config for ``summarize_ensemble``. Frozen public contract.
+    """User-supplied configuration for ``summarize_ensemble``.
 
     Parameters
     ----------
-    statistics:
-        Names of statistics to compute per timepoint. Each name must be in
-        :data:`tmelandscape.summarize.registry.KNOWN_STATISTICS`. The default
-        mirrors the LCSS paper's panel.
-    graph_method:
-        Cell-graph construction method passed through to
-        ``spatialtissuepy.network.CellGraph.from_spatial_data``.
-    graph_radius_um:
-        Proximity / contact radius in micrometres. Used by the proximity
-        graph and by all radius-based statistics (``interaction_strength_matrix``
-        in particular). Must be strictly positive.
-    n_workers:
-        Number of Dask workers for ensemble aggregation. Must be ``>= 1``.
-    include_dead_cells:
-        Whether to include cells flagged as dead in the underlying PhysiCell
-        output when building the ``SpatialTissueData``. Default ``False``
-        mirrors the LCSS-paper convention.
+    statistics
+        Required list of :class:`StatisticSpec` (or plain string names, which
+        are coerced into ``StatisticSpec(name=...)``). At least one entry.
+    n_workers
+        Number of Dask workers for ensemble aggregation. ``>= 1``.
+    include_dead_cells
+        Whether dead cells participate in the ``SpatialTissueData`` passed
+        to each metric. Default ``False`` matches the LCSS convention but is
+        otherwise neutral.
+    rewrite_interaction_keys
+        Whether to rewrite output keys of the shape
+        ``interaction_<src>_<dst>`` to ``interaction_<src>|<dst>``. The ``|``
+        delimiter disambiguates pair keys when cell-type names contain
+        underscores (``M0_macrophage``, ``effector_T_cell``). Default
+        ``True`` — turn off only if you need byte-for-byte compatibility
+        with raw spatialtissuepy output.
     """
 
-    statistics: list[str] = Field(
-        default_factory=_default_statistics,
+    statistics: list[StatisticSpec] = Field(
+        ...,
+        min_length=1,
         description=(
-            "StatisticsPanel keys to compute per timepoint. Default mirrors the LCSS paper's panel."
+            "Required: the metrics to compute per timepoint. No defaults are "
+            "supplied — call `tmelandscape.summarize.list_available_statistics()` "
+            "to discover names, then pass them here."
         ),
     )
-    graph_method: Literal["proximity", "knn", "delaunay", "gabriel"] = "proximity"
-    graph_radius_um: float = Field(
-        default=30.0,
-        gt=0.0,
-        description=(
-            "Radius in micrometres. Used (a) by graph construction when "
-            "`graph_method='proximity'` (otherwise the graph builder may ignore it), "
-            "AND (b) as the interaction-detection radius for `interaction_strength_matrix` "
-            "regardless of `graph_method`. PhysiCell stores positions in micrometres; "
-            "the value is passed through verbatim to spatialtissuepy as a unitless float."
-        ),
-    )
-    n_workers: int = Field(
-        default=1,
-        ge=1,
-        description="Dask workers for ensemble aggregation.",
-    )
+    n_workers: int = Field(default=1, ge=1)
     include_dead_cells: bool = False
+    rewrite_interaction_keys: bool = True
 
-    @field_validator("statistics")
+    @field_validator("statistics", mode="before")
     @classmethod
-    def _statistics_are_known(cls, value: list[str]) -> list[str]:
-        # Lazy import to avoid a circular dependency: ``registry`` imports
-        # ``SummarizeConfig`` for its ``compute_statistic`` type hint.
-        from tmelandscape.summarize.registry import KNOWN_STATISTICS
+    def _coerce_and_validate_statistics(cls, value: Any) -> list[StatisticSpec]:
+        # Accept plain strings as shorthand for `StatisticSpec(name=..., parameters={})`.
+        if not isinstance(value, list):
+            raise ValueError("statistics must be a list")
+        coerced: list[StatisticSpec] = []
+        for item in value:
+            if isinstance(item, str):
+                coerced.append(StatisticSpec(name=item))
+            elif isinstance(item, StatisticSpec):
+                coerced.append(item)
+            elif isinstance(item, dict):
+                coerced.append(StatisticSpec.model_validate(item))
+            else:
+                raise ValueError(
+                    f"statistics entries must be str, dict, or StatisticSpec; got {type(item)!r}"
+                )
 
-        unknown = [name for name in value if name not in KNOWN_STATISTICS]
+        # Validate metric names against spatialtissuepy's live registry. The
+        # registry is populated by module-import side effects, so we import the
+        # registering modules first. Lazy to keep `import tmelandscape` light.
+        from tmelandscape.summarize.registry import (
+            available_metric_names,
+        )
+
+        available = available_metric_names()
+        unknown = [s.name for s in coerced if s.name not in available]
         if unknown:
-            known_sorted = sorted(KNOWN_STATISTICS)
             raise ValueError(
-                f"Unknown statistic name(s): {unknown}. Known statistics are: {known_sorted}."
+                f"Unknown statistic name(s): {unknown}. "
+                f"Call tmelandscape.summarize.list_available_statistics() to "
+                f"see the catalogue ({len(available)} metrics available)."
             )
-        return value
+        return coerced

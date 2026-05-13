@@ -24,6 +24,20 @@ def summarize(
             help="Path to a SweepManifest JSON (the artefact from `tmelandscape sample`).",
         ),
     ],
+    summarize_config_path: Annotated[
+        Path,
+        typer.Argument(
+            exists=True,
+            file_okay=True,
+            dir_okay=False,
+            readable=True,
+            help=(
+                "JSON file holding a SummarizeConfig. Required: there is no "
+                "default panel. Run `tmelandscape statistics list` to discover "
+                "available metric names."
+            ),
+        ),
+    ],
     physicell_root: Annotated[
         Path,
         typer.Option(
@@ -44,14 +58,6 @@ def summarize(
             help="Path of the Zarr store to write.",
         ),
     ] = Path("ensemble.zarr"),
-    summarize_config_path: Annotated[
-        Path | None,
-        typer.Option(
-            "--summarize-config",
-            "-c",
-            help="Optional JSON file holding a SummarizeConfig. Defaults to the LCSS panel.",
-        ),
-    ] = None,
     chunk_simulations: Annotated[
         int, typer.Option(help="Zarr chunk size along `simulation`.")
     ] = 32,
@@ -64,11 +70,7 @@ def summarize(
 ) -> None:
     """Run step 3: spatial-statistic summarisation + ensemble Zarr aggregation."""
     manifest = SweepManifest.load(manifest_path)
-    config = (
-        SummarizeConfig.model_validate_json(summarize_config_path.read_text())
-        if summarize_config_path is not None
-        else SummarizeConfig()
-    )
+    config = SummarizeConfig.model_validate_json(summarize_config_path.read_text())
     zarr_path = summarize_ensemble(
         manifest,
         physicell_root=physicell_root,
@@ -81,6 +83,6 @@ def summarize(
     summary = {
         "zarr_path": str(zarr_path),
         "n_simulations": len({row.simulation_id for row in manifest.rows}),
-        "statistics": list(config.statistics),
+        "statistics": [spec.name for spec in config.statistics],
     }
     typer.echo(json.dumps(summary, indent=2))

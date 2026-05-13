@@ -32,7 +32,7 @@ def summarize_ensemble(
     *,
     physicell_root: str | Path,
     output_zarr: str | Path,
-    config: SummarizeConfig | None = None,
+    config: SummarizeConfig,
     chunk_simulations: int = 32,
     chunk_timepoints: int = -1,
     chunk_statistics: int = -1,
@@ -51,8 +51,8 @@ def summarize_ensemble(
     output_zarr
         Path of the Zarr store to write. Created if missing.
     config
-        :class:`SummarizeConfig` selecting which statistics to compute. Default
-        is the LCSS-paper panel.
+        Required :class:`SummarizeConfig` selecting which statistics to compute.
+        There is no default panel (ADR 0009).
     chunk_simulations, chunk_timepoints, chunk_statistics
         Per-axis Zarr chunk size. ``-1`` means "one chunk for the whole axis".
 
@@ -61,7 +61,7 @@ def summarize_ensemble(
     pathlib.Path
         Absolute path of the written Zarr store.
     """
-    cfg = config if config is not None else SummarizeConfig()
+    cfg = config
     root = Path(physicell_root).resolve()
     summary_frames: dict[str, pd.DataFrame] = {}
     seen_sim_ids: set[str] = set()

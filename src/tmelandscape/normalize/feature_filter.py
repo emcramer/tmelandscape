@@ -1,21 +1,16 @@
-"""Configurable feature-column filter.
+"""Configurable feature-column filter for the normalisation step.
 
-Reference oracle (``reference/00_abm_normalization.py``) drops six cell-density
-columns before normalization::
+By default this module drops **no** features. Users who want a subset of
+their summarised columns dropped before normalisation supply the names
+explicitly via :class:`NormalizeConfig.drop_columns` (Phase 3.5; pending).
 
-    M0_macrophage_density, M1_macrophage_density, M2_macrophage_density,
-    effector_T_cell_density, exhausted_T_cell_density, malignant_epithelial_cell_density
+There is no built-in list of "always drop" features. Earlier iterations of
+the reference oracle (``reference/00_abm_normalization.py``) hardcoded six
+cell-density columns — that choice was specific to the LCSS-paper
+application, not a property of the algorithm, and has been rolled back per
+the project owner's explicit direction (ADR 0009).
 
 Implementation deferred to Phase 3.5.
 """
 
 from __future__ import annotations
-
-DEFAULT_DROP_COLUMNS: tuple[str, ...] = (
-    "M0_macrophage_density",
-    "M1_macrophage_density",
-    "M2_macrophage_density",
-    "effector_T_cell_density",
-    "exhausted_T_cell_density",
-    "malignant_epithelial_cell_density",
-)
