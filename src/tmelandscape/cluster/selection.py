@@ -42,6 +42,15 @@ from sklearn.metrics import (
 
 _VALID_METRICS = ("wss_elbow", "calinski_harabasz", "silhouette")
 
+# Default cap on the candidate-k upper bound when the caller passes
+# `k_max=None`. The biological motivation (owner directive, 2026-05-14):
+# anything past ~8-10 final TME states becomes biologically less
+# interpretable. The cap of 12 leaves a small buffer above that range
+# while still respecting interpretability. A caller who needs more can
+# always pass `k_max=N` explicitly. See decision log
+# 2026-05-14-cluster-count-max-default.md.
+_DEFAULT_K_MAX_CAP = 12
+
 # Silhouette is O(n^2) in the number of samples. For ensembles much
 # larger than this the cost dominates the rest of clustering; cap at
 # a fixed deterministic subsample.
@@ -105,7 +114,10 @@ def select_n_clusters(
         Inclusive lower bound on the candidate range. Must be ``>= 2``
         and ``<= n_leiden_clusters``.
     k_max
-        Inclusive upper bound. ``None`` ⇒ ``min(20, n_leiden_clusters)``.
+        Inclusive upper bound. ``None`` ⇒
+        ``min(_DEFAULT_K_MAX_CAP, n_leiden_clusters)`` (the cap is 12 —
+        the biologically interpretable upper bound for TME states; see
+        decision log 2026-05-14-cluster-count-max-default.md).
         Internally clamped to ``n_leiden_clusters``.
 
     Returns
@@ -130,7 +142,11 @@ def select_n_clusters(
             f"({n_leiden_clusters}); cannot evaluate any candidate k."
         )
 
-    upper = min(20, n_leiden_clusters) if k_max is None else min(k_max, n_leiden_clusters)
+    upper = (
+        min(_DEFAULT_K_MAX_CAP, n_leiden_clusters)
+        if k_max is None
+        else min(k_max, n_leiden_clusters)
+    )
     if upper < k_min:
         raise ValueError(
             f"resolved candidate-k range is empty: k_min={k_min}, "

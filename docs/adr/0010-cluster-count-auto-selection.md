@@ -1,7 +1,7 @@
 # 0010 — Cluster-count auto-selection (no silent default for `n_final_clusters`)
 
-- **Status:** Accepted
-- **Date:** 2026-05-13
+- **Status:** Accepted (revised 2026-05-14: default `k_max` cap narrowed from 20 to 12 — see [decision log](../development/decisions/2026-05-14-cluster-count-max-default.md))
+- **Date:** 2026-05-13 (revised 2026-05-14)
 - **Deciders:** Eric, Claude
 
 ## Context
@@ -54,9 +54,13 @@ Three metrics are supported, with **WSS elbow as the default**:
    argmax over candidates. For large ensembles a subsample cap may be
    applied to keep this O(n).
 
-The candidate range defaults to `[2, min(20, n_leiden_clusters)]`. Both
-bounds are user-overridable via `cluster_count_min` and
-`cluster_count_max`.
+The candidate range defaults to `[2, min(12, n_leiden_clusters)]`. The
+upper-bound cap of 12 (revised 2026-05-14, was 20) reflects the
+biologically interpretable upper bound for TME states — anything past
+~8-10 final states becomes hard to interpret, and 12 leaves a small
+buffer above that range. Both bounds are user-overridable via
+`cluster_count_min` and `cluster_count_max`. See
+[decision log: cluster_count_max default](../development/decisions/2026-05-14-cluster-count-max-default.md).
 
 The output Zarr stores per-candidate metric values in a new
 `cluster_count_scores` variable, dimensioned by a new

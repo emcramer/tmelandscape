@@ -182,7 +182,10 @@ def cluster_leiden_ward(
     cluster_count_min, cluster_count_max
         Inclusive bounds for the candidate-k range used by
         auto-selection. ``cluster_count_max=None`` ⇒
-        ``min(20, n_leiden_clusters)``.
+        ``min(12, n_leiden_clusters)`` (the biologically interpretable
+        upper bound for TME states; the cap lives in
+        :func:`tmelandscape.cluster.selection.select_n_clusters` as
+        ``_DEFAULT_K_MAX_CAP``).
 
     Returns
     -------

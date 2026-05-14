@@ -2,6 +2,26 @@
 
 All notable changes to `tmelandscape`. Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The project follows SemVer pre-1.0 (breaking changes are allowed on minor bumps but called out below).
 
+## [0.6.1] — 2026-05-14 — housekeeping: cluster-count cap, k≥4 regression test, decision-log system
+
+### Changed
+
+- **`cluster_count_max` default narrowed** from `min(20, n_leiden_clusters)` to `min(12, n_leiden_clusters)` in `tmelandscape.cluster.selection.select_n_clusters`. The cap of 12 reflects the biologically interpretable upper bound for TME states (Eric: "anything past 8-10 clusters becomes biologically less interpretable"). Callers who need a wider range can still pass `cluster_count_max=N` explicitly. See [decision log](docs/development/decisions/2026-05-14-cluster-count-max-default.md).
+- **ADR 0008 revised** — removed the "PyPI before v1.0" target language per owner directive. `tissue_simulator` and `spatialtissuepy` will remain git+tag pinned indefinitely. See [decision log](docs/development/decisions/2026-05-14-no-pypi-plan.md).
+
+### Added
+
+- **Decision-log system** under `docs/development/decisions/` — per-decision and per-session entries with a chronological index. Excluded from the published docs site (it's an internal artefact). Process: write one entry per non-obvious choice and one session log per working session. See `docs/development/decisions/README.md` for the rules. Initial entries cover the four v0.6.1 housekeeping decisions plus a session log for the Phase 5 v0.6.0 ship.
+- **k≥4 anchor regression test** in `tests/unit/test_cluster_selection.py` — exercises a 5-blob fixture where the true WSS elbow is at k=5. Verifies the private k=1 anchor used to expose convex shape to kneed doesn't bias the chosen k toward small values. Both `wss_elbow` and `calinski_harabasz` land in `[4, 6]` on this fixture.
+- **Decision-log entry** [`2026-05-14-wss-elbow-algorithm-options.md`](docs/development/decisions/2026-05-14-wss-elbow-algorithm-options.md) — surveys six options for replacing the marginal-decrease fallback (kneed-only, L-method, exponential-asymptote fit, etc.) with a recommendation. Status: Proposed; awaiting owner pick.
+
+### Verification snapshot
+
+- `uv run pytest -q` — 377 passed (375 v0.6.0 + 2 new regression tests), 1 deselected, 1 warning.
+- `uv run ruff check .` / `uv run ruff format --check .` / `uv run mypy src` — clean.
+- `uv run mkdocs build --strict` — exit 0.
+- `tmelandscape version` — prints `0.6.1`.
+
 ## [0.6.0] — 2026-05-14 — Phase 5: two-stage Leiden + Ward clustering
 
 ### Added
@@ -150,6 +170,7 @@ This release implements the project owner's directive that *the user* picks whic
 - CI workflows (lint + type + tests on macOS + Linux × Python 3.11 + 3.12); docs deploy workflow.
 - `scripts/fetch_example_data.py` for Zenodo-backed example PhysiCell sims.
 
+[0.6.1]: https://github.com/emcramer/tmelandscape/releases/tag/v0.6.1
 [0.6.0]: https://github.com/emcramer/tmelandscape/releases/tag/v0.6.0
 [0.5.0]: https://github.com/emcramer/tmelandscape/releases/tag/v0.5.0
 [0.4.0]: https://github.com/emcramer/tmelandscape/releases/tag/v0.4.0

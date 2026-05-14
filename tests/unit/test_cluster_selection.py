@@ -7,7 +7,8 @@ Covers the Stream A Phase 5 checklist from
 * Calinski-Harabasz argmax matches argmax of the per-k CH array.
 * Silhouette argmax matches argmax of the per-k silhouette array.
 * ``k_min > n_leiden_clusters`` raises ``ValueError``.
-* ``k_max=None`` resolves the upper bound to ``min(20, n_leiden_clusters)``.
+* ``k_max=None`` resolves the upper bound to ``min(12, n_leiden_clusters)``
+  (the biologically interpretable cap; was 20 pre-v0.6.1).
 * ``k_scores`` has the same length as ``k_candidates``.
 * Determinism: identical input ⇒ identical ``SelectionResult``.
 * Invalid metric string raises ``ValueError``.
@@ -40,7 +41,7 @@ def _three_blob_setup(
     is built over the per-Leiden-community means, mirroring the real
     pipeline. We bump ``n_leiden_clusters`` artificially by splitting
     each blob into a few sub-communities so the candidate range
-    ``[2, min(20, n_leiden_clusters)]`` covers k=3 comfortably.
+    ``[2, min(12, n_leiden_clusters)]`` covers k=3 comfortably.
     """
     rng = np.random.default_rng(seed)
     centres = np.array(
@@ -158,11 +159,15 @@ def test_invalid_metric_raises() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_k_max_none_resolves_to_min_20_n_leiden() -> None:
-    """``k_max=None`` ⇒ candidate range upper bound is ``min(20, n_leiden)``."""
+def test_k_max_none_resolves_to_min_12_n_leiden() -> None:
+    """``k_max=None`` ⇒ candidate range upper bound is ``min(12, n_leiden)``.
+
+    The cap of 12 is the biologically interpretable upper bound for TME
+    states (decision log 2026-05-14-cluster-count-max-default.md).
+    """
     embedding, leiden_labels, linkage = _three_blob_setup()
     n_leiden = int(np.unique(leiden_labels).size)
-    expected_upper = min(20, n_leiden)
+    expected_upper = min(12, n_leiden)
 
     result = select_n_clusters(embedding, leiden_labels, linkage, metric="wss_elbow")
 
@@ -215,3 +220,87 @@ def test_determinism_repeated_calls_equal_result() -> None:
         assert a.metric == b.metric
         np.testing.assert_array_equal(a.k_candidates, b.k_candidates)
         np.testing.assert_array_equal(a.k_scores, b.k_scores)
+
+
+# ---------------------------------------------------------------------------
+# k>=4 anchor regression
+# ---------------------------------------------------------------------------
+
+
+def _five_blob_setup(
+    n_per_blob: int = 30,
+    n_feature: int = 8,
+    separation: float = 9.0,
+    seed: int = 7,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """5 well-separated blobs with sub-communities, so the true elbow is k≥4.
+
+    Constructed analogously to ``_three_blob_setup`` but with 5 blob
+    centres in a 5-vertex simplex-like arrangement and 4 sub-communities
+    per blob, yielding ``n_leiden_clusters == 20``. The wide separation
+    relative to within-blob noise should produce a WSS curve whose elbow
+    is at k=5, well above ``k_min=2``.
+    """
+    rng = np.random.default_rng(seed)
+    centres = separation * np.eye(5, n_feature, dtype=np.float64)
+
+    embeddings: list[np.ndarray] = []
+    leiden_labels_parts: list[np.ndarray] = []
+    next_community_id = 0
+    for c in centres:
+        blob = rng.standard_normal(size=(n_per_blob, n_feature)) + c
+        embeddings.append(blob)
+        sub_ids = np.repeat(np.arange(4) + next_community_id, n_per_blob // 4 + 1)[:n_per_blob]
+        leiden_labels_parts.append(sub_ids)
+        next_community_id += 4
+
+    embedding = np.vstack(embeddings).astype(np.float64)
+    leiden_labels = np.concatenate(leiden_labels_parts).astype(np.int_)
+
+    unique_ids = np.unique(leiden_labels)
+    cluster_means = np.stack([embedding[leiden_labels == c].mean(axis=0) for c in unique_ids])
+    d = spd.pdist(cluster_means, metric="euclidean")
+    linkage = sch.linkage(d, method="ward").astype(np.float64)
+    return embedding, leiden_labels, linkage
+
+
+def test_wss_elbow_five_blobs_picks_k_at_or_above_four() -> None:
+    """5-blob fixture: the WSS elbow must land at k≥4 — anchor regression.
+
+    Reviewer A2 (Phase 5, RISK #2) noted that the private k=1 anchor used
+    inside ``_wss_elbow`` to expose the convex shape to kneed could in
+    principle bias the chosen k toward smaller values when the true
+    elbow is at k≥4. This regression fixture explicitly exercises that
+    case: 5 well-separated blobs ⇒ the WSS-vs-k curve has a clear drop
+    at k=5. If the k=1 anchor were pulling kneed too early, this test
+    would pick k=2 or k=3 and fail. Assertion uses a tolerance band of
+    ``[4, 6]`` to allow for kneed's known slop on convex-decreasing
+    curves without being so loose as to mask a real regression.
+
+    Linked decision: docs/development/decisions/2026-05-14-wss-elbow-algorithm-options.md.
+    """
+    embedding, leiden_labels, linkage = _five_blob_setup()
+
+    result = select_n_clusters(embedding, leiden_labels, linkage, metric="wss_elbow")
+
+    assert result.metric == "wss_elbow"
+    assert 4 <= result.n_clusters <= 6, (
+        f"WSS elbow picked k={result.n_clusters} on a 5-blob fixture where "
+        f"the true elbow is at k=5. If this is a small-k bias from the k=1 "
+        f"anchor, see the deferred WSS-elbow-algorithm-options decision log."
+    )
+
+
+def test_wss_elbow_five_blobs_calinski_harabasz_also_finds_k_at_or_above_four() -> None:
+    """Companion check: CH on the same 5-blob fixture also lands at k≥4.
+
+    The CH metric does not use the k=1 anchor (it scores per-window
+    labels directly), so this acts as a sanity floor on what the WSS
+    elbow ought to roughly agree with on a fixture this well-separated.
+    """
+    embedding, leiden_labels, linkage = _five_blob_setup()
+
+    result = select_n_clusters(embedding, leiden_labels, linkage, metric="calinski_harabasz")
+
+    assert result.metric == "calinski_harabasz"
+    assert 4 <= result.n_clusters <= 6

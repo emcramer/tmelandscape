@@ -47,7 +47,7 @@ the reference; see
      `fcluster(Z, t=n_final_clusters, criterion='maxclust')`.
    - **If `n_final_clusters is None`**, *auto-select* `k` over the
      candidate range `[cluster_count_min, cluster_count_max]`
-     (default upper bound `min(20, n_leiden_clusters)`) using the
+     (default upper bound `min(12, n_leiden_clusters)`) using the
      chosen `cluster_count_metric`:
      - `wss_elbow` *(default)*: minimise within-cluster sum of squares,
        knee detected via [`kneed.KneeLocator`](https://github.com/arvkevi/kneed).
@@ -86,7 +86,7 @@ MCP agents call `list_cluster_strategies`.
 | `n_final_clusters` | `int \| None (>=2)` | `None` | Number of TME states. `None` ⇒ auto-select via `cluster_count_metric`. **No package default — see [ADR 0010](../adr/0010-cluster-count-auto-selection.md).** |
 | `cluster_count_metric` | `Literal["wss_elbow", "calinski_harabasz", "silhouette"]` | `"wss_elbow"` | Auto-selection metric. Only used when `n_final_clusters is None`. |
 | `cluster_count_min` | `int (>=2)` | `2` | Inclusive lower bound on the candidate-k range. |
-| `cluster_count_max` | `int \| None (>=2)` | `None` | Inclusive upper bound. `None` ⇒ `min(20, n_leiden_clusters)`. |
+| `cluster_count_max` | `int \| None (>=2)` | `None` | Inclusive upper bound. `None` ⇒ `min(12, n_leiden_clusters)`. |
 | `source_variable` | `str` | `"embedding"` | Input array name. |
 | `leiden_labels_variable` | `str` | `"leiden_labels"` | Output Leiden-labels variable name. |
 | `final_labels_variable` | `str` | `"cluster_labels"` | Output final-labels variable name. |

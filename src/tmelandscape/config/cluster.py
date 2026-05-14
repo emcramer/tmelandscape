@@ -80,7 +80,9 @@ class ClusterConfig(BaseModel):
         (a single-cluster cut is degenerate for every metric here).
     cluster_count_max
         Inclusive upper bound on the candidate-k range. ``None`` ⇒ runtime
-        heuristic ``min(20, n_leiden_clusters)``. Must be ``>= 2`` if
+        heuristic ``min(12, n_leiden_clusters)`` (12 is the biologically
+        interpretable cap for TME states; see decision log
+        2026-05-14-cluster-count-max-default.md). Must be ``>= 2`` if
         supplied.
     source_variable
         Name of the input Zarr data variable carrying the embedding to be
@@ -176,7 +178,8 @@ class ClusterConfig(BaseModel):
         ge=2,
         description=(
             "Inclusive upper bound on the candidate-k range. "
-            "None ⇒ runtime heuristic min(20, n_leiden_clusters)."
+            "None ⇒ runtime heuristic min(12, n_leiden_clusters) (12 is "
+            "the biologically interpretable cap for TME states)."
         ),
     )
 

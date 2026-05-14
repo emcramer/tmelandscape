@@ -1,7 +1,7 @@
 # 0008 — Dependency pin policy for git-only upstreams
 
-- **Status:** Accepted
-- **Date:** 2026-05-13
+- **Status:** Accepted (revised 2026-05-14: PyPI-target language removed per owner directive — see [decision log](../development/decisions/2026-05-14-no-pypi-plan.md))
+- **Date:** 2026-05-13 (revised 2026-05-14)
 - **Deciders:** Eric, Claude
 
 ## Context
@@ -21,7 +21,7 @@ Workflow:
 3. `uv lock` resolves to whatever commit the tag points to; `uv sync` reproduces deterministically across machines.
 4. An ADR-worthy bump (new tag) is captured in tmelandscape's CHANGELOG / commit history.
 
-For dual-published upstreams (a PyPI release exists), prefer PyPI and drop the git+URL entirely. Target: both `tissue_simulator` and `spatialtissuepy` on PyPI before tmelandscape v1.0 ships.
+For dual-published upstreams (a PyPI release exists), prefer PyPI and drop the git+URL entirely. **PyPI publishing for `tissue_simulator` and `spatialtissuepy` is not a project goal** — both packages will remain git+tag pinned indefinitely. If either ships to PyPI in the future, the owner will signal a re-pin; until then no roadmap line item depends on it. See [decision log: no PyPI plan](../development/decisions/2026-05-14-no-pypi-plan.md).
 
 ## Action items at the time of writing
 
@@ -29,12 +29,14 @@ For dual-published upstreams (a PyPI release exists), prefer PyPI and drop the g
 - `spatialtissuepy` is currently pinned to commit `c03cfa4`. Maintainer should tag `v0.2.0` at that commit. tmelandscape pin updates to `@v0.2.0`.
 - Until tags exist, the commit-pinned form is acceptable as a temporary measure; the policy is "tagged unless impossible right now."
 
+**Status (2026-05-14):** both action items complete. `tissue_simulator` is now pinned at `@v0.1.4`; `spatialtissuepy` is now pinned at `@v0.0.1`.
+
 ## Consequences
 
 - Drift risk eliminated: a `uv lock --upgrade` on an unchanged tag does nothing.
 - Human-readable provenance: looking at `pyproject.toml` tells you the upstream version, not just a commit hash.
 - Slight friction on the upstream side: maintainers have to remember to tag. Mitigation: document the tag-on-release habit in upstream READMEs and / or automate via release-please / a release script.
-- Once upstreams ship to PyPI, this ADR is largely retired in favour of the standard semver dependency style.
+- The git+tag form is the **long-term plan**, not a transitional one. The ADR does not retire on a hypothetical PyPI migration.
 
 ## Alternatives considered
 

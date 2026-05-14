@@ -5,6 +5,14 @@ repo_url: https://github.com/emcramer/tmelandscape
 repo_name: emcramer/tmelandscape
 edit_uri: edit/main/docs/
 
+# The decision log under docs/development/decisions/ is a project-internal
+# artefact for orchestrators and agents (see its README). Entries link
+# freely to repo-root files (tasks/, CHANGELOG.md, ADRs) and aren't
+# subject to the published-docs link-completeness check. Exclude from
+# the rendered site.
+exclude_docs: |
+  development/decisions/*
+
 theme:
   name: material
   features:

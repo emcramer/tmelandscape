@@ -101,7 +101,7 @@ class ClusterConfig(BaseModel):
         "wss_elbow", "calinski_harabasz", "silhouette"
     ] = "wss_elbow"
     cluster_count_min: int = Field(default=2, ge=2)
-    # None ⇒ runtime heuristic: min(20, n_leiden_clusters).
+    # None ⇒ runtime heuristic: min(12, n_leiden_clusters).
     cluster_count_max: int | None = Field(default=None, ge=2)
 
     # ----- Variable naming --------------------------------------------
@@ -202,7 +202,7 @@ def cluster_leiden_ward(
         Number of final TME states to cut the Ward dendrogram into. If
         ``None``, k is picked automatically via ``cluster_count_metric``
         over the candidate range
-        ``[cluster_count_min, min(cluster_count_max or 20, n_leiden_clusters)]``.
+        ``[cluster_count_min, min(cluster_count_max or 12, n_leiden_clusters)]``.
         If an integer, must be ``>= 2`` and ``<= n_leiden_clusters``; the
         Ward step raises a clear ``ValueError`` otherwise.
     cluster_count_metric
@@ -212,7 +212,7 @@ def cluster_leiden_ward(
         - ``"silhouette"``: argmax of sklearn's silhouette score.
     cluster_count_min, cluster_count_max
         Inclusive bounds on the candidate-k range for auto-selection.
-        ``cluster_count_max=None`` ⇒ ``min(20, n_leiden_clusters)``.
+        ``cluster_count_max=None`` ⇒ ``min(12, n_leiden_clusters)``.
 
     Returns
     -------
@@ -289,7 +289,7 @@ def select_n_clusters(
           argmax.
     k_min, k_max
         Inclusive bounds on the candidate range. ``k_max=None`` ⇒
-        ``min(20, n_leiden_clusters)``. If ``k_min > n_leiden_clusters``,
+        ``min(12, n_leiden_clusters)``. If ``k_min > n_leiden_clusters``,
         raise ``ValueError``.
 
     Returns
@@ -406,7 +406,7 @@ def cluster_ensemble(
   - Calinski-Harabasz argmax on the same fixture matches expectation.
   - Silhouette argmax likewise.
   - `k_min > n_leiden_clusters` raises `ValueError`.
-  - `k_max=None` ⇒ uses `min(20, n_leiden_clusters)`.
+  - `k_max=None` ⇒ uses `min(12, n_leiden_clusters)`.
   - `k_scores` has the same length as `k_candidates`.
   - Determinism: same input → same `SelectionResult`.
 

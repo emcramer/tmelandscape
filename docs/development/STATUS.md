@@ -4,7 +4,7 @@
 
 ## Where the project is (2026-05-14)
 
-**v0.6.0 shipped.** Pipeline steps 1, 3, 3.5, 4, and 5 are implemented end-to-end via three public surfaces (Python API, CLI, MCP). Step 2 (running PhysiCell simulations) is intentionally out of scope. v1 scope (per [ADR 0005](../adr/0005-no-msm-in-v1.md)) ends at clustering; the next phase is visualisation (Phase 6, target v0.7.0).
+**v0.6.1 shipped** (housekeeping bundle on top of the Phase 5 v0.6.0 ship earlier today). Pipeline steps 1, 3, 3.5, 4, and 5 are implemented end-to-end via three public surfaces (Python API, CLI, MCP). Step 2 (running PhysiCell simulations) is intentionally out of scope. v1 scope (per [ADR 0005](../adr/0005-no-msm-in-v1.md)) ends at clustering; the next phase is visualisation (Phase 6, target v0.7.0). A **decision-log system** was established this session under `docs/development/decisions/` — read its `README.md` before writing new code so you can capture decisions in line with the new process.
 
 | Phase | Step | Version | Status | Reference oracle |
 | --- | --- | --- | --- | --- |
@@ -14,17 +14,17 @@
 | 3 | Summarisation | v0.2.0 → v0.3.0 (panel rollback) | shipped | `spatialtissuepy` registry |
 | 3.5 | Normalisation | v0.4.0 | shipped | `reference/00_abm_normalization.py` |
 | 4 | Embedding | v0.5.0 | shipped | `reference/utils.py::window_trajectory_data` |
-| 5 | Clustering | v0.6.0 | **just shipped** | `reference/01_abm_generate_embedding.py` lines ~519-720 |
-| 6 | Visualisation | (target v0.7.0) | **NEXT** | TBD |
+| 5 | Clustering | v0.6.0 → v0.6.1 (housekeeping) | shipped | `reference/01_abm_generate_embedding.py` lines ~519-720 |
+| 6 | Visualisation | (target v0.7.0) | **NEXT** | LCSS figs 1/3/4/6 + TNBC figs 2a-e/6a-c |
 
-## Verification snapshot (v0.6.0)
+## Verification snapshot (v0.6.1)
 
-- `uv run pytest -q` — **375 passed, 1 deselected**, 1 warning (`spatialtissuepy.topology.visualization` upstream deprecation, harmless).
+- `uv run pytest -q` — **377 passed, 1 deselected**, 1 warning (`spatialtissuepy.topology.visualization` upstream deprecation, harmless).
 - `uv run ruff check .` — clean.
 - `uv run ruff format --check .` — clean.
-- `uv run mypy src` — clean (45 source files, strict mode).
+- `uv run mypy src` — clean (47 source files, strict mode).
 - `uv run mkdocs build --strict` — exit 0.
-- `tmelandscape version` — prints `0.6.0`.
+- `tmelandscape version` — prints `0.6.1`.
 - `tmelandscape-mcp` — boots; **11 tools registered**.
 
 ## MCP tools (11)
@@ -88,17 +88,21 @@ _None._ Phase 5 complete. Phase 6 (visualisation) not yet started; no task file 
 
 ## Open questions (for Eric)
 
-1. **Phase 6 (visualisation) — what to ship.** ROADMAP currently lists FNN/MI diagnostics, UMAP scatter, state-coloured trajectories. Which of these are highest priority? Are there figures from the LCSS paper or other manuscripts that v0.7.0 should reproduce? Should we draft a task file similar to `tasks/06-clustering-implementation.md` before kicking off?
-2. **PyPI publishing for `tissue_simulator` and `spatialtissuepy`.** Both are git-pinned via tag right now (per ADR 0008). The ADR's target is to migrate to PyPI before v1.0 ships. Is there a timeline for that, or should we plan to remain on git+URL through v0.7.0?
+1. **WSS-elbow algorithm — pick one of the proposed paths.** See [decision log](decisions/2026-05-14-wss-elbow-algorithm-options.md). Recommendation: Option 0 (fix the marginal-decrease fallback) + Option 2 (add an L-method metric). Pending owner pick before any code lands.
+
+Resolved in this session (see decision log):
+
+- ~~Phase 6 scope~~ — figures decided: LCSS 1, 3, 4, 6 + TNBC 2a-e, 6a-c. Task file drafted (next).
+- ~~PyPI plan~~ — not a goal; ADR 0008 amended; see [decision log: no PyPI plan](decisions/2026-05-14-no-pypi-plan.md).
 
 ## Deferred follow-up tickets from Phase 5 reviews
 
-These were noted by reviewers but punted out of v0.6.0 — none are blockers.
+Status as of v0.6.1.
 
-1. **Marginal-decrease fallback semantics** in `cluster/selection.py`. The WSS k=1 anchor dominates the kneed knee detection; when kneed returns `None` and the fallback runs, it currently always selects `k_min` because the steepest-decrease segment is the 1→2 step. Either refactor the fallback to operate on the un-anchored candidates, or document explicitly that the fallback collapses to `k_min` under the anchor regime.
-2. **Tighten the auto-selection test range.** `test_auto_selection_two_blob_wss_elbow_picks_small_k` currently asserts `chosen in [2, 4]`; if the choice is stable as `==2` across kneed minor versions in CI, tighten it.
-3. **Add a regression fixture for elbows at k≥4** to confirm the k=1 anchor doesn't bias auto-selection toward smaller k in pathological cases.
-4. **Decide on logging consistency across phases.** Phase 5 emits `cluster_ensemble.start` / `.done` structlog events (per contract); Phase 3.5 and Phase 4 orchestrators don't log at all. Either retrofit the earlier phases or drop the Phase 5 logs. Currently keeping them — they live on stderr now that `configure_logging()` is wired into CLI startup.
+1. **Marginal-decrease fallback semantics** in `cluster/selection.py` — captured in [decision log: WSS-elbow algorithm options](decisions/2026-05-14-wss-elbow-algorithm-options.md). Pending owner pick (see Open Questions above).
+2. **Tighten the auto-selection test range** from `chosen in [2, 4]` to `==2`. Still deferred; safe to do once CI confirms stability across kneed minor versions.
+3. ~~**Add a regression fixture for elbows at k≥4**~~ — **DONE in v0.6.1.** `tests/unit/test_cluster_selection.py::test_wss_elbow_five_blobs_picks_k_at_or_above_four` plus a companion CH check. Both pass, which is reassuring re: the k=1-anchor-bias concern in this regime.
+4. **Decide on logging consistency across phases.** Phase 5 emits `cluster_ensemble.start` / `.done` structlog events (per contract); Phase 3.5 and Phase 4 orchestrators don't log at all. Either retrofit the earlier phases or drop the Phase 5 logs. Currently keeping them — they live on stderr now that `configure_logging()` is wired into CLI startup. Still deferred.
 
 ## Quirks worth knowing (across phases)
 
