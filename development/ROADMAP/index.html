@@ -815,10 +815,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-4-step-4-embedding-v030" class="md-nav__link">
+  <a href="#phase-4-step-4-embedding-v050-complete" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 4 — Step 4 embedding (v0.3.0)
+        Phase 4 — Step 4 embedding (v0.5.0) — COMPLETE
       
     </span>
   </a>
@@ -1014,10 +1014,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-4-step-4-embedding-v030" class="md-nav__link">
+  <a href="#phase-4-step-4-embedding-v050-complete" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 4 — Step 4 embedding (v0.3.0)
+        Phase 4 — Step 4 embedding (v0.5.0) — COMPLETE
       
     </span>
   </a>
@@ -1174,16 +1174,25 @@
 <li><strong>A-SMELL</strong>: float32 → float64 promotion documented in the algorithm's docstring.</li>
 <li>[x] 168 tests passing (existing 158 + 5 new normalize unit tests in driver, 11 in orchestrator, 23 in config + alternatives, 5 integration = +27 new tests). ruff + format + mypy strict + mkdocs strict all clean.</li>
 </ul>
-<h2 id="phase-4-step-4-embedding-v030">Phase 4 — Step 4 embedding (v0.3.0)<a class="headerlink" href="#phase-4-step-4-embedding-v030" title="Permanent link">&para;</a></h2>
+<h2 id="phase-4-step-4-embedding-v050-complete">Phase 4 — Step 4 embedding (v0.5.0) — COMPLETE<a class="headerlink" href="#phase-4-step-4-embedding-v050-complete" title="Permanent link">&para;</a></h2>
+<p>Shipped 2026-05-13 via the buddy-pair team (3 Implementer + 3 Reviewer agents). Reference oracle: <code>reference/utils.py::window_trajectory_data</code>.</p>
 <ul>
-<li>[ ] <code>tmelandscape.embedding.delay_embed</code> (Takens)</li>
-<li>[ ] FNN dimension search (cross-check vs nolitsa)</li>
-<li>[ ] Mutual-information lag selection</li>
-<li>[ ] Joint <code>optimize_embedding</code></li>
-<li>[ ] Sliding-window construction (<code>W=50</code> default per LCSS paper / reference)</li>
-<li>[ ] Golden-file regression vs reference</li>
-<li>[ ] CLI: <code>tmelandscape embed</code></li>
-<li>[ ] MCP tools: <code>tmelandscape.optimize_embedding</code>, <code>tmelandscape.delay_embed</code></li>
+<li>[x] <code>tmelandscape.embedding.sliding_window.window_trajectory_ensemble</code> — pure function, reference-faithful (row-major flatten, step-1 default, <code>np.nanmean</code> for averages).</li>
+<li>[x] <code>tmelandscape.embedding.alternatives.embed_identity</code> — passthrough baseline / future-strategy anchor.</li>
+<li>[x] <code>tmelandscape.embedding.embed_ensemble</code> — Zarr orchestrator. Reads input lazily, writes a NEW Zarr containing the flattened embedding plus per-window metadata. Per-window coords broadcast from per-sim coords via <code>np.take(simulation_index)</code>. Refuses to overwrite; cleans up partial output on failure.</li>
+<li>[x] <code>tmelandscape.config.embedding.EmbeddingConfig</code> (Pydantic): <code>window_size</code> required (no default), three pairwise variable-name collision checks via <code>@model_validator(mode="after")</code>, <code>drop_statistics=[]</code> default.</li>
+<li>[x] CLI: <code>tmelandscape embed</code> + <code>tmelandscape embed-strategies list</code>.</li>
+<li>[x] MCP tools: <code>embed_ensemble</code>, <code>list_embed_strategies</code>.</li>
+<li>[x] Reviewer findings applied:</li>
+<li><strong>A2 SMELL</strong>: A1's docstring perf claim softened to match empirical ~20 ms/1000 windows.</li>
+<li><strong>B2 SMELL</strong>: <code>_serialise_config</code> dead <code>dict(config)</code> branch replaced with <code>vars(config)</code> for SimpleNamespace stubs.</li>
+<li>Three other reviewer SMELLs noted but non-blocking (chunking heuristic, source-hash forwarding, PEP 673 <code>Self</code> style).</li>
+<li>[x] 247 tests passing (existing 168 + 17 A + 19 B + 38 C + 5 integration = +79 new tests across Phase 4). ruff + format + mypy strict + mkdocs strict all clean.</li>
+</ul>
+<p>Deferred (in line with project-owner "don't add features beyond what's required"):</p>
+<ul>
+<li>FNN / MI optimisation: the reference doesn't use them; user can request as v0.5.x.</li>
+<li>Takens lag-coordinate delay embedding: the reference uses sliding window (same purpose, different math); user can request as v0.5.x.</li>
 </ul>
 <h2 id="phase-5-step-5-clustering-landscape-facade-v040">Phase 5 — Step 5 clustering + Landscape facade (v0.4.0)<a class="headerlink" href="#phase-5-step-5-clustering-landscape-facade-v040" title="Permanent link">&para;</a></h2>
 <blockquote>

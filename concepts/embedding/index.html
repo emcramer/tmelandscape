@@ -477,6 +477,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concept: time-delay embedding (step 4)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -493,6 +511,113 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inputs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#algorithm-sliding_window-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Algorithm — sliding_window (default)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#discovering-available-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Discovering available strategies
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#embeddingconfig-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EmbeddingConfig fields
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-output-zarr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The output Zarr
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-not-in-step-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's not in step 4
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -771,6 +896,102 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inputs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#algorithm-sliding_window-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Algorithm — sliding_window (default)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#discovering-available-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Discovering available strategies
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#embeddingconfig-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EmbeddingConfig fields
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-output-zarr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The output Zarr
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-not-in-step-4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's not in step 4
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -790,10 +1011,179 @@
 
 
 <h1 id="concept-time-delay-embedding-step-4">Concept: time-delay embedding (step 4)<a class="headerlink" href="#concept-time-delay-embedding-step-4" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p><em>Placeholder — will be filled in during Phase 4.</em></p>
-</blockquote>
-<p>Constructs delay-coordinate (Takens) embeddings of each simulation's spatial-statistic time series. Dimension is optimised via False Nearest Neighbours; lag is selected via the first minimum of mutual information.</p>
+<p>Step 4 takes the normalised ensemble Zarr from step 3.5 and converts each
+simulation's <code>(timepoint, statistic)</code> matrix into a stack of overlapping
+sliding-window vectors. The output is a new Zarr where each row is one
+window position from one simulation, flattened to a length-<code>window_size *
+n_statistic</code> embedding vector. Clustering (step 5) operates on these
+vectors.</p>
+<p>The reference oracle is <code>reference/utils.py::window_trajectory_data</code>; the
+implementation matches the reference exactly (row-major flatten, step
+size 1 by default, per-window per-statistic means kept as a companion
+array).</p>
+<h2 id="inputs">Inputs<a class="headerlink" href="#inputs" title="Permanent link">&para;</a></h2>
+<ul>
+<li>The normalised ensemble Zarr from <code>tmelandscape normalize</code>. By default
+  the embedding reads <code>value_normalized</code>; pass a different
+  <code>source_variable</code> to embed the raw <code>value</code> array or any other data
+  variable.</li>
+<li>An <code>EmbeddingConfig</code> (Pydantic) carrying the required <code>window_size</code>
+  and the optional <code>step_size</code> / <code>drop_statistics</code> / variable names.</li>
+</ul>
+<h2 id="algorithm-sliding_window-default">Algorithm — <code>sliding_window</code> (default)<a class="headerlink" href="#algorithm-sliding_window-default" title="Permanent link">&para;</a></h2>
+<p>For each simulation <code>s</code> along the input's <code>simulation</code> axis:</p>
+<ol>
+<li>Take its <code>(n_timepoint, n_statistic)</code> slab.</li>
+<li>Slide a window of length <code>W = config.window_size</code> along the
+   timepoint axis with step <code>config.step_size</code> (default 1).</li>
+<li>For each window position <code>i</code>:</li>
+<li>Flatten the <code>(W, n_statistic)</code> submatrix to a length-<code>W *
+     n_statistic</code> vector (row-major, <code>np.ravel(order="C")</code>).</li>
+<li>Compute the per-statistic mean across the window's <code>W</code> timepoints
+     (with <code>np.nanmean</code> so NaN-only columns produce NaN but finite
+     columns survive). This becomes the <code>window_averages</code> row.</li>
+<li>Skip the simulation if <code>n_timepoint &lt; window_size</code>; its
+   <code>simulation_id</code> is named in the skipped-sims warning and recorded
+   in the <code>n_skipped_simulations</code> provenance attribute.</li>
+</ol>
+<p>Per-simulation metadata (parameter values, <code>ic_id</code>,
+<code>parameter_combination_id</code>) is broadcast along the new <code>window</code> dim so
+each window carries its source-simulation's coords.</p>
+<h2 id="discovering-available-strategies">Discovering available strategies<a class="headerlink" href="#discovering-available-strategies" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>tmelandscape<span class="w"> </span>embed-strategies<span class="w"> </span>list
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tmelandscape.cli.embed_strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">_catalogue</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">_catalogue</span><span class="p">())</span>
+</code></pre></div>
+<p>MCP agents call <code>list_embed_strategies</code>.</p>
+<h2 id="embeddingconfig-fields"><code>EmbeddingConfig</code> fields<a class="headerlink" href="#embeddingconfig-fields" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>strategy</code></td>
+<td><code>Literal["sliding_window"]</code></td>
+<td><code>"sliding_window"</code></td>
+<td>Algorithm to apply.</td>
+</tr>
+<tr>
+<td><code>window_size</code></td>
+<td><code>int (&gt;=1)</code></td>
+<td><strong>required</strong></td>
+<td>Length of the sliding window in timepoints. The LCSS paper suggests <code>W ∈ {30, 50, 80}</code>; the reference uses 50. No package default.</td>
+</tr>
+<tr>
+<td><code>step_size</code></td>
+<td><code>int (&gt;=1)</code></td>
+<td><code>1</code></td>
+<td>Number of timepoints between consecutive window starts.</td>
+</tr>
+<tr>
+<td><code>source_variable</code></td>
+<td><code>str</code></td>
+<td><code>"value_normalized"</code></td>
+<td>Which input data variable carries the time series.</td>
+</tr>
+<tr>
+<td><code>output_variable</code></td>
+<td><code>str</code></td>
+<td><code>"embedding"</code></td>
+<td>Name of the flattened embedding array in the output Zarr. Must differ from <code>source_variable</code> and <code>averages_variable</code>.</td>
+</tr>
+<tr>
+<td><code>averages_variable</code></td>
+<td><code>str</code></td>
+<td><code>"window_averages"</code></td>
+<td>Name of the per-window per-statistic means array in the output Zarr. Must differ from <code>source_variable</code> and <code>output_variable</code>.</td>
+</tr>
+<tr>
+<td><code>drop_statistics</code></td>
+<td><code>list[str]</code></td>
+<td><code>[]</code></td>
+<td>Explicit list of statistic-coord values to drop <em>before</em> windowing. Default <code>[]</code> per ADR 0009.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="code-example">Code example<a class="headerlink" href="#code-example" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tmelandscape.config.embedding</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmbeddingConfig</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tmelandscape.embedding</span><span class="w"> </span><span class="kn">import</span> <span class="n">embed_ensemble</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="n">embed_ensemble</span><span class="p">(</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="s2">&quot;ensemble_normalized.zarr&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="s2">&quot;ensemble_embedded.zarr&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="n">config</span><span class="o">=</span><span class="n">EmbeddingConfig</span><span class="p">(</span><span class="n">window_size</span><span class="o">=</span><span class="mi">50</span><span class="p">),</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="p">)</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_zarr</span><span class="p">(</span><span class="s2">&quot;ensemble_embedded.zarr&quot;</span><span class="p">)</span>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="n">embedding</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;embedding&quot;</span><span class="p">]</span>           <span class="c1"># (n_window, window_size * n_statistic)</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="n">averages</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;window_averages&quot;</span><span class="p">]</span>      <span class="c1"># (n_window, n_statistic)</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a><span class="n">sim_ids</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;simulation_id&quot;</span><span class="p">]</span>         <span class="c1"># (n_window,) — which sim each window came from</span>
+</code></pre></div>
+<h2 id="cli">CLI<a class="headerlink" href="#cli" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Discover available strategies</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>tmelandscape<span class="w"> </span>embed-strategies<span class="w"> </span>list
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Run embedding</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>tmelandscape<span class="w"> </span>embed<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span>ensemble_normalized.zarr<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span>ensemble_embedded.zarr<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span>--config<span class="w"> </span>embedding_config.json
+</code></pre></div>
+<p>The JSON summary printed to stdout includes the output path and the
+applied config.</p>
+<h2 id="the-output-zarr">The output Zarr<a class="headerlink" href="#the-output-zarr" title="Permanent link">&para;</a></h2>
+<p>Dimensions: <code>(window, embedding_feature, statistic)</code>.</p>
+<ul>
+<li><code>window</code> — flat index over all windows (across all simulations).</li>
+<li><code>embedding_feature</code> — flat index of length <code>window_size * n_statistic</code>
+  along the flattened-window axis.</li>
+<li><code>statistic</code> — the (post-drop) original statistic names, carried for
+  the <code>window_averages</code> companion array.</li>
+</ul>
+<p>Coords along <code>window</code>:</p>
+<ul>
+<li><code>simulation_id</code> (string)</li>
+<li><code>window_index_in_sim</code> (int)</li>
+<li><code>start_timepoint</code>, <code>end_timepoint</code> (int, inclusive)</li>
+<li>broadcast per-simulation coords from input: <code>parameter_combination_id</code>,
+  <code>ic_id</code>, <code>parameter_&lt;name&gt;</code></li>
+</ul>
+<p>Data variables:</p>
+<ul>
+<li><code>embedding</code> — shape <code>(n_window, window_size * n_statistic)</code>, float64.</li>
+<li><code>window_averages</code> — shape <code>(n_window, n_statistic)</code>, float64.</li>
+</ul>
+<p>Provenance <code>.zattrs</code>:</p>
+<ul>
+<li><code>embedding_config</code> (JSON-serialised config),</li>
+<li><code>source_input_zarr</code> (resolved input path),</li>
+<li><code>source_variable</code>, <code>window_size</code>, <code>n_skipped_simulations</code>,</li>
+<li><code>created_at_utc</code>, <code>tmelandscape_version</code>,</li>
+<li>Forwarded: <code>source_normalize_config</code>, <code>source_manifest_hash</code> (when
+  the input carries them).</li>
+</ul>
+<h2 id="whats-not-in-step-4">What's <em>not</em> in step 4<a class="headerlink" href="#whats-not-in-step-4" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Choosing <code>window_size</code> automatically.</strong> The LCSS paper's W-sweep
+  (over {30, 50, 80}) is a downstream analysis decision; the package
+  ships no FNN / mutual-information heuristic in v0.5.0. Users supply
+  the window size; future v0.5.x may add optimisation helpers if the
+  workflow demands them.</li>
+<li><strong>Clustering.</strong> Step 5 reads the <code>embedding</code> array from this Zarr
+  and runs Leiden + Ward on the cluster means (see <a href="../../adr/0007-two-stage-leiden-ward-clustering/">ADR
+  0007</a> and the
+  <a href="../../development/ROADMAP/">roadmap</a>).</li>
+</ul>
 
 
 
