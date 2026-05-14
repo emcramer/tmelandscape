@@ -141,14 +141,29 @@ Deferred to follow-up tickets:
 - The `Landscape` facade and `.tmelandscape/` bundle format (revisit when projection is on the table — see [ADR 0005](../adr/0005-no-msm-in-v1.md)).
 - Interpretable state names ("Effector-Dominant" etc.) — purely a downstream labelling concern.
 
-## Phase 6 — Visualisation (target v0.7.0)
+## Phase 6 — Visualisation (v0.7.0) — COMPLETE
 
-- [ ] `tmelandscape.viz.diagnostics` (FNN curve, elbow, MI-vs-lag)
-- [ ] `tmelandscape.viz.embedding` (UMAP scatter; vector-field-style)
-- [ ] `tmelandscape.viz.trajectories` (state-colored time series, Fig. 2 style)
-- [ ] Notebook tutorials in `docs/tutorials/` executed in CI
+Shipped 2026-05-14 via the buddy-pair team (3 Implementer + 3 Reviewer agents). Reproduces **eleven** publication figures (LCSS 3/4/6 + TNBC 2a/2b/2c/2d/2e/6a/6b/6c). LCSS Fig. 1 is a schematic; ships as static SVG asset, not a Python function. See `tasks/07-visualisation-implementation.md` (repo root, not on the docs site) and the [Phase 6 session log](decisions/2026-05-14-phase-6-session.md).
 
-## Phase 7 — Release hardening (v1.0.0)
+- [x] `tmelandscape.viz.embedding` — UMAP-projection family. `fit_umap` (cached projection) + five `plot_*` functions covering LCSS-3, LCSS-4, TNBC-2b/2c/2d/2e.
+- [x] `tmelandscape.viz.trajectories` — `plot_state_feature_clustermap` (TNBC-2a) + `plot_trajectory_clustergram` (TNBC-6a).
+- [x] `tmelandscape.viz.dynamics` — `plot_phase_space_vector_field` (TNBC-6b) + `plot_parameter_by_state` (TNBC-6c, hand-rolled BH-FDR) + `plot_attractor_basins` (LCSS-6).
+- [x] `tmelandscape.landscape.join_manifest_cluster` — Phase-2-manifest ↔ Phase-5-cluster-Zarr join (Stream-C prerequisite). Per-sim terminal label via mode of last `terminal_window_count` windows.
+- [x] **10 MCP tools** (one per figure function) + `list_viz_figures` discovery tool. **Total MCP tool count now 22.**
+- [x] CLI: `tmelandscape viz-figures list` discovery verb. Per-figure CLI verbs intentionally **not** shipped — would overwhelm `--help` and the figures are Python-API + MCP-first anyway.
+- [x] Integration test: Python-API ↔ MCP equivalence on every figure tool + the discovery surface (`tests/integration/test_visualisation_end_to_end.py`, 12 tests).
+- [x] `docs/concepts/viz.md` filled in; `seaborn>=0.13` added to `viz` extra; mypy override centralised.
+- [x] Reviewer findings applied: see [Phase 6 session log](decisions/2026-05-14-phase-6-session.md). Non-blocking SMELLs deferred to v0.7.x.
+- [x] 519 tests passing (377 pre-Phase-6 + 65 unit + 12 integration = +77 new tests across Phase 6). ruff + format + mypy strict + mkdocs strict all clean. Tagged at v0.7.0.
+
+Deferred (out of v0.7.0; tracked in STATUS):
+
+- `tmelandscape.viz.diagnostics` (FNN curve, elbow, MI-vs-lag) — not requested for v0.7.0. Reopen when needed.
+- Notebook tutorials in `docs/tutorials/` executed in CI — orthogonal; can land in v0.7.x.
+- LCSS Figure 1 schematic SVG asset (pending hand-off from Eric).
+- Reviewer follow-ups: `warnings.warn` polish, float-equality fragility, additional regression assertions. See STATUS deferred-follow-ups section.
+
+## Phase 7 — Release hardening (v1.0.0) — NEXT
 
 - [ ] `pytest -m real` green against the three Zenodo-fetched sim_xxx directories
 - [ ] mkdocs published to GitHub Pages

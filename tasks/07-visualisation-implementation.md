@@ -1,10 +1,12 @@
 # 07 — Phase 6 visualisation implementation
 
 - **slug:** 07-visualisation-implementation
-- **status:** drafted, ready for Wave 1 kick-off
-- **owner:** TBD (next orchestrator + 3 buddy-pair teams)
+- **status:** **COMPLETE 2026-05-14** — shipped as v0.7.0 after Wave 1 / 2 / 3.
+- **owner:** Phase 6 orchestrator (claude-opus-4-7) + 3 buddy-pair teams
 - **opened:** 2026-05-14 (drafted)
-- **roadmap link:** Phase 6 — visualisation (target v0.7.0)
+- **shipped:** 2026-05-14 (v0.7.0)
+- **roadmap link:** Phase 6 — visualisation (v0.7.0)
+- **session log:** [decision log 2026-05-14-phase-6-session.md](../docs/development/decisions/2026-05-14-phase-6-session.md)
 
 ## Context
 
@@ -158,7 +160,7 @@ def fit_umap(
 ) -> UMAPResult: ...
 
 def plot_state_umap(
-    umap: UMAPResult,
+    umap_result: UMAPResult,
     cluster_zarr: str | Path,
     *,
     state_palette: dict[int, str] | None = None,
@@ -168,7 +170,7 @@ def plot_state_umap(
     matplotlib's `tab10` for ≤10 states; raise if more than tab10."""
 
 def plot_time_umap(
-    umap: UMAPResult,
+    umap_result: UMAPResult,
     cluster_zarr: str | Path,
     *,
     save_path: str | Path | None = None,
@@ -177,7 +179,7 @@ def plot_time_umap(
     time-coord quirk."""
 
 def plot_feature_umap(
-    umap: UMAPResult,
+    umap_result: UMAPResult,
     cluster_zarr: str | Path,
     *,
     features: Sequence[str],
@@ -188,7 +190,7 @@ def plot_feature_umap(
     appear in the input Zarr's `window_averages.statistic` coord."""
 
 def plot_trajectory_umap(
-    umap: UMAPResult,
+    umap_result: UMAPResult,
     cluster_zarr: str | Path,
     *,
     sim_ids: Sequence[str],
@@ -198,7 +200,7 @@ def plot_trajectory_umap(
     trajectories overlaid as polylines."""
 
 def plot_state_umap_with_vector_field(
-    umap: UMAPResult,
+    umap_result: UMAPResult,
     cluster_zarr: str | Path,
     *,
     grid_size: int = 20,

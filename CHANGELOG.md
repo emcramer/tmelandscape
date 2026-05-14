@@ -2,6 +2,50 @@
 
 All notable changes to `tmelandscape`. Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The project follows SemVer pre-1.0 (breaking changes are allowed on minor bumps but called out below).
 
+## [0.7.0] — 2026-05-14 — Phase 6: visualisation (LCSS + TNBC manuscript figures)
+
+### Added
+
+- **`tmelandscape.viz.embedding`** — UMAP-projection family. `fit_umap` (caches a 2D projection of the cluster-Zarr embedding) + five plot functions reproducing **LCSS Figures 3 and 4** and **TNBC Figures 2b, 2c, 2d, 2e**: `plot_state_umap`, `plot_time_umap`, `plot_feature_umap`, `plot_trajectory_umap`, `plot_state_umap_with_vector_field`. First positional kwarg renamed `umap_result` (avoids shadowing `import umap`; see [decision log](docs/development/decisions/2026-05-14-viz-umap-result-param-rename.md)).
+- **`tmelandscape.viz.trajectories`** — heatmap family. `plot_state_feature_clustermap` (TNBC-2a) and `plot_trajectory_clustergram` (TNBC-6a). Ragged trajectories raise rather than NaN-pad; `leiden_labels` is optional with graceful row-colour-bar degradation. See [decision log](docs/development/decisions/2026-05-14-viz-trajectories-deviations.md).
+- **`tmelandscape.viz.dynamics`** — phase-space and parameter-state plots. `plot_phase_space_vector_field` (TNBC-6b), `plot_parameter_by_state` (TNBC-6c), `plot_attractor_basins` (LCSS-6). BH-FDR hand-rolled to avoid adding `statsmodels` (see [decision log](docs/development/decisions/2026-05-14-bh-fdr-hand-rolled.md)). Parameter / feature names are user-supplied per ADR 0009 — no hardcoded `(rexh, radh)` or `(epithelial, T_eff)` defaults.
+- **`tmelandscape.landscape.join_manifest_cluster`** — Phase-2-manifest ↔ Phase-5-cluster-Zarr join. Returns a DataFrame indexed by `simulation_id` with one column per parameter plus `terminal_cluster_label` (mode of last `terminal_window_count` windows; default 5) and `n_windows`. See [decision log](docs/development/decisions/2026-05-14-terminal-cluster-label-mode.md).
+- **MCP tools** — **10 figure tools** (one per figure function) plus `list_viz_figures` discovery. **Total MCP tool count now 22** (was 11). Each figure tool requires `save_path` (MCP can't return Figure objects) and returns the resolved PNG path plus a small summary.
+- **CLI** — `tmelandscape viz-figures list` discovery verb. Per-figure CLI verbs intentionally **not** shipped (eleven verbs in one namespace would overwhelm `--help`; agents use MCP, humans use the Python API).
+- **`docs/concepts/viz.md`** — full concept page with figure catalogue, module layout, worked example, and MCP-usage section.
+- **`seaborn>=0.13`** added to the `viz` extra (used by clustermap, kdeplot, violinplot).
+- **65 new unit tests** (25 UMAP family + 15 heatmaps + 8 landscape join + 17 dynamics) + **12 new integration tests** (Python-API ↔ MCP equivalence on every figure + discovery surface). Total test count now **454**.
+- **Five Phase-6 decision-log entries** plus a comprehensive Phase 6 session log. See `docs/development/decisions/`.
+
+### Changed
+
+- **`seaborn.*` added to `[[tool.mypy.overrides]]`** in `pyproject.toml`. Per-import `# type: ignore[import-untyped]` on `import seaborn as sns` in all three viz modules removed. See [decision log](docs/development/decisions/2026-05-14-seaborn-mypy-override.md).
+- **`tasks/07-visualisation-implementation.md` frozen API updated** to reflect the `umap_result: UMAPResult` parameter rename.
+
+### Reviewer findings applied (buddy-pair team)
+
+- A2 R3: 7 mypy errors in `test_viz_embedding.py:392` — fixed via `np.asarray(c.get_offsets())`.
+- A2 R1: contour test now asserts `LineCollection` artists appear when `show_density_contours=True`.
+- A2 R2: vector-field smoke test now asserts at least one quiver `PolyCollection`.
+- C2 R5: mismatched-sim-set error-test now asserts both offending sim ids appear in the message.
+- A2 / B2 / C2 cross-stream SMELL: `seaborn.*` centralised in mypy overrides.
+
+### Deferred to v0.7.x (none blocking)
+
+- Float-equality fragility on `Axes.get_xlim()` — switch to `assert_allclose`.
+- `warnings.warn` on `leiden_labels` graceful degradation and on `KNeighborsClassifier` silent neighbor clamp.
+- Quiver false-positive-bin assertion strengthening.
+- Entry-point cross-marker explicit test.
+- LCSS Figure 1 SVG asset (pending hand-off from Eric).
+
+### Verification snapshot
+
+- `uv run pytest -q` — 454 passed, 1 deselected.
+- `uv run ruff check .` / `uv run ruff format --check .` / `uv run mypy src` — clean.
+- `uv run mkdocs build --strict` — exit 0.
+- `tmelandscape version` — prints `0.7.0`.
+- `tmelandscape-mcp` — boots; **22 tools registered**.
+
 ## [0.6.1] — 2026-05-14 — housekeeping: cluster-count cap, k≥4 regression test, decision-log system
 
 ### Changed
@@ -170,6 +214,7 @@ This release implements the project owner's directive that *the user* picks whic
 - CI workflows (lint + type + tests on macOS + Linux × Python 3.11 + 3.12); docs deploy workflow.
 - `scripts/fetch_example_data.py` for Zenodo-backed example PhysiCell sims.
 
+[0.7.0]: https://github.com/emcramer/tmelandscape/releases/tag/v0.7.0
 [0.6.1]: https://github.com/emcramer/tmelandscape/releases/tag/v0.6.1
 [0.6.0]: https://github.com/emcramer/tmelandscape/releases/tag/v0.6.0
 [0.5.0]: https://github.com/emcramer/tmelandscape/releases/tag/v0.5.0

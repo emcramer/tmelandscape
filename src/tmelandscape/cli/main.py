@@ -18,6 +18,7 @@ from tmelandscape.cli.normalize_strategies import app as normalize_strategies_ap
 from tmelandscape.cli.sample import sample
 from tmelandscape.cli.statistics import app as statistics_app
 from tmelandscape.cli.summarize import summarize
+from tmelandscape.cli.viz_figures import app as viz_figures_app
 from tmelandscape.utils.logging import configure_logging
 
 app = typer.Typer(
@@ -51,6 +52,7 @@ app.add_typer(statistics_app, name="statistics")
 app.add_typer(normalize_strategies_app, name="normalize-strategies")
 app.add_typer(embed_strategies_app, name="embed-strategies")
 app.add_typer(cluster_strategies_app, name="cluster-strategies")
+app.add_typer(viz_figures_app, name="viz-figures")
 
 
 if __name__ == "__main__":  # pragma: no cover

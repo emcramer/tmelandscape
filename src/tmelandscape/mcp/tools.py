@@ -5,6 +5,7 @@ Each function here is wrapped as an MCP tool in :mod:`tmelandscape.mcp.server`.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +23,23 @@ from tmelandscape.summarize import summarize_ensemble
 from tmelandscape.summarize.registry import (
     describe_metric,
     list_available_statistics,
+)
+from tmelandscape.viz.dynamics import (
+    plot_attractor_basins,
+    plot_parameter_by_state,
+    plot_phase_space_vector_field,
+)
+from tmelandscape.viz.embedding import (
+    fit_umap,
+    plot_feature_umap,
+    plot_state_umap,
+    plot_state_umap_with_vector_field,
+    plot_time_umap,
+    plot_trajectory_umap,
+)
+from tmelandscape.viz.trajectories import (
+    plot_state_feature_clustermap,
+    plot_trajectory_clustergram,
 )
 
 
@@ -382,5 +400,408 @@ def list_cluster_strategies_tool() -> list[dict[str, str]]:
                 "no-op anchor in tests."
             ),
             "module": "tmelandscape.cluster.alternatives",
+        },
+    ]
+
+
+# ---------------------------------------------------------------------------
+# Phase 6 visualisation tools (one per figure function).
+#
+# Every figure tool **requires** `save_path` (string) — MCP cannot pass
+# matplotlib Figure objects, so the only useful return value is the path
+# of the saved image plus a small summary dict. Tools that depend on a
+# UMAP projection fit it inline using the standard defaults
+# (n_neighbors=15, min_dist=0.1, random_state=42); a future MCP-side
+# caching layer could share fits across tools if call patterns demand it.
+# ---------------------------------------------------------------------------
+
+
+def _viz_summary(
+    save_path: str,
+    figure_tag: str,
+    *,
+    manuscript: str,
+    description: str,
+    extra: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    out: dict[str, Any] = {
+        "save_path": str(Path(save_path).resolve()),
+        "figure_tag": figure_tag,
+        "manuscript": manuscript,
+        "description": description,
+    }
+    if extra:
+        out.update(extra)
+    return out
+
+
+def plot_state_umap_tool(
+    cluster_zarr: str,
+    save_path: str,
+    *,
+    n_neighbors: int = 15,
+    min_dist: float = 0.1,
+    random_state: int = 42,
+) -> dict[str, Any]:
+    """TNBC-2b — state-coloured UMAP scatter of the windowed embedding.
+
+    Fits UMAP inline (parameters tunable via kwargs); writes the figure
+    to ``save_path``. Returns the absolute resolved save path.
+    """
+    umap_result = fit_umap(
+        cluster_zarr,
+        n_neighbors=n_neighbors,
+        min_dist=min_dist,
+        random_state=random_state,
+    )
+    plot_state_umap(umap_result, cluster_zarr, save_path=save_path)
+    return _viz_summary(
+        save_path,
+        "tnbc-2b",
+        manuscript="TNBC",
+        description="state-coloured UMAP scatter",
+    )
+
+
+def plot_time_umap_tool(
+    cluster_zarr: str,
+    save_path: str,
+    *,
+    n_neighbors: int = 15,
+    min_dist: float = 0.1,
+    random_state: int = 42,
+) -> dict[str, Any]:
+    """TNBC-2c — UMAP scatter coloured by per-window mean time (in
+    timepoint-index units; see decision log
+    2026-05-14-viz-time-umap-uses-window-bounds.md)."""
+    umap_result = fit_umap(
+        cluster_zarr,
+        n_neighbors=n_neighbors,
+        min_dist=min_dist,
+        random_state=random_state,
+    )
+    plot_time_umap(umap_result, cluster_zarr, save_path=save_path)
+    return _viz_summary(
+        save_path,
+        "tnbc-2c",
+        manuscript="TNBC",
+        description="UMAP scatter coloured by per-window mean time",
+    )
+
+
+def plot_feature_umap_tool(
+    cluster_zarr: str,
+    save_path: str,
+    *,
+    features: Sequence[str],
+    n_neighbors: int = 15,
+    min_dist: float = 0.1,
+    random_state: int = 42,
+) -> dict[str, Any]:
+    """LCSS-4 / TNBC-2e — multi-panel UMAP scatter, one panel per
+    feature in ``features`` (statistic names that appear in the
+    ``window_averages`` coord of the cluster Zarr)."""
+    umap_result = fit_umap(
+        cluster_zarr,
+        n_neighbors=n_neighbors,
+        min_dist=min_dist,
+        random_state=random_state,
+    )
+    plot_feature_umap(umap_result, cluster_zarr, features=list(features), save_path=save_path)
+    return _viz_summary(
+        save_path,
+        "lcss-4/tnbc-2e",
+        manuscript="LCSS/TNBC",
+        description="multi-panel UMAP coloured by per-feature window averages",
+        extra={"features": list(features)},
+    )
+
+
+def plot_trajectory_umap_tool(
+    cluster_zarr: str,
+    save_path: str,
+    *,
+    sim_ids: Sequence[str],
+    n_neighbors: int = 15,
+    min_dist: float = 0.1,
+    random_state: int = 42,
+) -> dict[str, Any]:
+    """TNBC-2d — state-coloured UMAP scatter with named simulation
+    trajectories overlaid as polylines."""
+    umap_result = fit_umap(
+        cluster_zarr,
+        n_neighbors=n_neighbors,
+        min_dist=min_dist,
+        random_state=random_state,
+    )
+    plot_trajectory_umap(umap_result, cluster_zarr, sim_ids=list(sim_ids), save_path=save_path)
+    return _viz_summary(
+        save_path,
+        "tnbc-2d",
+        manuscript="TNBC",
+        description="trajectory overlays on the state-coloured UMAP",
+        extra={"sim_ids": list(sim_ids)},
+    )
+
+
+def plot_state_umap_with_vector_field_tool(
+    cluster_zarr: str,
+    save_path: str,
+    *,
+    grid_size: int = 20,
+    show_density_contours: bool = True,
+    n_neighbors: int = 15,
+    min_dist: float = 0.1,
+    random_state: int = 42,
+) -> dict[str, Any]:
+    """LCSS-3 — state-coloured UMAP + per-state vector field + (optional)
+    per-state density contours. Vector-field inclusion criterion is "both
+    endpoints in state s" — see decision log
+    2026-05-14-viz-lcss3-vector-field-semantics.md."""
+    umap_result = fit_umap(
+        cluster_zarr,
+        n_neighbors=n_neighbors,
+        min_dist=min_dist,
+        random_state=random_state,
+    )
+    plot_state_umap_with_vector_field(
+        umap_result,
+        cluster_zarr,
+        grid_size=grid_size,
+        show_density_contours=show_density_contours,
+        save_path=save_path,
+    )
+    return _viz_summary(
+        save_path,
+        "lcss-3",
+        manuscript="LCSS",
+        description="state UMAP + per-state vector field + density contours",
+    )
+
+
+def plot_state_feature_clustermap_tool(
+    cluster_zarr: str,
+    save_path: str,
+    *,
+    z_score: int | None = 1,
+    cmap: str = "viridis",
+) -> dict[str, Any]:
+    """TNBC-2a — seaborn clustermap of Leiden cluster means x spatial
+    features. Row dendrogram comes from the cluster Zarr's
+    ``linkage_matrix``; rows annotated by Ward-cluster colour bar."""
+    plot_state_feature_clustermap(cluster_zarr, z_score=z_score, cmap=cmap, save_path=save_path)
+    return _viz_summary(
+        save_path,
+        "tnbc-2a",
+        manuscript="TNBC",
+        description="clustermap of Leiden cluster means x spatial features",
+    )
+
+
+def plot_trajectory_clustergram_tool(
+    cluster_zarr: str,
+    save_path: str,
+    *,
+    metric: str = "euclidean",
+    linkage_method: str = "average",
+) -> dict[str, Any]:
+    """TNBC-6a — (sim x window) heatmap of state labels with a row
+    dendrogram (Ward / specified ``linkage_method`` on the per-sim
+    trajectory vectors)."""
+    plot_trajectory_clustergram(
+        cluster_zarr,
+        metric=metric,
+        linkage_method=linkage_method,
+        save_path=save_path,
+    )
+    return _viz_summary(
+        save_path,
+        "tnbc-6a",
+        manuscript="TNBC",
+        description="trajectory clustergram (sim x window state labels)",
+    )
+
+
+def plot_phase_space_vector_field_tool(
+    cluster_zarr: str,
+    save_path: str,
+    *,
+    x_feature: str,
+    y_feature: str,
+    states: Sequence[int],
+    grid_size: int = 20,
+) -> dict[str, Any]:
+    """TNBC-6b — per-state vector field in ``(x_feature, y_feature)``
+    phase space plus per-state 2D occupancy heatmap. Feature names must
+    appear in the cluster Zarr's ``window_averages`` ``statistic`` coord.
+    Per ADR 0009, feature names are user-supplied — no hardcoded
+    ``(epithelial, T_eff)`` default."""
+    plot_phase_space_vector_field(
+        cluster_zarr,
+        x_feature=x_feature,
+        y_feature=y_feature,
+        states=list(states),
+        grid_size=grid_size,
+        save_path=save_path,
+    )
+    return _viz_summary(
+        save_path,
+        "tnbc-6b",
+        manuscript="TNBC",
+        description="per-state vector field in 2D feature phase space",
+        extra={"x_feature": x_feature, "y_feature": y_feature, "states": list(states)},
+    )
+
+
+def plot_parameter_by_state_tool(
+    cluster_zarr: str,
+    save_path: str,
+    *,
+    manifest_path: str,
+    parameter: str,
+) -> dict[str, Any]:
+    """TNBC-6c — violin plot of a named sweep parameter by terminal TME
+    state with pairwise Mann-Whitney + BH-FDR significance annotations
+    (BH-FDR is hand-rolled — see decision log
+    2026-05-14-bh-fdr-hand-rolled.md). Parameter name is user-supplied
+    per ADR 0009."""
+    plot_parameter_by_state(
+        cluster_zarr,
+        manifest_path,
+        parameter=parameter,
+        save_path=save_path,
+    )
+    return _viz_summary(
+        save_path,
+        "tnbc-6c",
+        manuscript="TNBC",
+        description="violin of a sweep parameter by terminal TME state",
+        extra={"parameter": parameter, "manifest_path": str(manifest_path)},
+    )
+
+
+def plot_attractor_basins_tool(
+    cluster_zarr: str,
+    save_path: str,
+    *,
+    manifest_path: str,
+    x_parameter: str,
+    y_parameter: str,
+    states: Sequence[int] | None = None,
+    knn_neighbors: int = 2,
+    grid_size: int = 200,
+) -> dict[str, Any]:
+    """LCSS-6 — 2D parameter-space scatter of simulations coloured by
+    terminal cluster; ``knn_neighbors``-NN decision-boundary regions
+    shaded as background. Parameter names are user-supplied per
+    ADR 0009."""
+    plot_attractor_basins(
+        cluster_zarr,
+        manifest_path,
+        x_parameter=x_parameter,
+        y_parameter=y_parameter,
+        states=list(states) if states is not None else None,
+        knn_neighbors=knn_neighbors,
+        grid_size=grid_size,
+        save_path=save_path,
+    )
+    return _viz_summary(
+        save_path,
+        "lcss-6",
+        manuscript="LCSS",
+        description="parameter-space attractor basins via kNN classifier",
+        extra={
+            "x_parameter": x_parameter,
+            "y_parameter": y_parameter,
+            "knn_neighbors": knn_neighbors,
+            "manifest_path": str(manifest_path),
+        },
+    )
+
+
+def list_viz_figures_tool() -> list[dict[str, str]]:
+    """List every figure-producing MCP tool with its manuscript citation
+    and a one-line description. Use this to discover which figures the
+    package can reproduce before calling a specific ``plot_*_tool``.
+    """
+    return [
+        {
+            "tool_name": "plot_state_umap",
+            "figure_tag": "tnbc-2b",
+            "manuscript": "TNBC",
+            "description": "state-coloured UMAP scatter",
+        },
+        {
+            "tool_name": "plot_time_umap",
+            "figure_tag": "tnbc-2c",
+            "manuscript": "TNBC",
+            "description": "UMAP scatter coloured by per-window mean time",
+        },
+        {
+            "tool_name": "plot_feature_umap",
+            "figure_tag": "lcss-4/tnbc-2e",
+            "manuscript": "LCSS/TNBC",
+            "description": (
+                "multi-panel UMAP coloured by per-feature window averages "
+                "(LCSS-4 uses 3 features: tumour cells, effector T cells, "
+                "exhausted T cells; TNBC-2e additionally includes tumour-cell "
+                "degree centrality)"
+            ),
+        },
+        {
+            "tool_name": "plot_trajectory_umap",
+            "figure_tag": "tnbc-2d",
+            "manuscript": "TNBC",
+            "description": "trajectory overlays on the state-coloured UMAP",
+        },
+        {
+            "tool_name": "plot_state_umap_with_vector_field",
+            "figure_tag": "lcss-3",
+            "manuscript": "LCSS",
+            "description": (
+                "state-coloured UMAP scatter + per-state vector field + per-state density contours"
+            ),
+        },
+        {
+            "tool_name": "plot_state_feature_clustermap",
+            "figure_tag": "tnbc-2a",
+            "manuscript": "TNBC",
+            "description": (
+                "seaborn clustermap of Leiden cluster means x spatial "
+                "features with Ward-row dendrogram and state colour bar"
+            ),
+        },
+        {
+            "tool_name": "plot_trajectory_clustergram",
+            "figure_tag": "tnbc-6a",
+            "manuscript": "TNBC",
+            "description": ("(sim x window) heatmap of state labels with row dendrogram"),
+        },
+        {
+            "tool_name": "plot_phase_space_vector_field",
+            "figure_tag": "tnbc-6b",
+            "manuscript": "TNBC",
+            "description": (
+                "per-state vector field in (x_feature, y_feature) phase "
+                "space with 2D occupancy histogram"
+            ),
+        },
+        {
+            "tool_name": "plot_parameter_by_state",
+            "figure_tag": "tnbc-6c",
+            "manuscript": "TNBC",
+            "description": (
+                "violin plot of a named sweep parameter by terminal TME "
+                "state with pairwise Mann-Whitney + BH-FDR significance"
+            ),
+        },
+        {
+            "tool_name": "plot_attractor_basins",
+            "figure_tag": "lcss-6",
+            "manuscript": "LCSS",
+            "description": (
+                "2D parameter-space scatter coloured by terminal cluster "
+                "with kNN decision-boundary regions"
+            ),
         },
     ]

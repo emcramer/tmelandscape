@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tmelandscape"
-version = "0.6.1"
+version = "0.7.0"
 description = "Generate tumor microenvironment state landscapes from agent-based model simulation ensembles."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -171,6 +171,8 @@ module = [
     "kneed.*",
     "igraph.*",
     "leidenalg.*",
+    # Phase 6 viz dep (seaborn) lacks published type stubs.
+    "seaborn.*",
 ]
 ignore_missing_imports = true
 

@@ -81,6 +81,7 @@ nav:
       - concepts/normalize.md
       - concepts/embedding.md
       - concepts/cluster.md
+      - concepts/viz.md
   - API reference: api/index.md
   - Tutorials: tutorials/index.md
   - MCP for agents: mcp/index.md
