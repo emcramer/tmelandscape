@@ -773,10 +773,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#where-the-project-is-2026-05-13" class="md-nav__link">
+  <a href="#where-the-project-is-2026-05-14" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where the project is (2026-05-13)
+        Where the project is (2026-05-14)
       
     </span>
   </a>
@@ -784,10 +784,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verification-snapshot-v050" class="md-nav__link">
+  <a href="#verification-snapshot-v060" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Verification snapshot (v0.5.0)
+        Verification snapshot (v0.6.0)
       
     </span>
   </a>
@@ -795,10 +795,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mcp-tools-9" class="md-nav__link">
+  <a href="#mcp-tools-11" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MCP tools (9)
+        MCP tools (11)
       
     </span>
   </a>
@@ -817,10 +817,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adrs-9" class="md-nav__link">
+  <a href="#adrs-10" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ADRs (9)
+        ADRs (10)
       
     </span>
   </a>
@@ -854,6 +854,17 @@
     <span class="md-ellipsis">
       
         Open questions (for Eric)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deferred-follow-up-tickets-from-phase-5-reviews" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deferred follow-up tickets from Phase 5 reviews
       
     </span>
   </a>
@@ -966,10 +977,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#where-the-project-is-2026-05-13" class="md-nav__link">
+  <a href="#where-the-project-is-2026-05-14" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where the project is (2026-05-13)
+        Where the project is (2026-05-14)
       
     </span>
   </a>
@@ -977,10 +988,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verification-snapshot-v050" class="md-nav__link">
+  <a href="#verification-snapshot-v060" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Verification snapshot (v0.5.0)
+        Verification snapshot (v0.6.0)
       
     </span>
   </a>
@@ -988,10 +999,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mcp-tools-9" class="md-nav__link">
+  <a href="#mcp-tools-11" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MCP tools (9)
+        MCP tools (11)
       
     </span>
   </a>
@@ -1010,10 +1021,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adrs-9" class="md-nav__link">
+  <a href="#adrs-10" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ADRs (9)
+        ADRs (10)
       
     </span>
   </a>
@@ -1047,6 +1058,17 @@
     <span class="md-ellipsis">
       
         Open questions (for Eric)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deferred-follow-up-tickets-from-phase-5-reviews" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deferred follow-up tickets from Phase 5 reviews
       
     </span>
   </a>
@@ -1110,8 +1132,8 @@
 <blockquote>
 <p>Updated at the <strong>end</strong> of every agent session. New agents read this <strong>first</strong>, then <a href="../HANDOFF/">HANDOFF.md</a> for the cold-start guide.</p>
 </blockquote>
-<h2 id="where-the-project-is-2026-05-13">Where the project is (2026-05-13)<a class="headerlink" href="#where-the-project-is-2026-05-13" title="Permanent link">&para;</a></h2>
-<p><strong>v0.5.0 shipped.</strong> Pipeline steps 1, 3, 3.5, and 4 are implemented end-to-end via three public surfaces (Python API, CLI, MCP). Step 2 (running PhysiCell simulations) is intentionally out of scope. Step 5 (two-stage Leiden + Ward clustering) is the next phase, with a pre-drafted task file ready at <code>tasks/06-clustering-implementation.md</code> (in the repo root, not on the docs site).</p>
+<h2 id="where-the-project-is-2026-05-14">Where the project is (2026-05-14)<a class="headerlink" href="#where-the-project-is-2026-05-14" title="Permanent link">&para;</a></h2>
+<p><strong>v0.6.0 shipped.</strong> Pipeline steps 1, 3, 3.5, 4, and 5 are implemented end-to-end via three public surfaces (Python API, CLI, MCP). Step 2 (running PhysiCell simulations) is intentionally out of scope. v1 scope (per <a href="../../adr/0005-no-msm-in-v1/">ADR 0005</a>) ends at clustering; the next phase is visualisation (Phase 6, target v0.7.0).</p>
 <table>
 <thead>
 <tr>
@@ -1149,7 +1171,7 @@
 <td>Summarisation</td>
 <td>v0.2.0 → v0.3.0 (panel rollback)</td>
 <td>shipped</td>
-<td><code>spatialtissuepy</code> registry (68 metrics)</td>
+<td><code>spatialtissuepy</code> registry</td>
 </tr>
 <tr>
 <td>3.5</td>
@@ -1162,29 +1184,36 @@
 <td>4</td>
 <td>Embedding</td>
 <td>v0.5.0</td>
-<td><strong>just shipped</strong></td>
+<td>shipped</td>
 <td><code>reference/utils.py::window_trajectory_data</code></td>
 </tr>
 <tr>
 <td>5</td>
 <td>Clustering</td>
-<td>(target v0.6.0)</td>
+<td>v0.6.0</td>
+<td><strong>just shipped</strong></td>
+<td><code>reference/01_abm_generate_embedding.py</code> lines ~519-720</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Visualisation</td>
+<td>(target v0.7.0)</td>
 <td><strong>NEXT</strong></td>
-<td><code>reference/01_abm_generate_embedding.py</code> (Leiden + Ward sections)</td>
+<td>TBD</td>
 </tr>
 </tbody>
 </table>
-<h2 id="verification-snapshot-v050">Verification snapshot (v0.5.0)<a class="headerlink" href="#verification-snapshot-v050" title="Permanent link">&para;</a></h2>
+<h2 id="verification-snapshot-v060">Verification snapshot (v0.6.0)<a class="headerlink" href="#verification-snapshot-v060" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>uv run pytest -q</code> — <strong>247 passed, 1 deselected</strong>, 1 warning (<code>spatialtissuepy.topology.visualization</code> upstream deprecation, harmless).</li>
+<li><code>uv run pytest -q</code> — <strong>375 passed, 1 deselected</strong>, 1 warning (<code>spatialtissuepy.topology.visualization</code> upstream deprecation, harmless).</li>
 <li><code>uv run ruff check .</code> — clean.</li>
 <li><code>uv run ruff format --check .</code> — clean.</li>
 <li><code>uv run mypy src</code> — clean (45 source files, strict mode).</li>
 <li><code>uv run mkdocs build --strict</code> — exit 0.</li>
-<li><code>tmelandscape version</code> — prints <code>0.5.0</code>.</li>
-<li><code>tmelandscape-mcp</code> — boots; 9 tools registered.</li>
+<li><code>tmelandscape version</code> — prints <code>0.6.0</code>.</li>
+<li><code>tmelandscape-mcp</code> — boots; <strong>11 tools registered</strong>.</li>
 </ul>
-<h2 id="mcp-tools-9">MCP tools (9)<a class="headerlink" href="#mcp-tools-9" title="Permanent link">&para;</a></h2>
+<h2 id="mcp-tools-11">MCP tools (11)<a class="headerlink" href="#mcp-tools-11" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -1239,6 +1268,16 @@
 <td>4</td>
 <td>Catalogue of embedding strategies</td>
 </tr>
+<tr>
+<td><code>cluster_ensemble</code></td>
+<td>5</td>
+<td>Two-stage Leiden + Ward clustering of an embedding Zarr</td>
+</tr>
+<tr>
+<td><code>list_cluster_strategies</code></td>
+<td>5</td>
+<td>Catalogue of clustering strategies</td>
+</tr>
 </tbody>
 </table>
 <h2 id="cli-verbs">CLI verbs<a class="headerlink" href="#cli-verbs" title="Permanent link">&para;</a></h2>
@@ -1246,12 +1285,14 @@
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>tmelandscape<span class="w"> </span>summarize<span class="w">             </span><span class="c1"># step 3</span>
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>tmelandscape<span class="w"> </span>normalize<span class="w">             </span><span class="c1"># step 3.5</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>tmelandscape<span class="w"> </span>embed<span class="w">                 </span><span class="c1"># step 4</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>tmelandscape<span class="w"> </span>statistics<span class="w"> </span>list/describe<span class="w">       </span><span class="c1"># step 3 discovery</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>tmelandscape<span class="w"> </span>normalize-strategies<span class="w"> </span>list<span class="w">      </span><span class="c1"># step 3.5 discovery</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>tmelandscape<span class="w"> </span>embed-strategies<span class="w"> </span>list<span class="w">          </span><span class="c1"># step 4 discovery</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>tmelandscape<span class="w"> </span>version
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>tmelandscape<span class="w"> </span>cluster<span class="w">               </span><span class="c1"># step 5</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>tmelandscape<span class="w"> </span>statistics<span class="w"> </span>list/describe<span class="w">       </span><span class="c1"># step 3 discovery</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>tmelandscape<span class="w"> </span>normalize-strategies<span class="w"> </span>list<span class="w">      </span><span class="c1"># step 3.5 discovery</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>tmelandscape<span class="w"> </span>embed-strategies<span class="w"> </span>list<span class="w">          </span><span class="c1"># step 4 discovery</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>tmelandscape<span class="w"> </span>cluster-strategies<span class="w"> </span>list<span class="w">        </span><span class="c1"># step 5 discovery</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>tmelandscape<span class="w"> </span>version
 </code></pre></div>
-<h2 id="adrs-9">ADRs (9)<a class="headerlink" href="#adrs-9" title="Permanent link">&para;</a></h2>
+<h2 id="adrs-10">ADRs (10)<a class="headerlink" href="#adrs-10" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -1316,25 +1357,37 @@
 <td>3</td>
 <td><strong>Dynamic discovery</strong>; user picks the panel</td>
 </tr>
+<tr>
+<td>0010</td>
+<td>Cluster-count auto-selection</td>
+<td>5</td>
+<td><strong>No silent default for <code>n_final_clusters</code></strong>; auto-select via tunable metric (default: WSS elbow)</td>
+</tr>
 </tbody>
 </table>
 <h2 id="project-owners-binding-directives-cumulative">Project owner's binding directives (cumulative)<a class="headerlink" href="#project-owners-binding-directives-cumulative" title="Permanent link">&para;</a></h2>
 <ol>
 <li><strong>Never overwrite raw data</strong> — applies to every pipeline step. Each phase writes a NEW Zarr at a user-supplied path.</li>
-<li><strong>No hardcoded panels / defaults</strong> — <code>SummarizeConfig.statistics</code> is required; <code>EmbeddingConfig.window_size</code> is required. Strategy literals can have defaults, but data-selection knobs cannot.</li>
+<li><strong>No hardcoded panels / defaults / cluster counts</strong> — <code>SummarizeConfig.statistics</code> is required; <code>EmbeddingConfig.window_size</code> is required; <code>ClusterConfig.n_final_clusters</code> defaults to <code>None</code> (auto-select via tunable metric, default WSS elbow — ADR 0010). Strategy literals can have defaults, but data-selection knobs cannot bake in literature numbers.</li>
 <li><strong>No built-in feature drops</strong> — <code>drop_columns</code>/<code>drop_statistics</code> always default to <code>[]</code>.</li>
 <li><strong>Buddy-pair pattern for non-trivial phases</strong> — Implementer agent + Reviewer agent per stream; reviewer audits read-only and emits BUG/RISK/SMELL findings; orchestrator integrates.</li>
 <li><strong>Three public surfaces</strong> — every pipeline step exposes Python API, CLI, MCP tool, with integration tests proving they produce equivalent output.</li>
+<li><strong>Dependency pins tagged, not floating</strong> — <code>tissue_simulator</code> and <code>spatialtissuepy</code> pinned via git tags (ADR 0008). Currently <code>@v0.1.4</code> and <code>@v0.0.1</code> respectively.</li>
 </ol>
 <h2 id="in-flight-tasks">In-flight tasks<a class="headerlink" href="#in-flight-tasks" title="Permanent link">&para;</a></h2>
-<p><em>None.</em> Phase 5 not yet started; task file pre-drafted but no implementer agents have run yet.</p>
+<p><em>None.</em> Phase 5 complete. Phase 6 (visualisation) not yet started; no task file pre-drafted yet.</p>
 <h2 id="open-questions-for-eric">Open questions (for Eric)<a class="headerlink" href="#open-questions-for-eric" title="Permanent link">&para;</a></h2>
 <ol>
-<li><strong><code>tissue_simulator</code> v0.1.0 upstream tag</strong> and <strong><code>spatialtissuepy</code> v0.2.0 upstream tag</strong> — Eric is handling these separately per ADR 0008. Once tags exist, update the <code>git+URL</code> pins in <code>pyproject.toml</code> from commit SHAs to tag names.</li>
-<li><strong>Phase 5 (clustering) — confirm the binding invariants ship:</strong></li>
-<li>Cluster labels are written to a NEW Zarr; the input embedding store is never modified.</li>
-<li><code>n_final_clusters</code> is a required user input (no default); we do not pick "6 TME states" silently.</li>
-<li>Output structure mirrors the rest of the pipeline (raw arrays preserved; new labels added alongside).</li>
+<li><strong>Phase 6 (visualisation) — what to ship.</strong> ROADMAP currently lists FNN/MI diagnostics, UMAP scatter, state-coloured trajectories. Which of these are highest priority? Are there figures from the LCSS paper or other manuscripts that v0.7.0 should reproduce? Should we draft a task file similar to <code>tasks/06-clustering-implementation.md</code> before kicking off?</li>
+<li><strong>PyPI publishing for <code>tissue_simulator</code> and <code>spatialtissuepy</code>.</strong> Both are git-pinned via tag right now (per ADR 0008). The ADR's target is to migrate to PyPI before v1.0 ships. Is there a timeline for that, or should we plan to remain on git+URL through v0.7.0?</li>
+</ol>
+<h2 id="deferred-follow-up-tickets-from-phase-5-reviews">Deferred follow-up tickets from Phase 5 reviews<a class="headerlink" href="#deferred-follow-up-tickets-from-phase-5-reviews" title="Permanent link">&para;</a></h2>
+<p>These were noted by reviewers but punted out of v0.6.0 — none are blockers.</p>
+<ol>
+<li><strong>Marginal-decrease fallback semantics</strong> in <code>cluster/selection.py</code>. The WSS k=1 anchor dominates the kneed knee detection; when kneed returns <code>None</code> and the fallback runs, it currently always selects <code>k_min</code> because the steepest-decrease segment is the 1→2 step. Either refactor the fallback to operate on the un-anchored candidates, or document explicitly that the fallback collapses to <code>k_min</code> under the anchor regime.</li>
+<li><strong>Tighten the auto-selection test range.</strong> <code>test_auto_selection_two_blob_wss_elbow_picks_small_k</code> currently asserts <code>chosen in [2, 4]</code>; if the choice is stable as <code>==2</code> across kneed minor versions in CI, tighten it.</li>
+<li><strong>Add a regression fixture for elbows at k≥4</strong> to confirm the k=1 anchor doesn't bias auto-selection toward smaller k in pathological cases.</li>
+<li><strong>Decide on logging consistency across phases.</strong> Phase 5 emits <code>cluster_ensemble.start</code> / <code>.done</code> structlog events (per contract); Phase 3.5 and Phase 4 orchestrators don't log at all. Either retrofit the earlier phases or drop the Phase 5 logs. Currently keeping them — they live on stderr now that <code>configure_logging()</code> is wired into CLI startup.</li>
 </ol>
 <h2 id="quirks-worth-knowing-across-phases">Quirks worth knowing (across phases)<a class="headerlink" href="#quirks-worth-knowing-across-phases" title="Permanent link">&para;</a></h2>
 <ul>
@@ -1343,34 +1396,43 @@
 <li><strong>Empty-timepoint contract</strong> (Phase 3): only <code>cell_counts</code> emits a row when a timepoint has zero live cells; the aggregator NaN-fills missing entries from the union schema. Centrality, fractions, interactions stay silent.</li>
 <li><strong>2D <code>time</code> coord</strong> (Phase 3): <code>time</code> is <code>(simulation, timepoint)</code>-aligned, not <code>(timepoint,)</code>-aligned. Different sims may emit different wall-clock times for the same step index.</li>
 <li><strong>Sweep-scoped IC subdirectories</strong> (Phase 2 polish): ICs land under <code>&lt;initial_conditions_dir&gt;/sweep_&lt;hash&gt;_&lt;timestamp&gt;/</code>. <code>SweepManifest.ic_root()</code> returns the actual directory.</li>
-<li><strong>Float32→float64 promotion</strong> (Phase 3.5 algorithm): the within-timestep normalisation promotes float32 inputs to float64. Documented in the algorithm's docstring.</li>
+<li><strong>Float32→float64 promotion</strong> (Phase 3.5 algorithm; Phase 5 orchestrator): both promote float32 inputs to float64. Documented in the affected docstrings.</li>
 <li><strong>NaN policy in <code>fill_nan_with</code></strong> (Phase 3.5): config validator rejects NaN to keep <code>model_dump_json</code> round-trips lossless.</li>
-<li><strong><code>output_variable == "value"</code></strong> (Phase 3.5) and <strong>the three variable-collision checks</strong> (Phase 4): each orchestrator has defence-in-depth guards in addition to the config validators.</li>
+<li><strong><code>output_variable == "value"</code></strong> (Phase 3.5) and <strong>the three variable-collision checks</strong> (Phase 4): each orchestrator has defence-in-depth guards in addition to the config validators. Phase 5 extends this to a six-way variable-collision check on <code>ClusterConfig</code>.</li>
+<li><strong>WSS k=1 anchor</strong> (Phase 5 selection): when <code>cluster_count_metric="wss_elbow"</code>, the algorithm evaluates a private k=1 anchor in addition to the user's candidate range so <code>kneed</code> can see the convex elbow; the returned candidates / scores arrays expose only the user range (the anchor is not surfaced). See ADR 0010 + the follow-up ticket on marginal-decrease semantics.</li>
+<li><strong>Modularity partition doesn't take resolution</strong> (Phase 5 algorithm): <code>leidenalg.ModularityVertexPartition</code> doesn't accept <code>resolution_parameter</code>; the algorithm dispatches accordingly. CPM (the reference default) and RBConfiguration do.</li>
 <li><strong>Zarr v3 unstable string dtype warnings</strong> (Phase 3 / ADR 0003 update): xarray writes string coords as <code>FixedLengthUTF32</code> which is pre-spec on Zarr v3; <code>pyproject.toml.[tool.pytest.ini_options].filterwarnings</code> filters them in tests.</li>
+<li><strong>Structured logging now active in CLI</strong> (Phase 5): <code>tmelandscape/cli/main.py</code> calls <code>configure_logging()</code> in the root callback, routing structlog to stderr so CLI JSON-stdout summaries stay machine-parseable. Library code uses <code>tmelandscape.utils.logging.get_logger</code>.</li>
 </ul>
 <h2 id="next-agents-first-actions">Next agent's first actions<a class="headerlink" href="#next-agents-first-actions" title="Permanent link">&para;</a></h2>
 <ol>
 <li><strong>Read</strong> <code>docs/development/HANDOFF.md</code> (the cold-start guide), then this STATUS, then <code>AGENTS.md</code>.</li>
-<li><strong>Verify the project state</strong>: <code>uv sync --all-extras &amp;&amp; uv run pytest -q</code> should show <strong>247 passed, 1 deselected</strong>.</li>
-<li><strong>Read the Phase 5 task file</strong>: <code>tasks/06-clustering-implementation.md</code> (in the repo root, not on the docs site). All Pydantic schemas and function signatures are frozen there.</li>
-<li><strong>Confirm with Eric</strong> on the Open Questions above before starting Phase 5 implementation. In particular: confirm the binding invariants for clustering output.</li>
-<li><strong>Spawn the buddy-pair team for Phase 5</strong> following the pattern used in v0.4.0 and v0.5.0:</li>
-<li>Wave 1: 3 Implementer agents in parallel (A: Leiden+Ward algorithm; B: Zarr orchestrator; C: ClusterConfig + alternatives).</li>
-<li>Wave 2: 3 Reviewer agents in parallel (read-only audit).</li>
-<li>Orchestrator: apply review findings, integrate, release v0.6.0.</li>
+<li><strong>Verify the project state</strong>: <code>uv sync --all-extras &amp;&amp; uv run pytest -q</code> should show <strong>375 passed, 1 deselected</strong>.</li>
+<li><strong>Decide on Phase 6 scope</strong> with Eric (Open Question #1). If approved, pre-draft <code>tasks/07-visualisation-implementation.md</code> mirroring the structure of <code>tasks/06-clustering-implementation.md</code>.</li>
+<li><strong>Address the deferred follow-ups</strong> if and when there's spare bandwidth — none are urgent.</li>
+<li><strong>Spawn the buddy-pair team for Phase 6</strong> once the scope is agreed; mirror the Wave-1 / Wave-2 / Wave-3 pattern used in v0.4.0, v0.5.0, and v0.6.0.</li>
 </ol>
 <h2 id="last-session-handoff">Last-session handoff<a class="headerlink" href="#last-session-handoff" title="Permanent link">&para;</a></h2>
-<p><strong>Session date:</strong> 2026-05-13<br />
+<p><strong>Session date:</strong> 2026-05-14
 <strong>Agent:</strong> Claude Code (claude-opus-4-7)</p>
-<p>Phase 4 <strong>complete and verified</strong>. 247 tests passing, all checks green. Repo is tagged at <code>v0.5.0</code> and pushed. Handoff documentation refreshed:</p>
+<p>Phase 5 <strong>complete and verified</strong>. 375 tests passing, all checks green. Repo at v0.6.0; commit and tag pending owner approval to push. Handoff documentation refreshed:</p>
 <ul>
 <li><code>docs/development/STATUS.md</code> — this file.</li>
-<li><code>docs/development/HANDOFF.md</code> — cold-start agent onboarding guide.</li>
-<li><code>docs/development/ROADMAP.md</code> — Phase 5 plan filled in.</li>
-<li><code>CHANGELOG.md</code> — full release history.</li>
-<li><code>tasks/06-clustering-implementation.md</code> — Phase 5 task file pre-drafted with frozen API contracts.</li>
+<li><code>docs/development/HANDOFF.md</code> — cold-start agent onboarding guide (unchanged from v0.5.0 — still accurate).</li>
+<li><code>docs/development/ROADMAP.md</code> — Phase 5 marked COMPLETE, Phase 6 unchanged.</li>
+<li><code>CHANGELOG.md</code> — v0.6.0 entry with full reviewer-findings log.</li>
+<li><code>tasks/06-clustering-implementation.md</code> — revised in-flight (added auto-selection contract) then executed.</li>
+<li><code>docs/adr/0010-cluster-count-auto-selection.md</code> — new ADR (cluster-count auto-selection policy).</li>
+<li><code>docs/concepts/cluster.md</code> — filled in (was placeholder).</li>
 </ul>
-<p>Phase 5 (two-stage Leiden + Ward clustering, v0.6.0) is fully unblocked except for the binding-invariants confirmation in Open Questions #2.</p>
+<p>Phase 5 wave-by-wave summary:</p>
+<ul>
+<li><strong>Pre-Wave</strong>: bumped <code>tissue_simulator</code> pin from floating-main (v0.1.0 commit) to tagged <code>@v0.1.4</code>; <code>spatialtissuepy</code> pin moved from commit (<code>@c03cfa4</code>) to tag (<code>@v0.0.1</code>). 247 tests stayed green.</li>
+<li><strong>Wave 1 (parallel implementers)</strong>: A wrote <code>leiden_ward.py</code> + <code>selection.py</code> + 26 tests; B wrote <code>cluster/__init__.py</code> + 18 tests (mocked the algorithm to insulate from cross-stream timing); C wrote <code>config/cluster.py</code> + <code>alternatives.py</code> + 77 tests. Two of three agents hit transient Cloudflare 522s on first dispatch; reissued cleanly.</li>
+<li><strong>Wave 2 (parallel reviewers, read-only)</strong>: A2 LGTM-with-nits (no BUGs); B2 LGTM; C2 LGTM. All recommended changes were cheap; applied in Wave 3a.</li>
+<li><strong>Wave 3 (orchestrator)</strong>: applied review fixes, wrote CLI + MCP tools + 7 integration tests, filled <code>docs/concepts/cluster.md</code>, wired <code>configure_logging()</code> into CLI startup (logs now flow to stderr so JSON-stdout stays pure), updated handoff docs, bumped to v0.6.0.</li>
+</ul>
+<p>Phase 6 (visualisation, v0.7.0) is unblocked once Eric confirms the scope per Open Question #1.</p>
 
 
 

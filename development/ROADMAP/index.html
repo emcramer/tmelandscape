@@ -828,10 +828,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-5-step-5-clustering-target-v060-next" class="md-nav__link">
+  <a href="#phase-5-step-5-clustering-v060-complete" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 5 — Step 5 clustering (target v0.6.0) — NEXT
+        Phase 5 — Step 5 clustering (v0.6.0) — COMPLETE
       
     </span>
   </a>
@@ -1055,10 +1055,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-5-step-5-clustering-target-v060-next" class="md-nav__link">
+  <a href="#phase-5-step-5-clustering-v060-complete" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 5 — Step 5 clustering (target v0.6.0) — NEXT
+        Phase 5 — Step 5 clustering (v0.6.0) — COMPLETE
       
     </span>
   </a>
@@ -1224,25 +1224,31 @@
 <li>FNN / MI optimisation: the reference doesn't use them; user can request as v0.5.x.</li>
 <li>Takens lag-coordinate delay embedding: the reference uses sliding window (same purpose, different math); user can request as v0.5.x.</li>
 </ul>
-<h2 id="phase-5-step-5-clustering-target-v060-next">Phase 5 — Step 5 clustering (target v0.6.0) — NEXT<a class="headerlink" href="#phase-5-step-5-clustering-target-v060-next" title="Permanent link">&para;</a></h2>
-<blockquote>
-<p>See <a href="../../adr/0007-two-stage-leiden-ward-clustering/">ADR 0007</a> and the pre-drafted <code>tasks/06-clustering-implementation.md</code> (in the repo root) for the frozen API contracts and buddy-pair stream allocation.</p>
-</blockquote>
-<p>Reference oracle: <code>reference/01_abm_generate_embedding.py</code> lines ~519-720.</p>
+<h2 id="phase-5-step-5-clustering-v060-complete">Phase 5 — Step 5 clustering (v0.6.0) — COMPLETE<a class="headerlink" href="#phase-5-step-5-clustering-v060-complete" title="Permanent link">&para;</a></h2>
+<p>Shipped 2026-05-14 via the buddy-pair team (3 Implementer + 3 Reviewer agents). Reference oracle: <code>reference/01_abm_generate_embedding.py</code> lines ~519-720. See <a href="../../adr/0007-two-stage-leiden-ward-clustering/">ADR 0007</a> and <a href="../../adr/0010-cluster-count-auto-selection/">ADR 0010</a>.</p>
 <ul>
-<li>[ ] <code>tmelandscape.cluster.leiden_ward.cluster_leiden_ward</code> — pure two-stage algorithm: kNN graph → Leiden (default partition <code>CPMVertexPartition</code>, matching the reference) → Ward on Leiden cluster means → <code>fcluster(maxclust)</code> to cut the dendrogram.</li>
-<li>[ ] <code>tmelandscape.cluster.alternatives.cluster_identity</code> — passthrough baseline.</li>
-<li>[ ] <code>tmelandscape.cluster.cluster_ensemble</code> — Zarr orchestrator. Reads input lazily; refuses to overwrite output; passes through <code>embedding</code> and <code>window_averages</code>; adds <code>leiden_labels</code>, <code>cluster_labels</code> (final), <code>leiden_cluster_means</code>, <code>linkage_matrix</code>.</li>
-<li>[ ] <code>tmelandscape.config.cluster.ClusterConfig</code> — Pydantic. <code>n_final_clusters</code> required (no default per ADR 0009). Five-way variable-name collision validator.</li>
-<li>[ ] CLI: <code>tmelandscape cluster</code> + <code>tmelandscape cluster-strategies list</code>.</li>
-<li>[ ] MCP tools: <code>cluster_ensemble</code>, <code>list_cluster_strategies</code>.</li>
-<li>[ ] Integration test: Python API + CLI + MCP byte-equal equivalence on a synthetic embedding Zarr.</li>
-<li>[ ] <code>docs/concepts/cluster.md</code> filled in (currently a placeholder).</li>
-<li>[ ] Bump to <code>v0.6.0</code> once all checks green.</li>
+<li>[x] <code>tmelandscape.cluster.leiden_ward.cluster_leiden_ward</code> — pure two-stage algorithm: kNN graph → Leiden (default partition <code>CPMVertexPartition</code>, matching the reference) → Ward on Leiden cluster means → <code>fcluster(maxclust)</code> to cut the dendrogram.</li>
+<li>[x] <code>tmelandscape.cluster.selection.select_n_clusters</code> — cluster-count auto-selection over a candidate range via <code>wss_elbow</code> (default; kneed-based knee), <code>calinski_harabasz</code>, or <code>silhouette</code>.</li>
+<li>[x] <code>tmelandscape.cluster.alternatives.cluster_identity</code> — passthrough baseline.</li>
+<li>[x] <code>tmelandscape.cluster.cluster_ensemble</code> — Zarr orchestrator. Reads input lazily; refuses to overwrite; six-way variable-collision defence; 2D source-array guard; partial-output cleanup; lifts <code>embedding_config</code> from input attrs into <code>source_embedding_config</code> on output.</li>
+<li>[x] <code>tmelandscape.config.cluster.ClusterConfig</code> — Pydantic. <code>n_final_clusters</code> is <code>int | None</code> with no package default (ADR 0010); auto-selection via <code>cluster_count_metric</code>. Six-way variable-collision validator + range-consistency validator.</li>
+<li>[x] CLI: <code>tmelandscape cluster</code> + <code>tmelandscape cluster-strategies list</code>. Structured logs routed to stderr via <code>configure_logging()</code> so CLI JSON-stdout stays pure.</li>
+<li>[x] MCP tools: <code>cluster_ensemble</code>, <code>list_cluster_strategies</code> (total tool count now <strong>11</strong>).</li>
+<li>[x] Integration test: Python API + CLI + MCP byte-equal equivalence on a synthetic embedding Zarr, both explicit-k and auto-select paths.</li>
+<li>[x] <code>docs/concepts/cluster.md</code> filled in.</li>
+<li>[x] New ADR: <a href="../../adr/0010-cluster-count-auto-selection/">cluster-count auto-selection policy</a>.</li>
+<li>[x] Reviewer findings applied:</li>
+<li><strong>A2 SMELL</strong>: 7 per-import <code># type: ignore[import-untyped]</code> collapsed into <code>[[tool.mypy.overrides]]</code>.</li>
+<li><strong>B2 RISK</strong>: orchestrator asserts <code>linkage_matrix.shape[1] == 4</code> defence-in-depth.</li>
+<li><strong>B2 SMELL</strong>: orchestrator docstring documents the float64 upcast and the intentionally-unsurfaced <code>leiden_to_final</code>.</li>
+<li><strong>B2 SMELL</strong>: missing-source-variable error-message test tightened to require a non-empty listing.</li>
+<li>[x] 375 tests passing (existing 247 + 121 unit + 7 integration). ruff + format + mypy strict + mkdocs strict all clean. Tagged at v0.6.0.</li>
 </ul>
-<p>Deferred (out of scope for v0.6.0 unless the owner says otherwise):</p>
+<p>Deferred to follow-up tickets:</p>
 <ul>
-<li>Leiden resolution sweep / silhouette-based selection helpers.</li>
+<li>Marginal-decrease fallback semantics (currently dominated by the WSS k=1 anchor).</li>
+<li>Tighten the auto-selection range assertion from <code>[2,4]</code> to <code>==2</code> once kneed stability is confirmed across CI runs.</li>
+<li>Leiden resolution sweep helpers (resolution sweep is not used by the reference).</li>
 <li>The <code>Landscape</code> facade and <code>.tmelandscape/</code> bundle format (revisit when projection is on the table — see <a href="../../adr/0005-no-msm-in-v1/">ADR 0005</a>).</li>
 <li>Interpretable state names ("Effector-Dominant" etc.) — purely a downstream labelling concern.</li>
 </ul>

@@ -505,6 +505,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concept: clustering (step 5)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -521,6 +539,113 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inputs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#algorithm-leiden_ward-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Algorithm — leiden_ward (default)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#discovering-available-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Discovering available strategies
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clusterconfig-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ClusterConfig fields
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-output-zarr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The output Zarr
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-not-in-step-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's not in step 5
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -801,6 +926,102 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#inputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inputs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#algorithm-leiden_ward-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Algorithm — leiden_ward (default)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#discovering-available-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Discovering available strategies
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clusterconfig-fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ClusterConfig fields
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CLI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-output-zarr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The output Zarr
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-not-in-step-5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's not in step 5
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -820,10 +1041,283 @@
 
 
 <h1 id="concept-clustering-step-5">Concept: clustering (step 5)<a class="headerlink" href="#concept-clustering-step-5" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p><em>Placeholder — will be filled in during Phase 5.</em></p>
-</blockquote>
-<p>Clusters the time-delay-embedded windows into discrete TME states. Default: hierarchical agglomerative clustering with Ward linkage (matches the LCSS paper). Cluster count is selected via WSS-elbow with <code>kneed</code>; silhouette and gap statistic are also available.</p>
+<p>Step 5 reads the windowed-embedding Zarr from step 4 and assigns each
+row (one window) to a discrete tumour-microenvironment (TME) state via a
+two-stage Leiden + Ward pipeline. The output is a new Zarr that
+carries the original <code>embedding</code> array through untouched, plus per-window
+integer labels at both the Leiden (over-segmented) and the final
+(Ward-merged) levels, plus the per-Leiden-cluster mean embedding vectors
+and the Ward linkage matrix.</p>
+<p>The algorithm matches <code>reference/01_abm_generate_embedding.py</code> lines
+~519-720 exactly for the Leiden + Ward core; see
+<a href="../../adr/0007-two-stage-leiden-ward-clustering/">ADR 0007</a>. The
+cluster-count auto-selection layer is a tmelandscape addition on top of
+the reference; see
+<a href="../../adr/0010-cluster-count-auto-selection/">ADR 0010</a>.</p>
+<h2 id="inputs">Inputs<a class="headerlink" href="#inputs" title="Permanent link">&para;</a></h2>
+<ul>
+<li>The windowed-embedding Zarr from <code>tmelandscape embed</code>. By default the
+  algorithm reads the <code>embedding</code> variable; pass a different
+  <code>source_variable</code> to cluster a different 2D array.</li>
+<li>A <code>ClusterConfig</code> (Pydantic) carrying the optional <code>n_final_clusters</code>
+  and the auto-selection knobs.</li>
+</ul>
+<h2 id="algorithm-leiden_ward-default">Algorithm — <code>leiden_ward</code> (default)<a class="headerlink" href="#algorithm-leiden_ward-default" title="Permanent link">&para;</a></h2>
+<p><strong>Stage 1 — Leiden community detection on a kNN graph.</strong></p>
+<ol>
+<li>Build a kNN graph over the <code>(n_window, n_feature)</code> embedding using
+   <code>sklearn.neighbors.kneighbors_graph(metric='euclidean',
+   mode='connectivity', include_self=False)</code>. The neighbour count
+   defaults to <code>int(sqrt(n_window))</code> (the reference heuristic) when
+   <code>knn_neighbors=None</code>.</li>
+<li>Convert the sparse graph to igraph (undirected, unweighted; edge
+   weights set to 1.0 to mirror the reference).</li>
+<li>Run <code>leidenalg.find_partition</code> with the chosen partition class
+   (<code>CPMVertexPartition</code> by default — matches the reference). Output:
+   one integer Leiden community id per row.</li>
+</ol>
+<p><strong>Stage 2 — Ward hierarchical clustering on Leiden cluster means.</strong></p>
+<ol>
+<li>Compute the mean embedding vector for each Leiden community.</li>
+<li><code>pdist(means, metric='euclidean')</code> → <code>linkage(D, method='ward')</code>.</li>
+<li>Cut the dendrogram at <code>n_final_clusters</code>:</li>
+<li><strong>If the user supplied an integer</strong>, cut directly:
+     <code>fcluster(Z, t=n_final_clusters, criterion='maxclust')</code>.</li>
+<li><strong>If <code>n_final_clusters is None</code></strong>, <em>auto-select</em> <code>k</code> over the
+     candidate range <code>[cluster_count_min, cluster_count_max]</code>
+     (default upper bound <code>min(20, n_leiden_clusters)</code>) using the
+     chosen <code>cluster_count_metric</code>:<ul>
+<li><code>wss_elbow</code> <em>(default)</em>: minimise within-cluster sum of squares,
+   knee detected via <a href="https://github.com/arvkevi/kneed"><code>kneed.KneeLocator</code></a>.</li>
+<li><code>calinski_harabasz</code>: argmax of
+   <code>sklearn.metrics.calinski_harabasz_score</code>.</li>
+<li><code>silhouette</code>: argmax of <code>sklearn.metrics.silhouette_score</code>
+   (subsampled at 5000 rows for ensembles larger than that, with a
+   fixed <code>random_state=42</code>).</li>
+</ul>
+</li>
+<li>Broadcast the Leiden→final mapping back to per-window labels:
+   <code>final_labels = leiden_to_final[leiden_labels]</code>. Final labels are
+   1-based (<code>1..n_final_clusters_used</code>) per scipy's <code>fcluster</code>
+   convention.</li>
+</ol>
+<h2 id="discovering-available-strategies">Discovering available strategies<a class="headerlink" href="#discovering-available-strategies" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>tmelandscape<span class="w"> </span>cluster-strategies<span class="w"> </span>list
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tmelandscape.cli.cluster_strategies</span><span class="w"> </span><span class="kn">import</span> <span class="n">_catalogue</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="nb">print</span><span class="p">(</span><span class="n">_catalogue</span><span class="p">())</span>
+</code></pre></div>
+<p>MCP agents call <code>list_cluster_strategies</code>.</p>
+<h2 id="clusterconfig-fields"><code>ClusterConfig</code> fields<a class="headerlink" href="#clusterconfig-fields" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>strategy</code></td>
+<td><code>Literal["leiden_ward"]</code></td>
+<td><code>"leiden_ward"</code></td>
+<td>Algorithm to apply.</td>
+</tr>
+<tr>
+<td><code>knn_neighbors</code></td>
+<td><code>int \| None (&gt;=1)</code></td>
+<td><code>None</code></td>
+<td>kNN graph degree. <code>None</code> ⇒ <code>int(sqrt(n_window))</code>.</td>
+</tr>
+<tr>
+<td><code>leiden_partition</code></td>
+<td><code>Literal["CPM", "Modularity", "RBConfiguration"]</code></td>
+<td><code>"CPM"</code></td>
+<td>leidenalg partition class. <code>CPM</code> matches the reference.</td>
+</tr>
+<tr>
+<td><code>leiden_resolution</code></td>
+<td><code>float (&gt;0)</code></td>
+<td><code>1.0</code></td>
+<td>Leiden resolution parameter (ignored for <code>Modularity</code>, which doesn't take one).</td>
+</tr>
+<tr>
+<td><code>leiden_seed</code></td>
+<td><code>int</code></td>
+<td><code>42</code></td>
+<td>Determinism anchor for <code>leidenalg.find_partition</code>.</td>
+</tr>
+<tr>
+<td><code>n_final_clusters</code></td>
+<td><code>int \| None (&gt;=2)</code></td>
+<td><code>None</code></td>
+<td>Number of TME states. <code>None</code> ⇒ auto-select via <code>cluster_count_metric</code>. <strong>No package default — see <a href="../../adr/0010-cluster-count-auto-selection/">ADR 0010</a>.</strong></td>
+</tr>
+<tr>
+<td><code>cluster_count_metric</code></td>
+<td><code>Literal["wss_elbow", "calinski_harabasz", "silhouette"]</code></td>
+<td><code>"wss_elbow"</code></td>
+<td>Auto-selection metric. Only used when <code>n_final_clusters is None</code>.</td>
+</tr>
+<tr>
+<td><code>cluster_count_min</code></td>
+<td><code>int (&gt;=2)</code></td>
+<td><code>2</code></td>
+<td>Inclusive lower bound on the candidate-k range.</td>
+</tr>
+<tr>
+<td><code>cluster_count_max</code></td>
+<td><code>int \| None (&gt;=2)</code></td>
+<td><code>None</code></td>
+<td>Inclusive upper bound. <code>None</code> ⇒ <code>min(20, n_leiden_clusters)</code>.</td>
+</tr>
+<tr>
+<td><code>source_variable</code></td>
+<td><code>str</code></td>
+<td><code>"embedding"</code></td>
+<td>Input array name.</td>
+</tr>
+<tr>
+<td><code>leiden_labels_variable</code></td>
+<td><code>str</code></td>
+<td><code>"leiden_labels"</code></td>
+<td>Output Leiden-labels variable name.</td>
+</tr>
+<tr>
+<td><code>final_labels_variable</code></td>
+<td><code>str</code></td>
+<td><code>"cluster_labels"</code></td>
+<td>Output final-labels variable name.</td>
+</tr>
+<tr>
+<td><code>cluster_means_variable</code></td>
+<td><code>str</code></td>
+<td><code>"leiden_cluster_means"</code></td>
+<td>Output Leiden-cluster-means variable name.</td>
+</tr>
+<tr>
+<td><code>linkage_variable</code></td>
+<td><code>str</code></td>
+<td><code>"linkage_matrix"</code></td>
+<td>Output Ward-linkage variable name.</td>
+</tr>
+<tr>
+<td><code>cluster_count_scores_variable</code></td>
+<td><code>str</code></td>
+<td><code>"cluster_count_scores"</code></td>
+<td>Output per-candidate metric scores variable name.</td>
+</tr>
+</tbody>
+</table>
+<p>The six variable names must be pairwise distinct (validated at
+construction).</p>
+<h2 id="code-example">Code example<a class="headerlink" href="#code-example" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tmelandscape.config.cluster</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClusterConfig</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="kn">from</span><span class="w"> </span><span class="nn">tmelandscape.cluster</span><span class="w"> </span><span class="kn">import</span> <span class="n">cluster_ensemble</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># Explicit k.</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="n">cluster_ensemble</span><span class="p">(</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="s2">&quot;ensemble_embedded.zarr&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="s2">&quot;ensemble_clustered_k6.zarr&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="n">config</span><span class="o">=</span><span class="n">ClusterConfig</span><span class="p">(</span><span class="n">n_final_clusters</span><span class="o">=</span><span class="mi">6</span><span class="p">),</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="p">)</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a><span class="c1"># Auto-select k via WSS elbow.</span>
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="n">cluster_ensemble</span><span class="p">(</span>
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>    <span class="s2">&quot;ensemble_embedded.zarr&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>    <span class="s2">&quot;ensemble_clustered_auto.zarr&quot;</span><span class="p">,</span>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>    <span class="n">config</span><span class="o">=</span><span class="n">ClusterConfig</span><span class="p">(</span><span class="n">cluster_count_metric</span><span class="o">=</span><span class="s2">&quot;wss_elbow&quot;</span><span class="p">),</span>
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a><span class="p">)</span>
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a><span class="n">ds</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_zarr</span><span class="p">(</span><span class="s2">&quot;ensemble_clustered_auto.zarr&quot;</span><span class="p">)</span>
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a><span class="n">labels</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;cluster_labels&quot;</span><span class="p">]</span>            <span class="c1"># (n_window,) int — 1..n_final_clusters_used</span>
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;chosen k:&quot;</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;n_final_clusters_used&quot;</span><span class="p">])</span>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;metric:&quot;</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;cluster_count_metric_used&quot;</span><span class="p">])</span>
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;per-candidate scores:&quot;</span><span class="p">,</span> <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;cluster_count_scores&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="cli">CLI<a class="headerlink" href="#cli" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Discover available strategies</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>tmelandscape<span class="w"> </span>cluster-strategies<span class="w"> </span>list
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Run clustering with explicit k</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>tmelandscape<span class="w"> </span>cluster<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">    </span>ensemble_embedded.zarr<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="w">    </span>ensemble_clustered.zarr<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">    </span>--config<span class="w"> </span>cluster_config.json
+</code></pre></div>
+<p>A minimal <code>cluster_config.json</code> for auto-selection:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="p">{</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">&quot;cluster_count_metric&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;wss_elbow&quot;</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="p">}</span>
+</code></pre></div>
+<p>A minimal <code>cluster_config.json</code> for explicit k:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="p">{</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">&quot;n_final_clusters&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="p">}</span>
+</code></pre></div>
+<p>The JSON summary printed to stdout includes the output path and the
+applied config; structured logs go to stderr.</p>
+<h2 id="the-output-zarr">The output Zarr<a class="headerlink" href="#the-output-zarr" title="Permanent link">&para;</a></h2>
+<p>Dimensions:</p>
+<ul>
+<li><code>window</code> (passed through from input) — one row per window.</li>
+<li><code>embedding_feature</code> (passed through) — flattened-window axis.</li>
+<li><code>statistic</code> (passed through, when the input has <code>window_averages</code>).</li>
+<li><code>leiden_cluster</code> (new) — one entry per Leiden community.</li>
+<li><code>linkage_step</code> (new) — <code>n_leiden_clusters - 1</code> rows of the Ward
+  linkage matrix.</li>
+<li><code>linkage_field</code> (new, length 4) — the
+  <code>(idx_a, idx_b, distance, n_in_cluster)</code> fields of scipy's linkage.</li>
+<li><code>cluster_count_candidate</code> (new) — the k's evaluated by auto-selection;
+  length 0 when the user supplied <code>n_final_clusters</code> explicitly.</li>
+</ul>
+<p>Data variables:</p>
+<ul>
+<li><code>embedding</code> (passthrough), <code>window_averages</code> (passthrough when
+  present).</li>
+<li><code>leiden_labels</code> <code>(window,)</code> — integer Leiden community per window.</li>
+<li><code>cluster_labels</code> <code>(window,)</code> — final TME-state label per window,
+  1-based.</li>
+<li><code>leiden_cluster_means</code> <code>(leiden_cluster, embedding_feature)</code> — mean
+  embedding per Leiden community.</li>
+<li><code>linkage_matrix</code> <code>(linkage_step, linkage_field)</code> — Ward linkage.</li>
+<li><code>cluster_count_scores</code> <code>(cluster_count_candidate,)</code> — metric value at
+  each candidate k; length 0 on the user-supplied-k path.</li>
+</ul>
+<p>Per-window coordinates (<code>simulation_id</code>, <code>window_index_in_sim</code>,
+<code>start_timepoint</code>, <code>end_timepoint</code>, <code>parameter_combination_id</code>, <code>ic_id</code>,
+<code>parameter_&lt;name&gt;</code>) are forwarded from the input.</p>
+<p>Provenance <code>.zattrs</code>:</p>
+<ul>
+<li><code>cluster_config</code> (JSON), <code>n_leiden_clusters</code>, <code>knn_neighbors_used</code>,
+  <code>n_final_clusters_used</code>, <code>cluster_count_metric_used</code>,
+  <code>source_input_zarr</code>, <code>source_variable</code>, <code>created_at_utc</code>,
+  <code>tmelandscape_version</code>.</li>
+<li>Forwarded if present in input: <code>source_embedding_config</code>,
+  <code>source_normalize_config</code>, <code>source_manifest_hash</code>. The orchestrator
+  also lifts a bare <code>embedding_config</code> attr from the input into the
+  <code>source_embedding_config</code> slot on output, so fresh Phase 4 stores get
+  a clean audit chain.</li>
+</ul>
+<h2 id="whats-not-in-step-5">What's <em>not</em> in step 5<a class="headerlink" href="#whats-not-in-step-5" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Choosing the cluster-count metric automatically.</strong> The package
+  exposes three metrics (<code>wss_elbow</code>, <code>calinski_harabasz</code>,
+  <code>silhouette</code>); the user picks. There is no "best metric" the package
+  selects for you.</li>
+<li><strong>Human-readable state names.</strong> The output is integer labels
+  (<code>1..n_final_clusters_used</code>). Mapping those to interpretable TME-state
+  names (Effector-Dominant, Exhausted-Dominant, etc.) is a downstream
+  analysis decision and is deferred to a later module.</li>
+<li><strong>Stability analysis across seeds.</strong> A single <code>leiden_seed</code> is used;
+  repeated runs at different seeds (to assess label stability) are a
+  user-driven workflow, not a built-in feature.</li>
+</ul>
 
 
 
