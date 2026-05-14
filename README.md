@@ -2,7 +2,8 @@
 
 [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](LICENSE)
 
-**tmelandscape** generates tumor microenvironment (TME) state landscapes from agent-based model (ABM) simulation ensembles. It implements the parameter sampling, spatial-statistic summarisation, time-delay embedding, and clustering steps of the trajectory-landscape pipeline described in Cramer et al. (TNBC manuscript) and Cramer, Heiser, Chang (LCSS short paper).
+**tmelandscape** generates tumor microenvironment (TME) state landscapes from agent-based model (ABM) simulation ensembles. It implements the parameter sampling, spatial-statistic summarisation, time-delay embedding, and clustering steps of the trajectory-landscape pipeline described in Cramer, E., Heiser, L. M. & Chang, Y. H. _Trajectory Landscapes for Therapeutic Strategy Design in Agent-Based Tumor Microenvironment Models_. Preprint at https://doi.org/10.48550/arXiv.2603.18333 (2026).
+
 
 > **Status:** pre-alpha (v0.0.1). API is not yet stable.
 
@@ -54,4 +55,9 @@ BSD 3-Clause. See [LICENSE](LICENSE).
 
 ## Citing
 
-See [CITATION.cff](CITATION.cff) for the software citation; cite the linked manuscripts for the methodology.
+See [CITATION.cff](CITATION.cff) for the software citation; cite the following manuscripts for the methodology:
+
+> 1. Cramer, E., Heiser, L. M. & Chang, Y. H. Trajectory Landscapes for Therapeutic Strategy Design in Agent-Based Tumor Microenvironment Models. Preprint at https://doi.org/10.48550/arXiv.2603.18333 (2026).
+> 2. Cramer, E. M. et al. Tumor-immune trajectory context connects static tissue architecture to clinical outcomes. 2026.03.26.714521 Preprint at https://doi.org/10.64898/2026.03.26.714521 (2026).
+
+ 
