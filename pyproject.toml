@@ -58,6 +58,8 @@ viz = [
     "matplotlib>=3.9",
     "umap-learn>=0.5",
     "plotly>=5.22",
+    # Phase 6 (v0.7.0) figure helpers — clustermap, kdeplot, violinplot.
+    "seaborn>=0.13",
 ]
 mcp = [
     "fastmcp>=2.0",
