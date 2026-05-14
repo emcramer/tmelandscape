@@ -870,8 +870,8 @@
 
 <h1 id="0008-dependency-pin-policy-for-git-only-upstreams">0008 — Dependency pin policy for git-only upstreams<a class="headerlink" href="#0008-dependency-pin-policy-for-git-only-upstreams" title="Permanent link">&para;</a></h1>
 <ul>
-<li><strong>Status:</strong> Accepted</li>
-<li><strong>Date:</strong> 2026-05-13</li>
+<li><strong>Status:</strong> Accepted (revised 2026-05-14: PyPI-target language removed per owner directive — see <a href="../../development/decisions/2026-05-14-no-pypi-plan/">decision log</a>)</li>
+<li><strong>Date:</strong> 2026-05-13 (revised 2026-05-14)</li>
 <li><strong>Deciders:</strong> Eric, Claude</li>
 </ul>
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
@@ -886,19 +886,20 @@
 <li><code>uv lock</code> resolves to whatever commit the tag points to; <code>uv sync</code> reproduces deterministically across machines.</li>
 <li>An ADR-worthy bump (new tag) is captured in tmelandscape's CHANGELOG / commit history.</li>
 </ol>
-<p>For dual-published upstreams (a PyPI release exists), prefer PyPI and drop the git+URL entirely. Target: both <code>tissue_simulator</code> and <code>spatialtissuepy</code> on PyPI before tmelandscape v1.0 ships.</p>
+<p>For dual-published upstreams (a PyPI release exists), prefer PyPI and drop the git+URL entirely. <strong>PyPI publishing for <code>tissue_simulator</code> and <code>spatialtissuepy</code> is not a project goal</strong> — both packages will remain git+tag pinned indefinitely. If either ships to PyPI in the future, the owner will signal a re-pin; until then no roadmap line item depends on it. See <a href="../../development/decisions/2026-05-14-no-pypi-plan/">decision log: no PyPI plan</a>.</p>
 <h2 id="action-items-at-the-time-of-writing">Action items at the time of writing<a class="headerlink" href="#action-items-at-the-time-of-writing" title="Permanent link">&para;</a></h2>
 <ul>
 <li><code>tissue_simulator</code> is currently pinned to floating <code>main</code>. Maintainer should tag <code>v0.1.0</code> at commit <code>67becc12576d76e56be29ac612f55101df878b62</code> (the commit <code>uv</code> resolved into tmelandscape v0.1.0's lockfile). tmelandscape's pyproject pin will then change to <code>@v0.1.0</code>.</li>
 <li><code>spatialtissuepy</code> is currently pinned to commit <code>c03cfa4</code>. Maintainer should tag <code>v0.2.0</code> at that commit. tmelandscape pin updates to <code>@v0.2.0</code>.</li>
 <li>Until tags exist, the commit-pinned form is acceptable as a temporary measure; the policy is "tagged unless impossible right now."</li>
 </ul>
+<p><strong>Status (2026-05-14):</strong> both action items complete. <code>tissue_simulator</code> is now pinned at <code>@v0.1.4</code>; <code>spatialtissuepy</code> is now pinned at <code>@v0.0.1</code>.</p>
 <h2 id="consequences">Consequences<a class="headerlink" href="#consequences" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Drift risk eliminated: a <code>uv lock --upgrade</code> on an unchanged tag does nothing.</li>
 <li>Human-readable provenance: looking at <code>pyproject.toml</code> tells you the upstream version, not just a commit hash.</li>
 <li>Slight friction on the upstream side: maintainers have to remember to tag. Mitigation: document the tag-on-release habit in upstream READMEs and / or automate via release-please / a release script.</li>
-<li>Once upstreams ship to PyPI, this ADR is largely retired in favour of the standard semver dependency style.</li>
+<li>The git+tag form is the <strong>long-term plan</strong>, not a transitional one. The ADR does not retire on a hypothetical PyPI migration.</li>
 </ul>
 <h2 id="alternatives-considered">Alternatives considered<a class="headerlink" href="#alternatives-considered" title="Permanent link">&para;</a></h2>
 <ul>

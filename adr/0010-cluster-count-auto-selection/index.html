@@ -870,8 +870,8 @@
 
 <h1 id="0010-cluster-count-auto-selection-no-silent-default-for-n_final_clusters">0010 — Cluster-count auto-selection (no silent default for <code>n_final_clusters</code>)<a class="headerlink" href="#0010-cluster-count-auto-selection-no-silent-default-for-n_final_clusters" title="Permanent link">&para;</a></h1>
 <ul>
-<li><strong>Status:</strong> Accepted</li>
-<li><strong>Date:</strong> 2026-05-13</li>
+<li><strong>Status:</strong> Accepted (revised 2026-05-14: default <code>k_max</code> cap narrowed from 20 to 12 — see <a href="../../development/decisions/2026-05-14-cluster-count-max-default/">decision log</a>)</li>
+<li><strong>Date:</strong> 2026-05-13 (revised 2026-05-14)</li>
 <li><strong>Deciders:</strong> Eric, Claude</li>
 </ul>
 <h2 id="context">Context<a class="headerlink" href="#context" title="Permanent link">&para;</a></h2>
@@ -920,9 +920,13 @@ package default</strong>. Semantics:</p>
    argmax over candidates. For large ensembles a subsample cap may be
    applied to keep this O(n).</li>
 </ol>
-<p>The candidate range defaults to <code>[2, min(20, n_leiden_clusters)]</code>. Both
-bounds are user-overridable via <code>cluster_count_min</code> and
-<code>cluster_count_max</code>.</p>
+<p>The candidate range defaults to <code>[2, min(12, n_leiden_clusters)]</code>. The
+upper-bound cap of 12 (revised 2026-05-14, was 20) reflects the
+biologically interpretable upper bound for TME states — anything past
+~8-10 final states becomes hard to interpret, and 12 leaves a small
+buffer above that range. Both bounds are user-overridable via
+<code>cluster_count_min</code> and <code>cluster_count_max</code>. See
+<a href="../../development/decisions/2026-05-14-cluster-count-max-default/">decision log: cluster_count_max default</a>.</p>
 <p>The output Zarr stores per-candidate metric values in a new
 <code>cluster_count_scores</code> variable, dimensioned by a new
 <code>cluster_count_candidate</code> axis. Both arrays are empty (length 0) when

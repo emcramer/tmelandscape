@@ -1085,7 +1085,7 @@ the reference; see
      <code>fcluster(Z, t=n_final_clusters, criterion='maxclust')</code>.</li>
 <li><strong>If <code>n_final_clusters is None</code></strong>, <em>auto-select</em> <code>k</code> over the
      candidate range <code>[cluster_count_min, cluster_count_max]</code>
-     (default upper bound <code>min(20, n_leiden_clusters)</code>) using the
+     (default upper bound <code>min(12, n_leiden_clusters)</code>) using the
      chosen <code>cluster_count_metric</code>:<ul>
 <li><code>wss_elbow</code> <em>(default)</em>: minimise within-cluster sum of squares,
    knee detected via <a href="https://github.com/arvkevi/kneed"><code>kneed.KneeLocator</code></a>.</li>
@@ -1171,7 +1171,7 @@ the reference; see
 <td><code>cluster_count_max</code></td>
 <td><code>int \| None (&gt;=2)</code></td>
 <td><code>None</code></td>
-<td>Inclusive upper bound. <code>None</code> ⇒ <code>min(20, n_leiden_clusters)</code>.</td>
+<td>Inclusive upper bound. <code>None</code> ⇒ <code>min(12, n_leiden_clusters)</code>.</td>
 </tr>
 <tr>
 <td><code>source_variable</code></td>

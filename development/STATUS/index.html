@@ -784,10 +784,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verification-snapshot-v060" class="md-nav__link">
+  <a href="#verification-snapshot-v061" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Verification snapshot (v0.6.0)
+        Verification snapshot (v0.6.1)
       
     </span>
   </a>
@@ -988,10 +988,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verification-snapshot-v060" class="md-nav__link">
+  <a href="#verification-snapshot-v061" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Verification snapshot (v0.6.0)
+        Verification snapshot (v0.6.1)
       
     </span>
   </a>
@@ -1133,7 +1133,7 @@
 <p>Updated at the <strong>end</strong> of every agent session. New agents read this <strong>first</strong>, then <a href="../HANDOFF/">HANDOFF.md</a> for the cold-start guide.</p>
 </blockquote>
 <h2 id="where-the-project-is-2026-05-14">Where the project is (2026-05-14)<a class="headerlink" href="#where-the-project-is-2026-05-14" title="Permanent link">&para;</a></h2>
-<p><strong>v0.6.0 shipped.</strong> Pipeline steps 1, 3, 3.5, 4, and 5 are implemented end-to-end via three public surfaces (Python API, CLI, MCP). Step 2 (running PhysiCell simulations) is intentionally out of scope. v1 scope (per <a href="../../adr/0005-no-msm-in-v1/">ADR 0005</a>) ends at clustering; the next phase is visualisation (Phase 6, target v0.7.0).</p>
+<p><strong>v0.6.1 shipped</strong> (housekeeping bundle on top of the Phase 5 v0.6.0 ship earlier today). Pipeline steps 1, 3, 3.5, 4, and 5 are implemented end-to-end via three public surfaces (Python API, CLI, MCP). Step 2 (running PhysiCell simulations) is intentionally out of scope. v1 scope (per <a href="../../adr/0005-no-msm-in-v1/">ADR 0005</a>) ends at clustering; the next phase is visualisation (Phase 6, target v0.7.0). A <strong>decision-log system</strong> was established this session under <code>docs/development/decisions/</code> — read its <code>README.md</code> before writing new code so you can capture decisions in line with the new process.</p>
 <table>
 <thead>
 <tr>
@@ -1190,8 +1190,8 @@
 <tr>
 <td>5</td>
 <td>Clustering</td>
-<td>v0.6.0</td>
-<td><strong>just shipped</strong></td>
+<td>v0.6.0 → v0.6.1 (housekeeping)</td>
+<td>shipped</td>
 <td><code>reference/01_abm_generate_embedding.py</code> lines ~519-720</td>
 </tr>
 <tr>
@@ -1199,18 +1199,18 @@
 <td>Visualisation</td>
 <td>(target v0.7.0)</td>
 <td><strong>NEXT</strong></td>
-<td>TBD</td>
+<td>LCSS figs 1/3/4/6 + TNBC figs 2a-e/6a-c</td>
 </tr>
 </tbody>
 </table>
-<h2 id="verification-snapshot-v060">Verification snapshot (v0.6.0)<a class="headerlink" href="#verification-snapshot-v060" title="Permanent link">&para;</a></h2>
+<h2 id="verification-snapshot-v061">Verification snapshot (v0.6.1)<a class="headerlink" href="#verification-snapshot-v061" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>uv run pytest -q</code> — <strong>375 passed, 1 deselected</strong>, 1 warning (<code>spatialtissuepy.topology.visualization</code> upstream deprecation, harmless).</li>
+<li><code>uv run pytest -q</code> — <strong>377 passed, 1 deselected</strong>, 1 warning (<code>spatialtissuepy.topology.visualization</code> upstream deprecation, harmless).</li>
 <li><code>uv run ruff check .</code> — clean.</li>
 <li><code>uv run ruff format --check .</code> — clean.</li>
-<li><code>uv run mypy src</code> — clean (45 source files, strict mode).</li>
+<li><code>uv run mypy src</code> — clean (47 source files, strict mode).</li>
 <li><code>uv run mkdocs build --strict</code> — exit 0.</li>
-<li><code>tmelandscape version</code> — prints <code>0.6.0</code>.</li>
+<li><code>tmelandscape version</code> — prints <code>0.6.1</code>.</li>
 <li><code>tmelandscape-mcp</code> — boots; <strong>11 tools registered</strong>.</li>
 </ul>
 <h2 id="mcp-tools-11">MCP tools (11)<a class="headerlink" href="#mcp-tools-11" title="Permanent link">&para;</a></h2>
@@ -1378,16 +1378,20 @@
 <p><em>None.</em> Phase 5 complete. Phase 6 (visualisation) not yet started; no task file pre-drafted yet.</p>
 <h2 id="open-questions-for-eric">Open questions (for Eric)<a class="headerlink" href="#open-questions-for-eric" title="Permanent link">&para;</a></h2>
 <ol>
-<li><strong>Phase 6 (visualisation) — what to ship.</strong> ROADMAP currently lists FNN/MI diagnostics, UMAP scatter, state-coloured trajectories. Which of these are highest priority? Are there figures from the LCSS paper or other manuscripts that v0.7.0 should reproduce? Should we draft a task file similar to <code>tasks/06-clustering-implementation.md</code> before kicking off?</li>
-<li><strong>PyPI publishing for <code>tissue_simulator</code> and <code>spatialtissuepy</code>.</strong> Both are git-pinned via tag right now (per ADR 0008). The ADR's target is to migrate to PyPI before v1.0 ships. Is there a timeline for that, or should we plan to remain on git+URL through v0.7.0?</li>
+<li><strong>WSS-elbow algorithm — pick one of the proposed paths.</strong> See <a href="../decisions/2026-05-14-wss-elbow-algorithm-options/">decision log</a>. Recommendation: Option 0 (fix the marginal-decrease fallback) + Option 2 (add an L-method metric). Pending owner pick before any code lands.</li>
 </ol>
+<p>Resolved in this session (see decision log):</p>
+<ul>
+<li>~~Phase 6 scope~~ — figures decided: LCSS 1, 3, 4, 6 + TNBC 2a-e, 6a-c. Task file drafted (next).</li>
+<li>~~PyPI plan~~ — not a goal; ADR 0008 amended; see <a href="../decisions/2026-05-14-no-pypi-plan/">decision log: no PyPI plan</a>.</li>
+</ul>
 <h2 id="deferred-follow-up-tickets-from-phase-5-reviews">Deferred follow-up tickets from Phase 5 reviews<a class="headerlink" href="#deferred-follow-up-tickets-from-phase-5-reviews" title="Permanent link">&para;</a></h2>
-<p>These were noted by reviewers but punted out of v0.6.0 — none are blockers.</p>
+<p>Status as of v0.6.1.</p>
 <ol>
-<li><strong>Marginal-decrease fallback semantics</strong> in <code>cluster/selection.py</code>. The WSS k=1 anchor dominates the kneed knee detection; when kneed returns <code>None</code> and the fallback runs, it currently always selects <code>k_min</code> because the steepest-decrease segment is the 1→2 step. Either refactor the fallback to operate on the un-anchored candidates, or document explicitly that the fallback collapses to <code>k_min</code> under the anchor regime.</li>
-<li><strong>Tighten the auto-selection test range.</strong> <code>test_auto_selection_two_blob_wss_elbow_picks_small_k</code> currently asserts <code>chosen in [2, 4]</code>; if the choice is stable as <code>==2</code> across kneed minor versions in CI, tighten it.</li>
-<li><strong>Add a regression fixture for elbows at k≥4</strong> to confirm the k=1 anchor doesn't bias auto-selection toward smaller k in pathological cases.</li>
-<li><strong>Decide on logging consistency across phases.</strong> Phase 5 emits <code>cluster_ensemble.start</code> / <code>.done</code> structlog events (per contract); Phase 3.5 and Phase 4 orchestrators don't log at all. Either retrofit the earlier phases or drop the Phase 5 logs. Currently keeping them — they live on stderr now that <code>configure_logging()</code> is wired into CLI startup.</li>
+<li><strong>Marginal-decrease fallback semantics</strong> in <code>cluster/selection.py</code> — captured in <a href="../decisions/2026-05-14-wss-elbow-algorithm-options/">decision log: WSS-elbow algorithm options</a>. Pending owner pick (see Open Questions above).</li>
+<li><strong>Tighten the auto-selection test range</strong> from <code>chosen in [2, 4]</code> to <code>==2</code>. Still deferred; safe to do once CI confirms stability across kneed minor versions.</li>
+<li>~~<strong>Add a regression fixture for elbows at k≥4</strong>~~ — <strong>DONE in v0.6.1.</strong> <code>tests/unit/test_cluster_selection.py::test_wss_elbow_five_blobs_picks_k_at_or_above_four</code> plus a companion CH check. Both pass, which is reassuring re: the k=1-anchor-bias concern in this regime.</li>
+<li><strong>Decide on logging consistency across phases.</strong> Phase 5 emits <code>cluster_ensemble.start</code> / <code>.done</code> structlog events (per contract); Phase 3.5 and Phase 4 orchestrators don't log at all. Either retrofit the earlier phases or drop the Phase 5 logs. Currently keeping them — they live on stderr now that <code>configure_logging()</code> is wired into CLI startup. Still deferred.</li>
 </ol>
 <h2 id="quirks-worth-knowing-across-phases">Quirks worth knowing (across phases)<a class="headerlink" href="#quirks-worth-knowing-across-phases" title="Permanent link">&para;</a></h2>
 <ul>
