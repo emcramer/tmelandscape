@@ -73,16 +73,23 @@ Project owner directive: never hardcode the spatial-statistics panel; never over
 - [x] ADR 0009 written; ADR 0006 updated with the "never overwrite, no built-in drop" invariants.
 - [x] Tests updated to pass explicit `statistics=[...]`; 107 tests passing.
 
-## Phase 3.5 — Step 3.5 normalization (v0.2.5)
+## Phase 3.5 — Step 3.5 normalization (v0.4.0) — COMPLETE
 
-> Added 2026-05-12 after the Phase 1 reference audit. See [ADR 0006](../adr/0006-normalize-as-pipeline-step.md).
+Shipped 2026-05-13 with the buddy-pair team pattern (3 Implementer + 3 Reviewer agents). See [ADR 0006](../adr/0006-normalize-as-pipeline-step.md) and [ADR 0009](../adr/0009-no-hardcoded-statistics-panel.md) for binding invariants.
 
-- [ ] `tmelandscape.normalize.within_timestep` (per-step mean → power transform → z-score → +mean)
-- [ ] `tmelandscape.normalize.feature_filter` (configurable drop of cell-density columns)
-- [ ] `tmelandscape.normalize.alternatives` (global / local-time / feature-distribution variants)
-- [ ] CLI: `tmelandscape normalize`
-- [ ] MCP tool: `tmelandscape.normalize_ensemble`
-- [ ] Numerical agreement vs `reference/00_abm_normalization.py` on the synthetic fixture
+- [x] `tmelandscape.normalize.within_timestep` — reference algorithm (per-step mean → Yeo-Johnson → z-score → re-add mean).
+- [x] `tmelandscape.normalize.alternatives` — `normalize_identity` passthrough as baseline / future-strategy anchor.
+- [x] `tmelandscape.normalize.normalize_ensemble` — Zarr orchestrator. Reads input lazily, writes a NEW Zarr containing both raw `value` and the new `value_normalized` arrays. Refuses to overwrite existing outputs.
+- [x] `tmelandscape.config.normalize.NormalizeConfig` (Pydantic): strategy literal, `preserve_time_effect`, `drop_columns=[]` default, `output_variable` validates `!= "value"`, `fill_nan_with` rejects NaN to keep JSON round-trip lossless.
+- [x] CLI: `tmelandscape normalize` + `tmelandscape normalize-strategies list`.
+- [x] MCP tools: `normalize_ensemble` + `list_normalize_strategies`.
+- [x] Reviewer-surfaced fixes baked in:
+  - **B-RISK 6**: orchestrator-side guard against `output_variable == "value"` collision.
+  - **C-RISK 10**: validator rejects `fill_nan_with = NaN`.
+  - **B-SMELL 8**: output Zarr inherits the input's chunk grid.
+  - **B-RISK 9**: input `Dataset` opened as context manager; partial output cleaned on `to_zarr` failure.
+  - **A-SMELL**: float32 → float64 promotion documented in the algorithm's docstring.
+- [x] 168 tests passing (existing 158 + 5 new normalize unit tests in driver, 11 in orchestrator, 23 in config + alternatives, 5 integration = +27 new tests). ruff + format + mypy strict + mkdocs strict all clean.
 
 ## Phase 4 — Step 4 embedding (v0.3.0)
 

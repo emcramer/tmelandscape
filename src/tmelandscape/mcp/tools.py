@@ -8,8 +8,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from tmelandscape.config.normalize import NormalizeConfig
 from tmelandscape.config.summarize import SummarizeConfig
 from tmelandscape.config.sweep import SweepConfig
+from tmelandscape.normalize import normalize_ensemble
 from tmelandscape.sampling import generate_sweep
 from tmelandscape.sampling.manifest import SweepManifest
 from tmelandscape.summarize import summarize_ensemble
@@ -146,3 +148,72 @@ def describe_statistic_tool(name: str) -> dict[str, Any]:
         ``parameters`` (map of parameter name to type name).
     """
     return describe_metric(name)
+
+
+def normalize_ensemble_tool(
+    input_zarr: str,
+    output_zarr: str,
+    *,
+    normalize_config: dict[str, Any],
+) -> dict[str, Any]:
+    """Run step 3.5: within-timestep normalisation of the ensemble Zarr.
+
+    Reads an input Zarr produced by :func:`summarize_ensemble_tool`, applies
+    the chosen normalisation strategy, and writes a NEW Zarr at
+    ``output_zarr`` containing both the raw ``value`` array and the new
+    normalised array. The input store is never overwritten.
+
+    Parameters
+    ----------
+    input_zarr
+        Path to the input ensemble Zarr.
+    output_zarr
+        Path of the NEW Zarr store to write. Must not already exist; the
+        orchestrator refuses to overwrite by design (ADR 0006).
+    normalize_config
+        Required serialised :class:`NormalizeConfig` dict. There is no
+        default — call :func:`list_normalize_strategies_tool` to discover
+        available strategies first.
+
+    Returns
+    -------
+    dict
+        Summary with the output Zarr path and the applied config.
+    """
+    cfg = NormalizeConfig.model_validate(normalize_config)
+    out_path = normalize_ensemble(input_zarr, output_zarr, config=cfg)
+    return {
+        "output_zarr": str(out_path),
+        "strategy": cfg.strategy,
+        "preserve_time_effect": cfg.preserve_time_effect,
+        "drop_columns": list(cfg.drop_columns),
+        "output_variable": cfg.output_variable,
+    }
+
+
+def list_normalize_strategies_tool() -> list[dict[str, str]]:
+    """List available normalisation strategies (name + description).
+
+    There is one default strategy in v0.4.0 (``within_timestep``) plus
+    ``identity`` as a passthrough baseline. New strategies in
+    ``tmelandscape.normalize.alternatives`` will land here in lockstep.
+    """
+    return [
+        {
+            "name": "within_timestep",
+            "description": (
+                "Per-timestep Yeo-Johnson + z-score, optionally re-adding the "
+                "pre-transform per-step mean to preserve temporal trend. "
+                "Reference oracle: reference/00_abm_normalization.py."
+            ),
+            "module": "tmelandscape.normalize.within_timestep",
+        },
+        {
+            "name": "identity",
+            "description": (
+                "Passthrough strategy: returns the input unchanged. Useful as "
+                "a baseline / for diagnosing orchestrator plumbing."
+            ),
+            "module": "tmelandscape.normalize.alternatives",
+        },
+    ]

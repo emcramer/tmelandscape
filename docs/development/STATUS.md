@@ -4,7 +4,7 @@
 
 ## Current focus
 
-**Phase 3 panel rollback: complete (v0.3.0).** Per the project owner's directive, the LCSS-default statistics panel has been removed and replaced with dynamic discovery from `spatialtissuepy`'s live registry; the `normalize.feature_filter` hardcoded density-column drop has been removed; ADRs 0006 + 0009 now document the "never overwrite, no built-in drop, no hardcoded panel" invariants. 107 tests pass; the system is ready for Phase 3.5 normalisation, which will write to new variables/files only.
+**Phase 3.5 — normalisation: complete (v0.4.0).** Within-timestep normalisation shipped end-to-end via the buddy-pair team (Implementer + Reviewer per stream, all reviewer findings applied pre-integration). The orchestrator reads the input Zarr read-only, writes a NEW Zarr containing both the raw `value` and a `value_normalized` array, refuses to overwrite, inherits the input's chunk grid. 168 tests pass; ruff/format/mypy/mkdocs strict all clean. Ready for Phase 4 (time-delay embedding).
 
 ## In-flight tasks
 

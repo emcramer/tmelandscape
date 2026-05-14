@@ -15,6 +15,8 @@ from tmelandscape.mcp.tools import (
     describe_statistic_tool,
     generate_sweep_tool,
     list_available_statistics_tool,
+    list_normalize_strategies_tool,
+    normalize_ensemble_tool,
     summarize_ensemble_tool,
 )
 
@@ -40,6 +42,8 @@ mcp.tool(generate_sweep_tool, name="generate_sweep")
 mcp.tool(summarize_ensemble_tool, name="summarize_ensemble")
 mcp.tool(list_available_statistics_tool, name="list_available_statistics")
 mcp.tool(describe_statistic_tool, name="describe_statistic")
+mcp.tool(normalize_ensemble_tool, name="normalize_ensemble")
+mcp.tool(list_normalize_strategies_tool, name="list_normalize_strategies")
 
 
 def main() -> None:

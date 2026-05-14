@@ -70,6 +70,7 @@ nav:
   - Concepts:
       - concepts/sampling.md
       - concepts/summarize.md
+      - concepts/normalize.md
       - concepts/embedding.md
       - concepts/cluster.md
   - API reference: api/index.md
