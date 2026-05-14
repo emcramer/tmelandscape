@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://emcramer.github.io/tmelandscape/development/STATUS/">
+        <link rel="canonical" href="https://emcramer.github.io/tmelandscape/development/HANDOFF/">
       
       
-        <link rel="prev" href="../ROADMAP/">
+        <link rel="prev" href="../STATUS/">
       
       
-        <link rel="next" href="../HANDOFF/">
+        <link rel="next" href="../../adr/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Status - tmelandscape</title>
+        <title>Handoff guide - tmelandscape</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#status-current-session-resume-doc" class="md-skip">
+        <a href="#handoff-cold-start-guide-for-a-new-agent-joining-tmelandscape" class="md-skip">
           Skip to content
         </a>
       
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Status
+              Handoff guide
             
           </span>
         </div>
@@ -710,6 +710,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../STATUS/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -729,7 +757,7 @@
   <span class="md-ellipsis">
     
   
-    Status
+    Handoff guide
   
 
     
@@ -747,7 +775,7 @@
   <span class="md-ellipsis">
     
   
-    Status
+    Handoff guide
   
 
     
@@ -773,10 +801,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#where-the-project-is-2026-05-13" class="md-nav__link">
+  <a href="#0-read-these-in-this-order" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where the project is (2026-05-13)
+        0. Read these, in this order
       
     </span>
   </a>
@@ -784,10 +812,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verification-snapshot-v050" class="md-nav__link">
+  <a href="#1-verify-you-have-the-project-in-a-working-state" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Verification snapshot (v0.5.0)
+        1. Verify you have the project in a working state
       
     </span>
   </a>
@@ -795,10 +823,77 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mcp-tools-9" class="md-nav__link">
+  <a href="#2-three-load-bearing-conventions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MCP tools (9)
+        2. Three load-bearing conventions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Three load-bearing conventions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-three-public-surfaces-every-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Three public surfaces, every step
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-never-overwrite-raw-data-never-hardcode-user-choices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Never overwrite raw data, never hardcode user choices
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-buddy-pair-pattern-for-non-trivial-phases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Buddy-pair pattern for non-trivial phases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.3 Buddy-pair pattern for non-trivial phases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#useful-prompts-when-spawning-agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Useful prompts when spawning agents
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-the-directory-tree-at-a-glance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. The directory tree at a glance
       
     </span>
   </a>
@@ -806,10 +901,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cli-verbs" class="md-nav__link">
+  <a href="#4-common-gotchas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CLI verbs
+        4. Common gotchas
       
     </span>
   </a>
@@ -817,10 +912,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adrs-9" class="md-nav__link">
+  <a href="#5-when-you-finish-a-session" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ADRs (9)
+        5. When you finish a session
       
     </span>
   </a>
@@ -828,65 +923,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#project-owners-binding-directives-cumulative" class="md-nav__link">
+  <a href="#6-who-to-ask" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Project owner's binding directives (cumulative)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#in-flight-tasks" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        In-flight tasks
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#open-questions-for-eric" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Open questions (for Eric)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#quirks-worth-knowing-across-phases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quirks worth knowing (across phases)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#next-agents-first-actions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Next agent's first actions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#last-session-handoff" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Last-session handoff
+        6. Who to ask
       
     </span>
   </a>
@@ -897,34 +937,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../HANDOFF/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Handoff guide
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -966,10 +978,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#where-the-project-is-2026-05-13" class="md-nav__link">
+  <a href="#0-read-these-in-this-order" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where the project is (2026-05-13)
+        0. Read these, in this order
       
     </span>
   </a>
@@ -977,10 +989,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verification-snapshot-v050" class="md-nav__link">
+  <a href="#1-verify-you-have-the-project-in-a-working-state" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Verification snapshot (v0.5.0)
+        1. Verify you have the project in a working state
       
     </span>
   </a>
@@ -988,10 +1000,77 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mcp-tools-9" class="md-nav__link">
+  <a href="#2-three-load-bearing-conventions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MCP tools (9)
+        2. Three load-bearing conventions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Three load-bearing conventions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-three-public-surfaces-every-step" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Three public surfaces, every step
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-never-overwrite-raw-data-never-hardcode-user-choices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Never overwrite raw data, never hardcode user choices
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-buddy-pair-pattern-for-non-trivial-phases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Buddy-pair pattern for non-trivial phases
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.3 Buddy-pair pattern for non-trivial phases">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#useful-prompts-when-spawning-agents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Useful prompts when spawning agents
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-the-directory-tree-at-a-glance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. The directory tree at a glance
       
     </span>
   </a>
@@ -999,10 +1078,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cli-verbs" class="md-nav__link">
+  <a href="#4-common-gotchas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CLI verbs
+        4. Common gotchas
       
     </span>
   </a>
@@ -1010,10 +1089,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adrs-9" class="md-nav__link">
+  <a href="#5-when-you-finish-a-session" class="md-nav__link">
     <span class="md-ellipsis">
       
-        ADRs (9)
+        5. When you finish a session
       
     </span>
   </a>
@@ -1021,65 +1100,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#project-owners-binding-directives-cumulative" class="md-nav__link">
+  <a href="#6-who-to-ask" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Project owner's binding directives (cumulative)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#in-flight-tasks" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        In-flight tasks
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#open-questions-for-eric" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Open questions (for Eric)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#quirks-worth-knowing-across-phases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quirks worth knowing (across phases)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#next-agents-first-actions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Next agent's first actions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#last-session-handoff" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Last-session handoff
+        6. Who to ask
       
     </span>
   </a>
@@ -1106,271 +1130,133 @@
   
 
 
-<h1 id="status-current-session-resume-doc">STATUS — current session resume doc<a class="headerlink" href="#status-current-session-resume-doc" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p>Updated at the <strong>end</strong> of every agent session. New agents read this <strong>first</strong>, then <a href="../HANDOFF/">HANDOFF.md</a> for the cold-start guide.</p>
-</blockquote>
-<h2 id="where-the-project-is-2026-05-13">Where the project is (2026-05-13)<a class="headerlink" href="#where-the-project-is-2026-05-13" title="Permanent link">&para;</a></h2>
-<p><strong>v0.5.0 shipped.</strong> Pipeline steps 1, 3, 3.5, and 4 are implemented end-to-end via three public surfaces (Python API, CLI, MCP). Step 2 (running PhysiCell simulations) is intentionally out of scope. Step 5 (two-stage Leiden + Ward clustering) is the next phase, with a pre-drafted task file ready at <code>tasks/06-clustering-implementation.md</code> (in the repo root, not on the docs site).</p>
-<table>
-<thead>
-<tr>
-<th>Phase</th>
-<th>Step</th>
-<th>Version</th>
-<th>Status</th>
-<th>Reference oracle</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>0</td>
-<td>Bootstrap</td>
-<td>v0.0.1</td>
-<td>shipped</td>
-<td>—</td>
-</tr>
-<tr>
-<td>1</td>
-<td>Reference audit</td>
-<td>(no bump)</td>
-<td>shipped</td>
-<td>the <code>reference/</code> directory</td>
-</tr>
-<tr>
-<td>2</td>
-<td>Sampling</td>
-<td>v0.1.0 → v0.1.1 (fixes)</td>
-<td>shipped</td>
-<td><code>/tmp/physim-calibration/code/sampling.py</code></td>
-</tr>
-<tr>
-<td>3</td>
-<td>Summarisation</td>
-<td>v0.2.0 → v0.3.0 (panel rollback)</td>
-<td>shipped</td>
-<td><code>spatialtissuepy</code> registry (68 metrics)</td>
-</tr>
-<tr>
-<td>3.5</td>
-<td>Normalisation</td>
-<td>v0.4.0</td>
-<td>shipped</td>
-<td><code>reference/00_abm_normalization.py</code></td>
-</tr>
-<tr>
-<td>4</td>
-<td>Embedding</td>
-<td>v0.5.0</td>
-<td><strong>just shipped</strong></td>
-<td><code>reference/utils.py::window_trajectory_data</code></td>
-</tr>
-<tr>
-<td>5</td>
-<td>Clustering</td>
-<td>(target v0.6.0)</td>
-<td><strong>NEXT</strong></td>
-<td><code>reference/01_abm_generate_embedding.py</code> (Leiden + Ward sections)</td>
-</tr>
-</tbody>
-</table>
-<h2 id="verification-snapshot-v050">Verification snapshot (v0.5.0)<a class="headerlink" href="#verification-snapshot-v050" title="Permanent link">&para;</a></h2>
-<ul>
-<li><code>uv run pytest -q</code> — <strong>247 passed, 1 deselected</strong>, 1 warning (<code>spatialtissuepy.topology.visualization</code> upstream deprecation, harmless).</li>
-<li><code>uv run ruff check .</code> — clean.</li>
-<li><code>uv run ruff format --check .</code> — clean.</li>
-<li><code>uv run mypy src</code> — clean (45 source files, strict mode).</li>
-<li><code>uv run mkdocs build --strict</code> — exit 0.</li>
-<li><code>tmelandscape version</code> — prints <code>0.5.0</code>.</li>
-<li><code>tmelandscape-mcp</code> — boots; 9 tools registered.</li>
-</ul>
-<h2 id="mcp-tools-9">MCP tools (9)<a class="headerlink" href="#mcp-tools-9" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Tool</th>
-<th>Phase</th>
-<th>What it does</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>ping</code></td>
-<td>0</td>
-<td>Health check</td>
-</tr>
-<tr>
-<td><code>generate_sweep</code></td>
-<td>2</td>
-<td>Latin Hypercube parameter sweep + tissue_simulator IC replicates</td>
-</tr>
-<tr>
-<td><code>summarize_ensemble</code></td>
-<td>3</td>
-<td>spatialtissuepy panel over a PhysiCell output directory tree</td>
-</tr>
-<tr>
-<td><code>list_available_statistics</code></td>
-<td>3</td>
-<td>Catalogue of spatialtissuepy metrics</td>
-</tr>
-<tr>
-<td><code>describe_statistic</code></td>
-<td>3</td>
-<td>Full description of one metric</td>
-</tr>
-<tr>
-<td><code>normalize_ensemble</code></td>
-<td>3.5</td>
-<td>Within-time-step normalisation on a Zarr ensemble</td>
-</tr>
-<tr>
-<td><code>list_normalize_strategies</code></td>
-<td>3.5</td>
-<td>Catalogue of normalisation strategies</td>
-</tr>
-<tr>
-<td><code>embed_ensemble</code></td>
-<td>4</td>
-<td>Sliding-window embedding of a Zarr ensemble</td>
-</tr>
-<tr>
-<td><code>list_embed_strategies</code></td>
-<td>4</td>
-<td>Catalogue of embedding strategies</td>
-</tr>
-</tbody>
-</table>
-<h2 id="cli-verbs">CLI verbs<a class="headerlink" href="#cli-verbs" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>tmelandscape<span class="w"> </span>sample<span class="w">                </span><span class="c1"># step 1</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>tmelandscape<span class="w"> </span>summarize<span class="w">             </span><span class="c1"># step 3</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>tmelandscape<span class="w"> </span>normalize<span class="w">             </span><span class="c1"># step 3.5</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>tmelandscape<span class="w"> </span>embed<span class="w">                 </span><span class="c1"># step 4</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>tmelandscape<span class="w"> </span>statistics<span class="w"> </span>list/describe<span class="w">       </span><span class="c1"># step 3 discovery</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>tmelandscape<span class="w"> </span>normalize-strategies<span class="w"> </span>list<span class="w">      </span><span class="c1"># step 3.5 discovery</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>tmelandscape<span class="w"> </span>embed-strategies<span class="w"> </span>list<span class="w">          </span><span class="c1"># step 4 discovery</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>tmelandscape<span class="w"> </span>version
+<h1 id="handoff-cold-start-guide-for-a-new-agent-joining-tmelandscape">HANDOFF — cold-start guide for a new agent joining <code>tmelandscape</code><a class="headerlink" href="#handoff-cold-start-guide-for-a-new-agent-joining-tmelandscape" title="Permanent link">&para;</a></h1>
+<p>You are picking up a multi-month research-software project that produces tumour-microenvironment (TME) state landscapes from agent-based-model simulation ensembles. The project owner is Eric Cramer (OHSU). The repo is at <a href="https://github.com/emcramer/tmelandscape">https://github.com/emcramer/tmelandscape</a>.</p>
+<p>The current version is <strong>v0.5.0</strong>, shipped 2026-05-13. Pipeline steps 1, 3, 3.5, and 4 are done. Step 2 is intentionally external. Step 5 (clustering) is the next phase and has a pre-drafted task file at <code>tasks/06-clustering-implementation.md</code> in the repo root with frozen API contracts.</p>
+<h2 id="0-read-these-in-this-order">0. Read these, in this order<a class="headerlink" href="#0-read-these-in-this-order" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>This file</strong> — orientation.</li>
+<li><strong><a href="../STATUS/"><code>STATUS.md</code></a></strong> — where the project is right now.</li>
+<li><strong><code>AGENTS.md</code></strong> at the repo root — house-style invariants, canonical commands, scope boundaries, do/don't lists.</li>
+<li><strong><a href="../ROADMAP/"><code>ROADMAP.md</code></a></strong> — what's shipped vs upcoming.</li>
+<li><strong><code>tasks/06-clustering-implementation.md</code></strong> (repo root, not on the docs site) — the next phase (Phase 5 / clustering), with API contracts already frozen and the buddy-pair stream allocation drafted.</li>
+<li><strong>The most recent ADRs</strong> (<code>docs/adr/000{6,7,8,9}-*.md</code>) — the binding architectural decisions you should not overturn without explicit owner approval.</li>
+</ol>
+<h2 id="1-verify-you-have-the-project-in-a-working-state">1. Verify you have the project in a working state<a class="headerlink" href="#1-verify-you-have-the-project-in-a-working-state" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>/Users/cramere/landscape-generation
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>uv<span class="w"> </span>sync<span class="w"> </span>--all-extras
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-q
 </code></pre></div>
-<h2 id="adrs-9">ADRs (9)<a class="headerlink" href="#adrs-9" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>#</th>
-<th>Title</th>
-<th>Phase</th>
-<th>Key invariant</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>0001</td>
-<td>Package name <code>tmelandscape</code></td>
-<td>0</td>
-<td>—</td>
-</tr>
-<tr>
-<td>0002</td>
-<td><code>uv</code> + pyproject.toml</td>
-<td>0</td>
-<td>—</td>
-</tr>
-<tr>
-<td>0003</td>
-<td>Zarr as the ensemble-store format</td>
-<td>0/3</td>
-<td>Zarr v3 acceptable; document spec drift</td>
-</tr>
-<tr>
-<td>0004</td>
-<td>MCP server is a first-class surface</td>
-<td>0</td>
-<td>Every public API has an MCP tool</td>
-</tr>
-<tr>
-<td>0005</td>
-<td>v1 scope ends at clustering</td>
-<td>0</td>
-<td>No MSM/MDP, no projection in v1</td>
-</tr>
-<tr>
-<td>0006</td>
-<td>Normalisation is a discrete pipeline step</td>
-<td>1/3.5</td>
-<td><strong>Never overwrite raw data</strong>; <strong>no built-in feature drops</strong></td>
-</tr>
-<tr>
-<td>0007</td>
-<td>Two-stage Leiden + Ward clustering</td>
-<td>1/5</td>
-<td>Reference faithfulness for the clustering pipeline</td>
-</tr>
-<tr>
-<td>0008</td>
-<td>Dependency pin policy</td>
-<td>2</td>
-<td>Git+URL deps tagged before PyPI; pin via tag</td>
-</tr>
-<tr>
-<td>0009</td>
-<td>No hardcoded statistics panel</td>
-<td>3</td>
-<td><strong>Dynamic discovery</strong>; user picks the panel</td>
-</tr>
-</tbody>
-</table>
-<h2 id="project-owners-binding-directives-cumulative">Project owner's binding directives (cumulative)<a class="headerlink" href="#project-owners-binding-directives-cumulative" title="Permanent link">&para;</a></h2>
-<ol>
-<li><strong>Never overwrite raw data</strong> — applies to every pipeline step. Each phase writes a NEW Zarr at a user-supplied path.</li>
-<li><strong>No hardcoded panels / defaults</strong> — <code>SummarizeConfig.statistics</code> is required; <code>EmbeddingConfig.window_size</code> is required. Strategy literals can have defaults, but data-selection knobs cannot.</li>
-<li><strong>No built-in feature drops</strong> — <code>drop_columns</code>/<code>drop_statistics</code> always default to <code>[]</code>.</li>
-<li><strong>Buddy-pair pattern for non-trivial phases</strong> — Implementer agent + Reviewer agent per stream; reviewer audits read-only and emits BUG/RISK/SMELL findings; orchestrator integrates.</li>
-<li><strong>Three public surfaces</strong> — every pipeline step exposes Python API, CLI, MCP tool, with integration tests proving they produce equivalent output.</li>
-</ol>
-<h2 id="in-flight-tasks">In-flight tasks<a class="headerlink" href="#in-flight-tasks" title="Permanent link">&para;</a></h2>
-<p><em>None.</em> Phase 5 not yet started; task file pre-drafted but no implementer agents have run yet.</p>
-<h2 id="open-questions-for-eric">Open questions (for Eric)<a class="headerlink" href="#open-questions-for-eric" title="Permanent link">&para;</a></h2>
-<ol>
-<li><strong><code>tissue_simulator</code> v0.1.0 upstream tag</strong> and <strong><code>spatialtissuepy</code> v0.2.0 upstream tag</strong> — Eric is handling these separately per ADR 0008. Once tags exist, update the <code>git+URL</code> pins in <code>pyproject.toml</code> from commit SHAs to tag names.</li>
-<li><strong>Phase 5 (clustering) — confirm the binding invariants ship:</strong></li>
-<li>Cluster labels are written to a NEW Zarr; the input embedding store is never modified.</li>
-<li><code>n_final_clusters</code> is a required user input (no default); we do not pick "6 TME states" silently.</li>
-<li>Output structure mirrors the rest of the pipeline (raw arrays preserved; new labels added alongside).</li>
-</ol>
-<h2 id="quirks-worth-knowing-across-phases">Quirks worth knowing (across phases)<a class="headerlink" href="#quirks-worth-knowing-across-phases" title="Permanent link">&para;</a></h2>
+<p>You should see <strong>247 passed, 1 deselected</strong> in ~35 seconds. The deselected test is the opt-in <code>pytest -m real</code> real-data integration test, which requires the example PhysiCell sims fetched into <code>tests/data/example_physicell/</code>. If your run shows a different count, stop and figure out why before changing anything.</p>
+<p>Other verification gates:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uv<span class="w"> </span>run<span class="w"> </span>ruff<span class="w"> </span>check<span class="w"> </span>.<span class="w">            </span><span class="c1"># → All checks passed!</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>uv<span class="w"> </span>run<span class="w"> </span>ruff<span class="w"> </span>format<span class="w"> </span>--check<span class="w"> </span>.<span class="w">   </span><span class="c1"># → N files already formatted</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>uv<span class="w"> </span>run<span class="w"> </span>mypy<span class="w"> </span>src<span class="w">                </span><span class="c1"># → Success: no issues found in 45 source files</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>uv<span class="w"> </span>run<span class="w"> </span>mkdocs<span class="w"> </span>build<span class="w"> </span>--strict<span class="w">   </span><span class="c1"># → exit 0</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>uv<span class="w"> </span>run<span class="w"> </span>tmelandscape<span class="w"> </span>version<span class="w">    </span><span class="c1"># → 0.5.0</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>uv<span class="w"> </span>run<span class="w"> </span>tmelandscape-mcp<span class="w">        </span><span class="c1"># MCP server boots over stdio</span>
+</code></pre></div>
+<h2 id="2-three-load-bearing-conventions">2. Three load-bearing conventions<a class="headerlink" href="#2-three-load-bearing-conventions" title="Permanent link">&para;</a></h2>
+<h3 id="21-three-public-surfaces-every-step">2.1 Three public surfaces, every step<a class="headerlink" href="#21-three-public-surfaces-every-step" title="Permanent link">&para;</a></h3>
+<p>Every pipeline step exposes:</p>
 <ul>
-<li><strong>tissue_simulator monkey-patch</strong> (Phase 2): upstream's unseeded <code>np.random.default_rng()</code> calls are monkey-patched at the call site for the duration of <code>generate_initial_conditions</code>. Scoped via <code>ExitStack</code>. File upstream issue when convenient.</li>
-<li><strong>Interaction-key <code>|</code> rewrite</strong> (Phase 3): output keys like <code>interaction_&lt;src&gt;_&lt;dst&gt;</code> are rewritten to <code>interaction_&lt;src&gt;|&lt;dst&gt;</code> because cell-type names contain underscores (<code>M0_macrophage</code>). Off via <code>SummarizeConfig.rewrite_interaction_keys=False</code>.</li>
-<li><strong>Empty-timepoint contract</strong> (Phase 3): only <code>cell_counts</code> emits a row when a timepoint has zero live cells; the aggregator NaN-fills missing entries from the union schema. Centrality, fractions, interactions stay silent.</li>
-<li><strong>2D <code>time</code> coord</strong> (Phase 3): <code>time</code> is <code>(simulation, timepoint)</code>-aligned, not <code>(timepoint,)</code>-aligned. Different sims may emit different wall-clock times for the same step index.</li>
-<li><strong>Sweep-scoped IC subdirectories</strong> (Phase 2 polish): ICs land under <code>&lt;initial_conditions_dir&gt;/sweep_&lt;hash&gt;_&lt;timestamp&gt;/</code>. <code>SweepManifest.ic_root()</code> returns the actual directory.</li>
-<li><strong>Float32→float64 promotion</strong> (Phase 3.5 algorithm): the within-timestep normalisation promotes float32 inputs to float64. Documented in the algorithm's docstring.</li>
-<li><strong>NaN policy in <code>fill_nan_with</code></strong> (Phase 3.5): config validator rejects NaN to keep <code>model_dump_json</code> round-trips lossless.</li>
-<li><strong><code>output_variable == "value"</code></strong> (Phase 3.5) and <strong>the three variable-collision checks</strong> (Phase 4): each orchestrator has defence-in-depth guards in addition to the config validators.</li>
-<li><strong>Zarr v3 unstable string dtype warnings</strong> (Phase 3 / ADR 0003 update): xarray writes string coords as <code>FixedLengthUTF32</code> which is pre-spec on Zarr v3; <code>pyproject.toml.[tool.pytest.ini_options].filterwarnings</code> filters them in tests.</li>
+<li>A Python API: <code>from tmelandscape.&lt;phase&gt; import &lt;step&gt;_ensemble</code>.</li>
+<li>A CLI verb: <code>tmelandscape &lt;step&gt;</code>.</li>
+<li>An MCP tool: <code>&lt;step&gt;_ensemble_tool</code> in <code>src/tmelandscape/mcp/tools.py</code>, registered in <code>src/tmelandscape/mcp/server.py</code>.</li>
 </ul>
-<h2 id="next-agents-first-actions">Next agent's first actions<a class="headerlink" href="#next-agents-first-actions" title="Permanent link">&para;</a></h2>
-<ol>
-<li><strong>Read</strong> <code>docs/development/HANDOFF.md</code> (the cold-start guide), then this STATUS, then <code>AGENTS.md</code>.</li>
-<li><strong>Verify the project state</strong>: <code>uv sync --all-extras &amp;&amp; uv run pytest -q</code> should show <strong>247 passed, 1 deselected</strong>.</li>
-<li><strong>Read the Phase 5 task file</strong>: <code>tasks/06-clustering-implementation.md</code> (in the repo root, not on the docs site). All Pydantic schemas and function signatures are frozen there.</li>
-<li><strong>Confirm with Eric</strong> on the Open Questions above before starting Phase 5 implementation. In particular: confirm the binding invariants for clustering output.</li>
-<li><strong>Spawn the buddy-pair team for Phase 5</strong> following the pattern used in v0.4.0 and v0.5.0:</li>
-<li>Wave 1: 3 Implementer agents in parallel (A: Leiden+Ward algorithm; B: Zarr orchestrator; C: ClusterConfig + alternatives).</li>
-<li>Wave 2: 3 Reviewer agents in parallel (read-only audit).</li>
-<li>Orchestrator: apply review findings, integrate, release v0.6.0.</li>
-</ol>
-<h2 id="last-session-handoff">Last-session handoff<a class="headerlink" href="#last-session-handoff" title="Permanent link">&para;</a></h2>
-<p><strong>Session date:</strong> 2026-05-13<br />
-<strong>Agent:</strong> Claude Code (claude-opus-4-7)</p>
-<p>Phase 4 <strong>complete and verified</strong>. 247 tests passing, all checks green. Repo is tagged at <code>v0.5.0</code> and pushed. Handoff documentation refreshed:</p>
+<p>There's also a strategy-discovery surface per step: <code>tmelandscape &lt;step&gt;-strategies list</code> plus <code>list_&lt;step&gt;_strategies</code> MCP tool. Cataloguing what strategies are available is a first-class concern (see ADR 0009).</p>
+<p>When you implement a new step, ship all three surfaces in the same release, with an integration test in <code>tests/integration/test_&lt;step&gt;_end_to_end.py</code> that asserts byte-equal output across the three.</p>
+<h3 id="22-never-overwrite-raw-data-never-hardcode-user-choices">2.2 Never overwrite raw data, never hardcode user choices<a class="headerlink" href="#22-never-overwrite-raw-data-never-hardcode-user-choices" title="Permanent link">&para;</a></h3>
+<p>Two binding invariants from the project owner, captured in ADRs 0006 and 0009:</p>
 <ul>
-<li><code>docs/development/STATUS.md</code> — this file.</li>
-<li><code>docs/development/HANDOFF.md</code> — cold-start agent onboarding guide.</li>
-<li><code>docs/development/ROADMAP.md</code> — Phase 5 plan filled in.</li>
-<li><code>CHANGELOG.md</code> — full release history.</li>
-<li><code>tasks/06-clustering-implementation.md</code> — Phase 5 task file pre-drafted with frozen API contracts.</li>
+<li>Pipeline steps <strong>always</strong> write a NEW Zarr at a user-supplied output path. The orchestrator refuses (<code>FileExistsError</code>) if the output already exists. Input is opened read-only inside an <code>xr.open_zarr</code> context manager. Tests verify byte-equality of the input store before and after every call.</li>
+<li>Data-selection knobs (which statistics to compute, which columns to drop, the window size, the number of final clusters) <strong>must</strong> be required arguments with no package default. Strategy literals can have defaults — <code>strategy: Literal["sliding_window"] = "sliding_window"</code> is fine, because the literal is just naming the algorithm — but the user-data choices that affect what they see in their landscape must be explicit.</li>
 </ul>
-<p>Phase 5 (two-stage Leiden + Ward clustering, v0.6.0) is fully unblocked except for the binding-invariants confirmation in Open Questions #2.</p>
+<p>These invariants drive a lot of the orchestrator code structure (defence-in-depth guards, the <code>drop_*</code> lists always defaulting to <code>[]</code>, the JSON-roundtrip validators in the configs).</p>
+<h3 id="23-buddy-pair-pattern-for-non-trivial-phases">2.3 Buddy-pair pattern for non-trivial phases<a class="headerlink" href="#23-buddy-pair-pattern-for-non-trivial-phases" title="Permanent link">&para;</a></h3>
+<p>Phases 3, 3.5, and 4 were each built with this pattern:</p>
+<ul>
+<li><strong>Wave 1 (parallel)</strong>: spawn three Implementer agents, one per stream (algorithm / Zarr orchestrator / config + alternatives). They run in parallel, each producing a written report listing files created, test counts, deviations from the contract, and surprises hit.</li>
+<li><strong>Wave 2 (parallel)</strong>: spawn three Reviewer agents, one per stream. <strong>Reviewers may NOT edit code.</strong> They audit their partner's diff read-only and produce a findings report tagged BUG / RISK / SMELL / OK plus a 5-line verdict.</li>
+<li><strong>Wave 3 (orchestrator)</strong>: you (the next session) apply review findings, integrate the streams (top-level function, CLI verb, MCP tool, integration test, docs), update STATUS/ROADMAP, bump the version, commit, tag, push.</li>
+</ul>
+<p>The Phase 5 task file (<code>tasks/06-clustering-implementation.md</code>) has the three-stream allocation already drafted. Use it.</p>
+<h4 id="useful-prompts-when-spawning-agents">Useful prompts when spawning agents<a class="headerlink" href="#useful-prompts-when-spawning-agents" title="Permanent link">&para;</a></h4>
+<p>Each previous phase's prompt has been preserved in conversation history (Phase 5 will mirror them closely). Key features of a good Implementer prompt:</p>
+<ul>
+<li>Frozen function signatures pasted into the prompt (no ambiguity at handoff).</li>
+<li>Explicit "do not create or touch" list for the files belonging to the other streams.</li>
+<li>Explicit "verify before reporting done" checklist (your tests pass; full suite still green; ruff + format + mypy clean).</li>
+<li>An explicit "report when done" template (files created, deviations, surprises).</li>
+</ul>
+<p>Reviewer prompts:</p>
+<ul>
+<li>Explicit "MUST NOT EDIT CODE" guard.</li>
+<li>Audit checklist tied to the spec's bullet points.</li>
+<li>Sandbox commands they can use (<code>uv run python -c "..."</code>, <code>uv run pytest -v</code>, file readers).</li>
+<li>Severity-tagged findings format.</li>
+</ul>
+<p>If you need to nudge a buddy-pair member after their initial report, use <code>SendMessage</code> to the agent ID returned in their initial report — they retain context. A <code>new Agent</code> call starts a fresh agent with no memory.</p>
+<h2 id="3-the-directory-tree-at-a-glance">3. The directory tree at a glance<a class="headerlink" href="#3-the-directory-tree-at-a-glance" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>src/tmelandscape/
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>├── config/          # Pydantic configs per pipeline step
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>│   ├── sweep.py             # Phase 2
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>│   ├── summarize.py         # Phase 3
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>│   ├── normalize.py         # Phase 3.5
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>│   └── embedding.py         # Phase 4
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>├── sampling/        # Phase 2 (manifest, LHS, alternatives, tissue_simulator wrapper)
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>├── summarize/       # Phase 3 (driver, aggregator, registry, schema)
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>├── normalize/       # Phase 3.5 (within_timestep, alternatives, feature_filter stub)
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>├── embedding/       # Phase 4 (sliding_window, alternatives, __init__ orchestrator)
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>├── cluster/         # Phase 5 — TO BE WRITTEN
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>├── landscape/       # Phase 5+ — Landscape facade (post-clustering)
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>├── viz/             # Phase 6 — visualisation helpers
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>├── io/, utils/      # cross-cutting
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>├── cli/             # Typer verbs (one file per verb)
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>└── mcp/             # FastMCP server + tools
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>tests/
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>├── unit/                    # one test file per module
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>├── integration/             # one per pipeline step
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>├── data/synthetic_physicell/  # 3 sims × 3 timepoints × 21 cells fixture
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>└── real_data/               # opt-in via `pytest -m real`
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>reference/             # gitignored read-only oracle scripts (Eric&#39;s local marimo notebooks)
+<a id="__codelineno-2-25" name="__codelineno-2-25" href="#__codelineno-2-25"></a>docs/
+<a id="__codelineno-2-26" name="__codelineno-2-26" href="#__codelineno-2-26"></a>├── adr/              # 9 numbered ADRs
+<a id="__codelineno-2-27" name="__codelineno-2-27" href="#__codelineno-2-27"></a>├── development/      # STATUS.md, ROADMAP.md, this HANDOFF.md, CONTRIBUTING.md
+<a id="__codelineno-2-28" name="__codelineno-2-28" href="#__codelineno-2-28"></a>└── concepts/         # one per pipeline step
+<a id="__codelineno-2-29" name="__codelineno-2-29" href="#__codelineno-2-29"></a>tasks/                # per-task markdown work-files
+</code></pre></div>
+<h2 id="4-common-gotchas">4. Common gotchas<a class="headerlink" href="#4-common-gotchas" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><code>reference/</code> is gitignored.</strong> The marimo notebooks (<code>00_abm_normalization.py</code>, <code>01_abm_generate_embedding.py</code>, <code>02_abm_state_space_analysis.marimo.py</code>, <code>utils.py</code>) are on Eric's local machine and were copied into <code>reference/</code> during Phase 1's audit. They're the oracle for every subsequent phase. When a contract references a "reference oracle," it's pointing into this directory.</li>
+<li><strong><code>tissue_simulator</code> and <code>spatialtissuepy</code> are git-pinned, not PyPI.</strong> ADR 0008 documents the pin policy (tag the upstream before bumping; for now, pin to commit SHAs in <code>uv.lock</code>). Eric is handling the upstream tagging separately.</li>
+<li><strong>The synthetic PhysiCell fixture</strong> under <code>tests/data/synthetic_physicell/</code> is regenerated deterministically by <code>build.py</code>. It's intentionally tiny (3 sims × 3 timepoints × 21 cells, ~112 KB total) so it can live in git.</li>
+<li><strong>Zarr v3 unstable string dtype warnings</strong> are filtered in <code>pyproject.toml.[tool.pytest.ini_options].filterwarnings</code>. Don't be alarmed if you see them when running the test suite manually outside <code>uv run pytest</code>.</li>
+<li><strong>The CI on GitHub Actions</strong> runs the same <code>uv sync &amp;&amp; uv run pytest</code> matrix. If your local tests pass and CI fails, the most likely culprit is a Python-version-specific behaviour (CI tests 3.11 and 3.12).</li>
+<li><strong>MCP tool count</strong> as of v0.5.0: <strong>9 tools</strong>. Don't add an MCP tool without a matching public Python function AND a matching CLI verb (the "three surfaces" invariant from §2.1).</li>
+</ul>
+<h2 id="5-when-you-finish-a-session">5. When you finish a session<a class="headerlink" href="#5-when-you-finish-a-session" title="Permanent link">&para;</a></h2>
+<p>Update <code>STATUS.md</code> with:</p>
+<ul>
+<li>What you shipped in this session.</li>
+<li>Whether the test suite is still green and the version that's tagged.</li>
+<li>Any open questions you couldn't resolve, with enough context that the next agent can ask Eric directly.</li>
+<li>A "next agent's first actions" list (1-5 bullet points).</li>
+</ul>
+<p>If you wrote a non-trivial decision document or design choice, capture it as a new ADR in <code>docs/adr/</code>. Numbered, append-only.</p>
+<p>If you started a task that didn't finish, leave a per-task work file in <code>tasks/&lt;slug&gt;.md</code> so the next session can pick up cold.</p>
+<h2 id="6-who-to-ask">6. Who to ask<a class="headerlink" href="#6-who-to-ask" title="Permanent link">&para;</a></h2>
+<p>Eric (the project owner, <a href="mailto:ericscrum@gmail.com">ericscrum@gmail.com</a>) is the source of truth on:</p>
+<ul>
+<li>Whether a feature is in scope.</li>
+<li>Whether a default is a "good default" or a "silent constraint on his science."</li>
+<li>Anything touching the reference oracle's algorithm — he wrote those notebooks.</li>
+</ul>
+<p>When in doubt: leave a clear open question in STATUS.md and ask him before making a scope-affecting decision. The project has explicit ADRs for cases where defaults were rolled back because they constrained downstream choices (ADR 0009 in particular).</p>
+<hr />
+<p>Welcome aboard.</p>
 
 
 
@@ -1406,7 +1292,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../ROADMAP/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Roadmap">
+          <a href="../STATUS/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Status">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1416,20 +1302,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Roadmap
+                Status
               </div>
             </div>
           </a>
         
         
           
-          <a href="../HANDOFF/" class="md-footer__link md-footer__link--next" aria-label="Next: Handoff guide">
+          <a href="../../adr/" class="md-footer__link md-footer__link--next" aria-label="Next: ADRs">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Handoff guide
+                ADRs
               </div>
             </div>
             <div class="md-footer__button md-icon">

@@ -621,6 +621,8 @@
         
       
         
+      
+        
           
         
       
@@ -826,10 +828,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-5-step-5-clustering-landscape-facade-v040" class="md-nav__link">
+  <a href="#phase-5-step-5-clustering-target-v060-next" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 5 — Step 5 clustering + Landscape facade (v0.4.0)
+        Phase 5 — Step 5 clustering (target v0.6.0) — NEXT
       
     </span>
   </a>
@@ -837,10 +839,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-6-visualisation-v050" class="md-nav__link">
+  <a href="#phase-6-visualisation-target-v070" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 6 — Visualisation (v0.5.0)
+        Phase 6 — Visualisation (target v0.7.0)
       
     </span>
   </a>
@@ -893,6 +895,34 @@
     
   
     Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../HANDOFF/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Handoff guide
   
 
     
@@ -1025,10 +1055,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-5-step-5-clustering-landscape-facade-v040" class="md-nav__link">
+  <a href="#phase-5-step-5-clustering-target-v060-next" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 5 — Step 5 clustering + Landscape facade (v0.4.0)
+        Phase 5 — Step 5 clustering (target v0.6.0) — NEXT
       
     </span>
   </a>
@@ -1036,10 +1066,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-6-visualisation-v050" class="md-nav__link">
+  <a href="#phase-6-visualisation-target-v070" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 6 — Visualisation (v0.5.0)
+        Phase 6 — Visualisation (target v0.7.0)
       
     </span>
   </a>
@@ -1194,22 +1224,29 @@
 <li>FNN / MI optimisation: the reference doesn't use them; user can request as v0.5.x.</li>
 <li>Takens lag-coordinate delay embedding: the reference uses sliding window (same purpose, different math); user can request as v0.5.x.</li>
 </ul>
-<h2 id="phase-5-step-5-clustering-landscape-facade-v040">Phase 5 — Step 5 clustering + Landscape facade (v0.4.0)<a class="headerlink" href="#phase-5-step-5-clustering-landscape-facade-v040" title="Permanent link">&para;</a></h2>
+<h2 id="phase-5-step-5-clustering-target-v060-next">Phase 5 — Step 5 clustering (target v0.6.0) — NEXT<a class="headerlink" href="#phase-5-step-5-clustering-target-v060-next" title="Permanent link">&para;</a></h2>
 <blockquote>
-<p>Reshaped 2026-05-12 after Phase 1. See <a href="../../adr/0007-two-stage-leiden-ward-clustering/">ADR 0007</a>.</p>
+<p>See <a href="../../adr/0007-two-stage-leiden-ward-clustering/">ADR 0007</a> and the pre-drafted <code>tasks/06-clustering-implementation.md</code> (in the repo root) for the frozen API contracts and buddy-pair stream allocation.</p>
 </blockquote>
+<p>Reference oracle: <code>reference/01_abm_generate_embedding.py</code> lines ~519-720.</p>
 <ul>
-<li>[ ] <code>tmelandscape.cluster.leiden</code> — kNN graph + Leiden community detection (stage 1)</li>
-<li>[ ] <code>tmelandscape.cluster.meta</code> — Ward hierarchical clustering on Leiden cluster means (stage 2)</li>
-<li>[ ] <code>tmelandscape.cluster.selection</code> — Leiden resolution sweep + Ward elbow / silhouette</li>
-<li>[ ] <code>tmelandscape.cluster.labels</code> — state-label persistence + interpretable names (Effector-Dominant, etc.)</li>
-<li>[ ] <code>Landscape</code> facade + <code>.tmelandscape/</code> bundle format (stores both Leiden labels and Ward final labels)</li>
-<li>[ ] CLI: <code>tmelandscape fit</code></li>
-<li>[ ] MCP tools: <code>tmelandscape.fit_landscape</code>, <code>tmelandscape.describe_landscape</code></li>
-<li>[ ] End-to-end integration test on synthetic fixture (Python API + CLI + MCP)</li>
-<li>[ ] Numerical agreement vs <code>reference/01_abm_generate_embedding.py</code> clustering output on the synthetic fixture</li>
+<li>[ ] <code>tmelandscape.cluster.leiden_ward.cluster_leiden_ward</code> — pure two-stage algorithm: kNN graph → Leiden (default partition <code>CPMVertexPartition</code>, matching the reference) → Ward on Leiden cluster means → <code>fcluster(maxclust)</code> to cut the dendrogram.</li>
+<li>[ ] <code>tmelandscape.cluster.alternatives.cluster_identity</code> — passthrough baseline.</li>
+<li>[ ] <code>tmelandscape.cluster.cluster_ensemble</code> — Zarr orchestrator. Reads input lazily; refuses to overwrite output; passes through <code>embedding</code> and <code>window_averages</code>; adds <code>leiden_labels</code>, <code>cluster_labels</code> (final), <code>leiden_cluster_means</code>, <code>linkage_matrix</code>.</li>
+<li>[ ] <code>tmelandscape.config.cluster.ClusterConfig</code> — Pydantic. <code>n_final_clusters</code> required (no default per ADR 0009). Five-way variable-name collision validator.</li>
+<li>[ ] CLI: <code>tmelandscape cluster</code> + <code>tmelandscape cluster-strategies list</code>.</li>
+<li>[ ] MCP tools: <code>cluster_ensemble</code>, <code>list_cluster_strategies</code>.</li>
+<li>[ ] Integration test: Python API + CLI + MCP byte-equal equivalence on a synthetic embedding Zarr.</li>
+<li>[ ] <code>docs/concepts/cluster.md</code> filled in (currently a placeholder).</li>
+<li>[ ] Bump to <code>v0.6.0</code> once all checks green.</li>
 </ul>
-<h2 id="phase-6-visualisation-v050">Phase 6 — Visualisation (v0.5.0)<a class="headerlink" href="#phase-6-visualisation-v050" title="Permanent link">&para;</a></h2>
+<p>Deferred (out of scope for v0.6.0 unless the owner says otherwise):</p>
+<ul>
+<li>Leiden resolution sweep / silhouette-based selection helpers.</li>
+<li>The <code>Landscape</code> facade and <code>.tmelandscape/</code> bundle format (revisit when projection is on the table — see <a href="../../adr/0005-no-msm-in-v1/">ADR 0005</a>).</li>
+<li>Interpretable state names ("Effector-Dominant" etc.) — purely a downstream labelling concern.</li>
+</ul>
+<h2 id="phase-6-visualisation-target-v070">Phase 6 — Visualisation (target v0.7.0)<a class="headerlink" href="#phase-6-visualisation-target-v070" title="Permanent link">&para;</a></h2>
 <ul>
 <li>[ ] <code>tmelandscape.viz.diagnostics</code> (FNN curve, elbow, MI-vs-lag)</li>
 <li>[ ] <code>tmelandscape.viz.embedding</code> (UMAP scatter; vector-field-style)</li>
