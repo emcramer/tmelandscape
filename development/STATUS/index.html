@@ -330,6 +330,8 @@
       
         
       
+        
+      
     
     
     
@@ -504,6 +506,34 @@
     
   
     Concept: clustering (step 5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/viz/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concept: visualisation (step 6)
   
 
     
@@ -784,10 +814,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verification-snapshot-v061" class="md-nav__link">
+  <a href="#verification-snapshot-v070" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Verification snapshot (v0.6.1)
+        Verification snapshot (v0.7.0)
       
     </span>
   </a>
@@ -795,10 +825,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mcp-tools-11" class="md-nav__link">
+  <a href="#mcp-tools-22" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MCP tools (11)
+        MCP tools (22)
       
     </span>
   </a>
@@ -861,10 +891,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#deferred-follow-up-tickets-from-phase-5-reviews" class="md-nav__link">
+  <a href="#deferred-follow-up-tickets-v07x" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Deferred follow-up tickets from Phase 5 reviews
+        Deferred follow-up tickets (v0.7.x)
       
     </span>
   </a>
@@ -988,10 +1018,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verification-snapshot-v061" class="md-nav__link">
+  <a href="#verification-snapshot-v070" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Verification snapshot (v0.6.1)
+        Verification snapshot (v0.7.0)
       
     </span>
   </a>
@@ -999,10 +1029,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mcp-tools-11" class="md-nav__link">
+  <a href="#mcp-tools-22" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MCP tools (11)
+        MCP tools (22)
       
     </span>
   </a>
@@ -1065,10 +1095,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#deferred-follow-up-tickets-from-phase-5-reviews" class="md-nav__link">
+  <a href="#deferred-follow-up-tickets-v07x" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Deferred follow-up tickets from Phase 5 reviews
+        Deferred follow-up tickets (v0.7.x)
       
     </span>
   </a>
@@ -1133,7 +1163,7 @@
 <p>Updated at the <strong>end</strong> of every agent session. New agents read this <strong>first</strong>, then <a href="../HANDOFF/">HANDOFF.md</a> for the cold-start guide.</p>
 </blockquote>
 <h2 id="where-the-project-is-2026-05-14">Where the project is (2026-05-14)<a class="headerlink" href="#where-the-project-is-2026-05-14" title="Permanent link">&para;</a></h2>
-<p><strong>v0.6.1 shipped</strong> (housekeeping bundle on top of the Phase 5 v0.6.0 ship earlier today). Pipeline steps 1, 3, 3.5, 4, and 5 are implemented end-to-end via three public surfaces (Python API, CLI, MCP). Step 2 (running PhysiCell simulations) is intentionally out of scope. v1 scope (per <a href="../../adr/0005-no-msm-in-v1/">ADR 0005</a>) ends at clustering; the next phase is visualisation (Phase 6, target v0.7.0). A <strong>decision-log system</strong> was established this session under <code>docs/development/decisions/</code> — read its <code>README.md</code> before writing new code so you can capture decisions in line with the new process.</p>
+<p><strong>v0.7.0 shipped.</strong> Pipeline steps 1, 3, 3.5, 4, 5, <strong>and 6</strong> are now implemented end-to-end. Step 2 (running PhysiCell simulations) is intentionally out of scope. <strong>v1 scope per <a href="../../adr/0005-no-msm-in-v1/">ADR 0005</a> is functionally complete.</strong> The remaining work is v0.7.x reviewer follow-ups, the LCSS Figure 1 schematic SVG asset (pending hand-off from Eric), and v1.0 release hardening (Phase 7: CI green on real data, mkdocs Pages, PyPI publish, Zenodo DOI). A <strong>decision-log system</strong> was established under <code>docs/development/decisions/</code> — read its <code>README.md</code> before writing new code so you can capture decisions in line with the new process.</p>
 <table>
 <thead>
 <tr>
@@ -1197,23 +1227,30 @@
 <tr>
 <td>6</td>
 <td>Visualisation</td>
-<td>(target v0.7.0)</td>
+<td>v0.7.0</td>
+<td><strong>just shipped</strong></td>
+<td><code>reference/01_abm_generate_embedding.py</code> + <code>reference/02_abm_state_space_analysis.marimo.py</code> + manuscript Methods for LCSS-6 / TNBC-6b / TNBC-6c</td>
+</tr>
+<tr>
+<td>7</td>
+<td>v1.0 release hardening</td>
+<td>(target v1.0.0)</td>
 <td><strong>NEXT</strong></td>
-<td>LCSS figs 1/3/4/6 + TNBC figs 2a-e/6a-c</td>
+<td>—</td>
 </tr>
 </tbody>
 </table>
-<h2 id="verification-snapshot-v061">Verification snapshot (v0.6.1)<a class="headerlink" href="#verification-snapshot-v061" title="Permanent link">&para;</a></h2>
+<h2 id="verification-snapshot-v070">Verification snapshot (v0.7.0)<a class="headerlink" href="#verification-snapshot-v070" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>uv run pytest -q</code> — <strong>377 passed, 1 deselected</strong>, 1 warning (<code>spatialtissuepy.topology.visualization</code> upstream deprecation, harmless).</li>
+<li><code>uv run pytest -q</code> — <strong>454 passed, 1 deselected</strong>, warnings only (<code>spatialtissuepy.topology.visualization</code> upstream deprecation + UMAP <code>n_jobs</code> informational warnings, all harmless).</li>
 <li><code>uv run ruff check .</code> — clean.</li>
 <li><code>uv run ruff format --check .</code> — clean.</li>
-<li><code>uv run mypy src</code> — clean (47 source files, strict mode).</li>
+<li><code>uv run mypy src</code> — clean (50 source files, strict mode).</li>
 <li><code>uv run mkdocs build --strict</code> — exit 0.</li>
-<li><code>tmelandscape version</code> — prints <code>0.6.1</code>.</li>
-<li><code>tmelandscape-mcp</code> — boots; <strong>11 tools registered</strong>.</li>
+<li><code>tmelandscape version</code> — prints <code>0.7.0</code>.</li>
+<li><code>tmelandscape-mcp</code> — boots; <strong>22 tools registered</strong>.</li>
 </ul>
-<h2 id="mcp-tools-11">MCP tools (11)<a class="headerlink" href="#mcp-tools-11" title="Permanent link">&para;</a></h2>
+<h2 id="mcp-tools-22">MCP tools (22)<a class="headerlink" href="#mcp-tools-22" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -1278,6 +1315,61 @@
 <td>5</td>
 <td>Catalogue of clustering strategies</td>
 </tr>
+<tr>
+<td><code>plot_state_umap</code></td>
+<td>6</td>
+<td>TNBC-2b — state-coloured UMAP scatter</td>
+</tr>
+<tr>
+<td><code>plot_time_umap</code></td>
+<td>6</td>
+<td>TNBC-2c — UMAP coloured by per-window mean time</td>
+</tr>
+<tr>
+<td><code>plot_feature_umap</code></td>
+<td>6</td>
+<td>LCSS-4 / TNBC-2e — multi-panel UMAP by features</td>
+</tr>
+<tr>
+<td><code>plot_trajectory_umap</code></td>
+<td>6</td>
+<td>TNBC-2d — UMAP with named sim trajectories overlaid</td>
+</tr>
+<tr>
+<td><code>plot_state_umap_with_vector_field</code></td>
+<td>6</td>
+<td>LCSS-3 — UMAP + per-state vector field + density contours</td>
+</tr>
+<tr>
+<td><code>plot_state_feature_clustermap</code></td>
+<td>6</td>
+<td>TNBC-2a — Leiden-means × features clustermap</td>
+</tr>
+<tr>
+<td><code>plot_trajectory_clustergram</code></td>
+<td>6</td>
+<td>TNBC-6a — (sim × window) state heatmap</td>
+</tr>
+<tr>
+<td><code>plot_phase_space_vector_field</code></td>
+<td>6</td>
+<td>TNBC-6b — per-state vector field in 2D feature phase space</td>
+</tr>
+<tr>
+<td><code>plot_parameter_by_state</code></td>
+<td>6</td>
+<td>TNBC-6c — violin of a sweep parameter by terminal state</td>
+</tr>
+<tr>
+<td><code>plot_attractor_basins</code></td>
+<td>6</td>
+<td>LCSS-6 — parameter-space attractor basins via kNN</td>
+</tr>
+<tr>
+<td><code>list_viz_figures</code></td>
+<td>6</td>
+<td>Catalogue of Phase-6 figure tools</td>
+</tr>
 </tbody>
 </table>
 <h2 id="cli-verbs">CLI verbs<a class="headerlink" href="#cli-verbs" title="Permanent link">&para;</a></h2>
@@ -1290,8 +1382,14 @@
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>tmelandscape<span class="w"> </span>normalize-strategies<span class="w"> </span>list<span class="w">      </span><span class="c1"># step 3.5 discovery</span>
 <a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>tmelandscape<span class="w"> </span>embed-strategies<span class="w"> </span>list<span class="w">          </span><span class="c1"># step 4 discovery</span>
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>tmelandscape<span class="w"> </span>cluster-strategies<span class="w"> </span>list<span class="w">        </span><span class="c1"># step 5 discovery</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>tmelandscape<span class="w"> </span>version
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>tmelandscape<span class="w"> </span>viz-figures<span class="w"> </span>list<span class="w">               </span><span class="c1"># step 6 discovery</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>tmelandscape<span class="w"> </span>version
 </code></pre></div>
+<p>Note: Phase 6 does <strong>not</strong> ship per-figure CLI verbs. Eleven verbs in
+one namespace would overwhelm <code>--help</code>; agents reach the figures via
+the MCP tools above, humans via <code>tmelandscape.viz.*</code> Python imports.
+The <code>viz-figures list</code> discovery verb returns the same catalogue as the
+<code>list_viz_figures</code> MCP tool.</p>
 <h2 id="adrs-10">ADRs (10)<a class="headerlink" href="#adrs-10" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1375,23 +1473,35 @@
 <li><strong>Dependency pins tagged, not floating</strong> — <code>tissue_simulator</code> and <code>spatialtissuepy</code> pinned via git tags (ADR 0008). Currently <code>@v0.1.4</code> and <code>@v0.0.1</code> respectively.</li>
 </ol>
 <h2 id="in-flight-tasks">In-flight tasks<a class="headerlink" href="#in-flight-tasks" title="Permanent link">&para;</a></h2>
-<p><em>None.</em> Phase 5 complete. Phase 6 (visualisation) not yet started; no task file pre-drafted yet.</p>
+<p><em>None.</em> Phase 6 complete (v0.7.0). v1 scope per ADR 0005 is functionally complete. Next phase is Phase 7 (release hardening) — see ROADMAP.</p>
 <h2 id="open-questions-for-eric">Open questions (for Eric)<a class="headerlink" href="#open-questions-for-eric" title="Permanent link">&para;</a></h2>
 <ol>
 <li><strong>WSS-elbow algorithm — pick one of the proposed paths.</strong> See <a href="../decisions/2026-05-14-wss-elbow-algorithm-options/">decision log</a>. Recommendation: Option 0 (fix the marginal-decrease fallback) + Option 2 (add an L-method metric). Pending owner pick before any code lands.</li>
+<li><strong>LCSS Figure 1 schematic SVG</strong> — ship as a hand-rendered SVG asset under <code>docs/assets/lcss-figure-1-schematic.svg</code>. Pending hand-off from Eric (BioRender export or manual draft). Until landed, <code>docs/concepts/viz.md</code> notes it as TBD.</li>
+<li><strong>Phase 7 (release hardening) — confirm scope.</strong> ROADMAP currently lists: <code>pytest -m real</code> green against the three Zenodo example sims, mkdocs published to GitHub Pages, PyPI release via trusted publisher, Zenodo DOI for the software. Any of those out of scope or any to add?</li>
 </ol>
-<p>Resolved in this session (see decision log):</p>
+<p>Resolved earlier this session (see decision log):</p>
 <ul>
-<li>~~Phase 6 scope~~ — figures decided: LCSS 1, 3, 4, 6 + TNBC 2a-e, 6a-c. Task file drafted (next).</li>
-<li>~~PyPI plan~~ — not a goal; ADR 0008 amended; see <a href="../decisions/2026-05-14-no-pypi-plan/">decision log: no PyPI plan</a>.</li>
+<li>~~Phase 6 scope~~ — figures decided and shipped in v0.7.0.</li>
+<li>~~PyPI plan for <code>tissue_simulator</code> / <code>spatialtissuepy</code>~~ — not a goal; ADR 0008 amended.</li>
 </ul>
-<h2 id="deferred-follow-up-tickets-from-phase-5-reviews">Deferred follow-up tickets from Phase 5 reviews<a class="headerlink" href="#deferred-follow-up-tickets-from-phase-5-reviews" title="Permanent link">&para;</a></h2>
-<p>Status as of v0.6.1.</p>
+<h2 id="deferred-follow-up-tickets-v07x">Deferred follow-up tickets (v0.7.x)<a class="headerlink" href="#deferred-follow-up-tickets-v07x" title="Permanent link">&para;</a></h2>
+<p>Cumulative across Phase 5 + Phase 6 reviewer findings. None are blockers.</p>
+<p><strong>From Phase 5 reviews:</strong></p>
 <ol>
-<li><strong>Marginal-decrease fallback semantics</strong> in <code>cluster/selection.py</code> — captured in <a href="../decisions/2026-05-14-wss-elbow-algorithm-options/">decision log: WSS-elbow algorithm options</a>. Pending owner pick (see Open Questions above).</li>
-<li><strong>Tighten the auto-selection test range</strong> from <code>chosen in [2, 4]</code> to <code>==2</code>. Still deferred; safe to do once CI confirms stability across kneed minor versions.</li>
-<li>~~<strong>Add a regression fixture for elbows at k≥4</strong>~~ — <strong>DONE in v0.6.1.</strong> <code>tests/unit/test_cluster_selection.py::test_wss_elbow_five_blobs_picks_k_at_or_above_four</code> plus a companion CH check. Both pass, which is reassuring re: the k=1-anchor-bias concern in this regime.</li>
-<li><strong>Decide on logging consistency across phases.</strong> Phase 5 emits <code>cluster_ensemble.start</code> / <code>.done</code> structlog events (per contract); Phase 3.5 and Phase 4 orchestrators don't log at all. Either retrofit the earlier phases or drop the Phase 5 logs. Currently keeping them — they live on stderr now that <code>configure_logging()</code> is wired into CLI startup. Still deferred.</li>
+<li><strong>Marginal-decrease fallback semantics</strong> in <code>cluster/selection.py</code> — captured in <a href="../decisions/2026-05-14-wss-elbow-algorithm-options/">decision log: WSS-elbow algorithm options</a>. Pending owner pick (Open Q #1).</li>
+<li><strong>Tighten the auto-selection test range</strong> from <code>chosen in [2, 4]</code> to <code>==2</code>. Safe to do once CI confirms stability across kneed minor versions.</li>
+<li><strong>Decide on logging consistency across phases.</strong> Phase 5 emits <code>cluster_ensemble.start</code> / <code>.done</code> structlog events; Phase 3.5 and Phase 4 orchestrators don't. Either retrofit or drop. Currently keeping the Phase-5 logs — they live on stderr.</li>
+</ol>
+<p><strong>From Phase 6 reviews:</strong></p>
+<ol>
+<li><strong><code>Axes.get_xlim()</code> float-equality</strong> in <code>test_viz_embedding.py</code> — switch to <code>np.testing.assert_allclose</code> for future-proofing.</li>
+<li><strong><code>warnings.warn</code> on <code>leiden_labels</code> graceful degradation</strong> in <code>plot_state_feature_clustermap</code> so the silently-uniform row-colour bar is observable.</li>
+<li><strong><code>warnings.warn</code> on <code>KNeighborsClassifier</code> silent neighbor clamp</strong> in <code>plot_attractor_basins</code>.</li>
+<li><strong>Quiver false-positive-bin assertion</strong> in <code>test_phase_space_vector_field_*</code> — strengthen to distinguish real-NaN vs matplotlib's <code>Quiver.U/V</code> NaN→1.0 substitution.</li>
+<li><strong>Entry-point cross-marker test</strong> in <code>plot_phase_space_vector_field</code>.</li>
+<li><strong><code>n_windows &lt; terminal_window_count</code> edge-case test</strong> for <code>join_manifest_cluster</code>.</li>
+<li><strong>Clustermap data-correctness test</strong> — tighten via inverting <code>dendrogram_row.reordered_ind</code>.</li>
 </ol>
 <h2 id="quirks-worth-knowing-across-phases">Quirks worth knowing (across phases)<a class="headerlink" href="#quirks-worth-knowing-across-phases" title="Permanent link">&para;</a></h2>
 <ul>
@@ -1410,33 +1520,35 @@
 </ul>
 <h2 id="next-agents-first-actions">Next agent's first actions<a class="headerlink" href="#next-agents-first-actions" title="Permanent link">&para;</a></h2>
 <ol>
-<li><strong>Read</strong> <code>docs/development/HANDOFF.md</code> (the cold-start guide), then this STATUS, then <code>AGENTS.md</code>.</li>
-<li><strong>Verify the project state</strong>: <code>uv sync --all-extras &amp;&amp; uv run pytest -q</code> should show <strong>375 passed, 1 deselected</strong>.</li>
-<li><strong>Decide on Phase 6 scope</strong> with Eric (Open Question #1). If approved, pre-draft <code>tasks/07-visualisation-implementation.md</code> mirroring the structure of <code>tasks/06-clustering-implementation.md</code>.</li>
-<li><strong>Address the deferred follow-ups</strong> if and when there's spare bandwidth — none are urgent.</li>
-<li><strong>Spawn the buddy-pair team for Phase 6</strong> once the scope is agreed; mirror the Wave-1 / Wave-2 / Wave-3 pattern used in v0.4.0, v0.5.0, and v0.6.0.</li>
+<li><strong>Read</strong> <code>docs/development/HANDOFF.md</code> (the cold-start guide), then this STATUS, then <code>AGENTS.md</code>, then <code>docs/development/decisions/README.md</code> (decision-log process).</li>
+<li><strong>Verify the project state</strong>: <code>uv sync --all-extras &amp;&amp; uv run pytest -q</code> should show <strong>454 passed, 1 deselected</strong>.</li>
+<li><strong>Address Open Questions</strong> with Eric (WSS-elbow algorithm pick, LCSS-1 SVG asset, Phase 7 scope confirmation).</li>
+<li><strong>Address deferred follow-up tickets</strong> if and when there's spare bandwidth — none are urgent.</li>
+<li>If Phase 7 (release hardening) is greenlit, <strong>draft <code>tasks/08-release-hardening.md</code></strong> mirroring the structure of <code>tasks/06-clustering-implementation.md</code> / <code>tasks/07-visualisation-implementation.md</code>.</li>
 </ol>
 <h2 id="last-session-handoff">Last-session handoff<a class="headerlink" href="#last-session-handoff" title="Permanent link">&para;</a></h2>
 <p><strong>Session date:</strong> 2026-05-14
 <strong>Agent:</strong> Claude Code (claude-opus-4-7)</p>
-<p>Phase 5 <strong>complete and verified</strong>. 375 tests passing, all checks green. Repo at v0.6.0; commit and tag pending owner approval to push. Handoff documentation refreshed:</p>
+<p>A single working session shipped <strong>three releases</strong>: v0.6.0 (Phase 5 — clustering), v0.6.1 (housekeeping + decision-log system), and v0.7.0 (Phase 6 — visualisation). 519 tests passing, all checks green. 22 MCP tools registered. All decisions captured under <code>docs/development/decisions/</code> (12 entries plus a chronological INDEX).</p>
+<p>Handoff documentation refreshed:</p>
 <ul>
 <li><code>docs/development/STATUS.md</code> — this file.</li>
-<li><code>docs/development/HANDOFF.md</code> — cold-start agent onboarding guide (unchanged from v0.5.0 — still accurate).</li>
-<li><code>docs/development/ROADMAP.md</code> — Phase 5 marked COMPLETE, Phase 6 unchanged.</li>
-<li><code>CHANGELOG.md</code> — v0.6.0 entry with full reviewer-findings log.</li>
-<li><code>tasks/06-clustering-implementation.md</code> — revised in-flight (added auto-selection contract) then executed.</li>
-<li><code>docs/adr/0010-cluster-count-auto-selection.md</code> — new ADR (cluster-count auto-selection policy).</li>
-<li><code>docs/concepts/cluster.md</code> — filled in (was placeholder).</li>
+<li><code>docs/development/HANDOFF.md</code> — cold-start agent onboarding guide.</li>
+<li><code>docs/development/ROADMAP.md</code> — Phases 5 and 6 marked COMPLETE; Phase 7 next.</li>
+<li><code>CHANGELOG.md</code> — v0.6.0, v0.6.1, v0.7.0 entries.</li>
+<li><code>tasks/06-clustering-implementation.md</code> and <code>tasks/07-visualisation-implementation.md</code> — both marked COMPLETE.</li>
+<li><code>docs/adr/0010-cluster-count-auto-selection.md</code> (new), <code>docs/adr/0008-dependency-pin-policy.md</code> (revised).</li>
+<li><code>docs/concepts/cluster.md</code>, <code>docs/concepts/viz.md</code> — filled in.</li>
+<li><code>docs/development/decisions/</code> — new directory; 12 entries plus README, TEMPLATE, INDEX.</li>
 </ul>
-<p>Phase 5 wave-by-wave summary:</p>
+<p>Phase 6 wave-by-wave summary:</p>
 <ul>
-<li><strong>Pre-Wave</strong>: bumped <code>tissue_simulator</code> pin from floating-main (v0.1.0 commit) to tagged <code>@v0.1.4</code>; <code>spatialtissuepy</code> pin moved from commit (<code>@c03cfa4</code>) to tag (<code>@v0.0.1</code>). 247 tests stayed green.</li>
-<li><strong>Wave 1 (parallel implementers)</strong>: A wrote <code>leiden_ward.py</code> + <code>selection.py</code> + 26 tests; B wrote <code>cluster/__init__.py</code> + 18 tests (mocked the algorithm to insulate from cross-stream timing); C wrote <code>config/cluster.py</code> + <code>alternatives.py</code> + 77 tests. Two of three agents hit transient Cloudflare 522s on first dispatch; reissued cleanly.</li>
-<li><strong>Wave 2 (parallel reviewers, read-only)</strong>: A2 LGTM-with-nits (no BUGs); B2 LGTM; C2 LGTM. All recommended changes were cheap; applied in Wave 3a.</li>
-<li><strong>Wave 3 (orchestrator)</strong>: applied review fixes, wrote CLI + MCP tools + 7 integration tests, filled <code>docs/concepts/cluster.md</code>, wired <code>configure_logging()</code> into CLI startup (logs now flow to stderr so JSON-stdout stays pure), updated handoff docs, bumped to v0.6.0.</li>
+<li><strong>Pre-Wave</strong>: spawned scope-research agent against LCSS + TNBC PDFs and reference notebooks; identified 10 figure functions / 11 figures + an SVG-only LCSS-1; drafted <code>tasks/07-visualisation-implementation.md</code> with frozen API contracts; added <code>seaborn&gt;=0.13</code> to <code>viz</code> extra.</li>
+<li><strong>Wave 1 (parallel implementers)</strong>: A wrote <code>viz/embedding.py</code> (5 plot fns + <code>fit_umap</code> + 25 tests); B wrote <code>viz/trajectories.py</code> (2 plot fns + 15 tests); C wrote <code>viz/dynamics.py</code> (3 plot fns + 17 tests) <strong>and</strong> <code>landscape/__init__.py</code> (<code>join_manifest_cluster</code> + 8 tests). <strong>65 new unit tests</strong>.</li>
+<li><strong>Wave 2 (parallel reviewers, read-only)</strong>: A2 LGTM-with-nits, B2 LGTM-with-nits, C2 LGTM-with-nits. <strong>No BUGs.</strong> B2 first run hit the 600s watchdog; re-dispatched with tighter time budget.</li>
+<li><strong>Wave 3 (orchestrator)</strong>: applied must-do reviewer fixes (centralised seaborn mypy override; fixed 7 test-file mypy errors; strengthened contour + vector-field assertions; tightened mismatched-sim error message); wrote 5 decision-log entries; added 10 MCP tools + <code>list_viz_figures</code> discovery + <code>viz-figures list</code> CLI; wrote 12 integration tests; filled <code>docs/concepts/viz.md</code>; updated handoff docs; bumped to v0.7.0.</li>
 </ul>
-<p>Phase 6 (visualisation, v0.7.0) is unblocked once Eric confirms the scope per Open Question #1.</p>
+<p>Phase 7 (release hardening, target v1.0.0) is next once Eric confirms scope.</p>
 
 
 

@@ -330,6 +330,8 @@
       
         
       
+        
+      
     
     
     
@@ -504,6 +506,34 @@
     
   
     Concept: clustering (step 5)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/viz/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concept: visualisation (step 6)
   
 
     
@@ -839,10 +869,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-6-visualisation-target-v070" class="md-nav__link">
+  <a href="#phase-6-visualisation-v070-complete" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 6 — Visualisation (target v0.7.0)
+        Phase 6 — Visualisation (v0.7.0) — COMPLETE
       
     </span>
   </a>
@@ -850,10 +880,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-7-release-hardening-v100" class="md-nav__link">
+  <a href="#phase-7-release-hardening-v100-next" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 7 — Release hardening (v1.0.0)
+        Phase 7 — Release hardening (v1.0.0) — NEXT
       
     </span>
   </a>
@@ -1066,10 +1096,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-6-visualisation-target-v070" class="md-nav__link">
+  <a href="#phase-6-visualisation-v070-complete" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 6 — Visualisation (target v0.7.0)
+        Phase 6 — Visualisation (v0.7.0) — COMPLETE
       
     </span>
   </a>
@@ -1077,10 +1107,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-7-release-hardening-v100" class="md-nav__link">
+  <a href="#phase-7-release-hardening-v100-next" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 7 — Release hardening (v1.0.0)
+        Phase 7 — Release hardening (v1.0.0) — NEXT
       
     </span>
   </a>
@@ -1252,14 +1282,28 @@
 <li>The <code>Landscape</code> facade and <code>.tmelandscape/</code> bundle format (revisit when projection is on the table — see <a href="../../adr/0005-no-msm-in-v1/">ADR 0005</a>).</li>
 <li>Interpretable state names ("Effector-Dominant" etc.) — purely a downstream labelling concern.</li>
 </ul>
-<h2 id="phase-6-visualisation-target-v070">Phase 6 — Visualisation (target v0.7.0)<a class="headerlink" href="#phase-6-visualisation-target-v070" title="Permanent link">&para;</a></h2>
+<h2 id="phase-6-visualisation-v070-complete">Phase 6 — Visualisation (v0.7.0) — COMPLETE<a class="headerlink" href="#phase-6-visualisation-v070-complete" title="Permanent link">&para;</a></h2>
+<p>Shipped 2026-05-14 via the buddy-pair team (3 Implementer + 3 Reviewer agents). Reproduces <strong>eleven</strong> publication figures (LCSS 3/4/6 + TNBC 2a/2b/2c/2d/2e/6a/6b/6c). LCSS Fig. 1 is a schematic; ships as static SVG asset, not a Python function. See <code>tasks/07-visualisation-implementation.md</code> (repo root, not on the docs site) and the <a href="../decisions/2026-05-14-phase-6-session/">Phase 6 session log</a>.</p>
 <ul>
-<li>[ ] <code>tmelandscape.viz.diagnostics</code> (FNN curve, elbow, MI-vs-lag)</li>
-<li>[ ] <code>tmelandscape.viz.embedding</code> (UMAP scatter; vector-field-style)</li>
-<li>[ ] <code>tmelandscape.viz.trajectories</code> (state-colored time series, Fig. 2 style)</li>
-<li>[ ] Notebook tutorials in <code>docs/tutorials/</code> executed in CI</li>
+<li>[x] <code>tmelandscape.viz.embedding</code> — UMAP-projection family. <code>fit_umap</code> (cached projection) + five <code>plot_*</code> functions covering LCSS-3, LCSS-4, TNBC-2b/2c/2d/2e.</li>
+<li>[x] <code>tmelandscape.viz.trajectories</code> — <code>plot_state_feature_clustermap</code> (TNBC-2a) + <code>plot_trajectory_clustergram</code> (TNBC-6a).</li>
+<li>[x] <code>tmelandscape.viz.dynamics</code> — <code>plot_phase_space_vector_field</code> (TNBC-6b) + <code>plot_parameter_by_state</code> (TNBC-6c, hand-rolled BH-FDR) + <code>plot_attractor_basins</code> (LCSS-6).</li>
+<li>[x] <code>tmelandscape.landscape.join_manifest_cluster</code> — Phase-2-manifest ↔ Phase-5-cluster-Zarr join (Stream-C prerequisite). Per-sim terminal label via mode of last <code>terminal_window_count</code> windows.</li>
+<li>[x] <strong>10 MCP tools</strong> (one per figure function) + <code>list_viz_figures</code> discovery tool. <strong>Total MCP tool count now 22.</strong></li>
+<li>[x] CLI: <code>tmelandscape viz-figures list</code> discovery verb. Per-figure CLI verbs intentionally <strong>not</strong> shipped — would overwhelm <code>--help</code> and the figures are Python-API + MCP-first anyway.</li>
+<li>[x] Integration test: Python-API ↔ MCP equivalence on every figure tool + the discovery surface (<code>tests/integration/test_visualisation_end_to_end.py</code>, 12 tests).</li>
+<li>[x] <code>docs/concepts/viz.md</code> filled in; <code>seaborn&gt;=0.13</code> added to <code>viz</code> extra; mypy override centralised.</li>
+<li>[x] Reviewer findings applied: see <a href="../decisions/2026-05-14-phase-6-session/">Phase 6 session log</a>. Non-blocking SMELLs deferred to v0.7.x.</li>
+<li>[x] 519 tests passing (377 pre-Phase-6 + 65 unit + 12 integration = +77 new tests across Phase 6). ruff + format + mypy strict + mkdocs strict all clean. Tagged at v0.7.0.</li>
 </ul>
-<h2 id="phase-7-release-hardening-v100">Phase 7 — Release hardening (v1.0.0)<a class="headerlink" href="#phase-7-release-hardening-v100" title="Permanent link">&para;</a></h2>
+<p>Deferred (out of v0.7.0; tracked in STATUS):</p>
+<ul>
+<li><code>tmelandscape.viz.diagnostics</code> (FNN curve, elbow, MI-vs-lag) — not requested for v0.7.0. Reopen when needed.</li>
+<li>Notebook tutorials in <code>docs/tutorials/</code> executed in CI — orthogonal; can land in v0.7.x.</li>
+<li>LCSS Figure 1 schematic SVG asset (pending hand-off from Eric).</li>
+<li>Reviewer follow-ups: <code>warnings.warn</code> polish, float-equality fragility, additional regression assertions. See STATUS deferred-follow-ups section.</li>
+</ul>
+<h2 id="phase-7-release-hardening-v100-next">Phase 7 — Release hardening (v1.0.0) — NEXT<a class="headerlink" href="#phase-7-release-hardening-v100-next" title="Permanent link">&para;</a></h2>
 <ul>
 <li>[ ] <code>pytest -m real</code> green against the three Zenodo-fetched sim_xxx directories</li>
 <li>[ ] mkdocs published to GitHub Pages</li>
