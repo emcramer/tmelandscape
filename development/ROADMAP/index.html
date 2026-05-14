@@ -328,6 +328,8 @@
       
         
       
+        
+      
     
     
     
@@ -418,6 +420,34 @@
     
   
     Concept: spatial-statistic summarisation (step 3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/normalize/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concept: spatial-statistic normalisation (step 3.5)
   
 
     
@@ -774,10 +804,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-35-step-35-normalization-v025" class="md-nav__link">
+  <a href="#phase-35-step-35-normalization-v040-complete" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 3.5 — Step 3.5 normalization (v0.2.5)
+        Phase 3.5 — Step 3.5 normalization (v0.4.0) — COMPLETE
       
     </span>
   </a>
@@ -973,10 +1003,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#phase-35-step-35-normalization-v025" class="md-nav__link">
+  <a href="#phase-35-step-35-normalization-v040-complete" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Phase 3.5 — Step 3.5 normalization (v0.2.5)
+        Phase 3.5 — Step 3.5 normalization (v0.4.0) — COMPLETE
       
     </span>
   </a>
@@ -1127,17 +1157,22 @@
 <li>[x] ADR 0009 written; ADR 0006 updated with the "never overwrite, no built-in drop" invariants.</li>
 <li>[x] Tests updated to pass explicit <code>statistics=[...]</code>; 107 tests passing.</li>
 </ul>
-<h2 id="phase-35-step-35-normalization-v025">Phase 3.5 — Step 3.5 normalization (v0.2.5)<a class="headerlink" href="#phase-35-step-35-normalization-v025" title="Permanent link">&para;</a></h2>
-<blockquote>
-<p>Added 2026-05-12 after the Phase 1 reference audit. See <a href="../../adr/0006-normalize-as-pipeline-step/">ADR 0006</a>.</p>
-</blockquote>
+<h2 id="phase-35-step-35-normalization-v040-complete">Phase 3.5 — Step 3.5 normalization (v0.4.0) — COMPLETE<a class="headerlink" href="#phase-35-step-35-normalization-v040-complete" title="Permanent link">&para;</a></h2>
+<p>Shipped 2026-05-13 with the buddy-pair team pattern (3 Implementer + 3 Reviewer agents). See <a href="../../adr/0006-normalize-as-pipeline-step/">ADR 0006</a> and <a href="../../adr/0009-no-hardcoded-statistics-panel/">ADR 0009</a> for binding invariants.</p>
 <ul>
-<li>[ ] <code>tmelandscape.normalize.within_timestep</code> (per-step mean → power transform → z-score → +mean)</li>
-<li>[ ] <code>tmelandscape.normalize.feature_filter</code> (configurable drop of cell-density columns)</li>
-<li>[ ] <code>tmelandscape.normalize.alternatives</code> (global / local-time / feature-distribution variants)</li>
-<li>[ ] CLI: <code>tmelandscape normalize</code></li>
-<li>[ ] MCP tool: <code>tmelandscape.normalize_ensemble</code></li>
-<li>[ ] Numerical agreement vs <code>reference/00_abm_normalization.py</code> on the synthetic fixture</li>
+<li>[x] <code>tmelandscape.normalize.within_timestep</code> — reference algorithm (per-step mean → Yeo-Johnson → z-score → re-add mean).</li>
+<li>[x] <code>tmelandscape.normalize.alternatives</code> — <code>normalize_identity</code> passthrough as baseline / future-strategy anchor.</li>
+<li>[x] <code>tmelandscape.normalize.normalize_ensemble</code> — Zarr orchestrator. Reads input lazily, writes a NEW Zarr containing both raw <code>value</code> and the new <code>value_normalized</code> arrays. Refuses to overwrite existing outputs.</li>
+<li>[x] <code>tmelandscape.config.normalize.NormalizeConfig</code> (Pydantic): strategy literal, <code>preserve_time_effect</code>, <code>drop_columns=[]</code> default, <code>output_variable</code> validates <code>!= "value"</code>, <code>fill_nan_with</code> rejects NaN to keep JSON round-trip lossless.</li>
+<li>[x] CLI: <code>tmelandscape normalize</code> + <code>tmelandscape normalize-strategies list</code>.</li>
+<li>[x] MCP tools: <code>normalize_ensemble</code> + <code>list_normalize_strategies</code>.</li>
+<li>[x] Reviewer-surfaced fixes baked in:</li>
+<li><strong>B-RISK 6</strong>: orchestrator-side guard against <code>output_variable == "value"</code> collision.</li>
+<li><strong>C-RISK 10</strong>: validator rejects <code>fill_nan_with = NaN</code>.</li>
+<li><strong>B-SMELL 8</strong>: output Zarr inherits the input's chunk grid.</li>
+<li><strong>B-RISK 9</strong>: input <code>Dataset</code> opened as context manager; partial output cleaned on <code>to_zarr</code> failure.</li>
+<li><strong>A-SMELL</strong>: float32 → float64 promotion documented in the algorithm's docstring.</li>
+<li>[x] 168 tests passing (existing 158 + 5 new normalize unit tests in driver, 11 in orchestrator, 23 in config + alternatives, 5 integration = +27 new tests). ruff + format + mypy strict + mkdocs strict all clean.</li>
 </ul>
 <h2 id="phase-4-step-4-embedding-v030">Phase 4 — Step 4 embedding (v0.3.0)<a class="headerlink" href="#phase-4-step-4-embedding-v030" title="Permanent link">&para;</a></h2>
 <ul>

@@ -328,6 +328,8 @@
       
         
       
+        
+      
     
     
     
@@ -418,6 +420,34 @@
     
   
     Concept: spatial-statistic summarisation (step 3)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/normalize/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concept: spatial-statistic normalisation (step 3.5)
   
 
     
@@ -985,7 +1015,7 @@
 <p>Updated at the <strong>end</strong> of every agent session. New agents read this <strong>first</strong>.</p>
 </blockquote>
 <h2 id="current-focus">Current focus<a class="headerlink" href="#current-focus" title="Permanent link">&para;</a></h2>
-<p><strong>Phase 3 panel rollback: complete (v0.3.0).</strong> Per the project owner's directive, the LCSS-default statistics panel has been removed and replaced with dynamic discovery from <code>spatialtissuepy</code>'s live registry; the <code>normalize.feature_filter</code> hardcoded density-column drop has been removed; ADRs 0006 + 0009 now document the "never overwrite, no built-in drop, no hardcoded panel" invariants. 107 tests pass; the system is ready for Phase 3.5 normalisation, which will write to new variables/files only.</p>
+<p><strong>Phase 3.5 — normalisation: complete (v0.4.0).</strong> Within-timestep normalisation shipped end-to-end via the buddy-pair team (Implementer + Reviewer per stream, all reviewer findings applied pre-integration). The orchestrator reads the input Zarr read-only, writes a NEW Zarr containing both the raw <code>value</code> and a <code>value_normalized</code> array, refuses to overwrite, inherits the input's chunk grid. 168 tests pass; ruff/format/mypy/mkdocs strict all clean. Ready for Phase 4 (time-delay embedding).</p>
 <h2 id="in-flight-tasks">In-flight tasks<a class="headerlink" href="#in-flight-tasks" title="Permanent link">&para;</a></h2>
 <p><em>None.</em> (<code>tasks/03-summarize-implementation.md</code> closed 2026-05-13.)</p>
 <h2 id="recently-completed-phase-3-2026-05-13">Recently completed (Phase 3, 2026-05-13)<a class="headerlink" href="#recently-completed-phase-3-2026-05-13" title="Permanent link">&para;</a></h2>
