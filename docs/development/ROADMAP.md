@@ -112,21 +112,29 @@ Deferred (in line with project-owner "don't add features beyond what's required"
 - FNN / MI optimisation: the reference doesn't use them; user can request as v0.5.x.
 - Takens lag-coordinate delay embedding: the reference uses sliding window (same purpose, different math); user can request as v0.5.x.
 
-## Phase 5 — Step 5 clustering + Landscape facade (v0.4.0)
+## Phase 5 — Step 5 clustering (target v0.6.0) — NEXT
 
-> Reshaped 2026-05-12 after Phase 1. See [ADR 0007](../adr/0007-two-stage-leiden-ward-clustering.md).
+> See [ADR 0007](../adr/0007-two-stage-leiden-ward-clustering.md) and the pre-drafted `tasks/06-clustering-implementation.md` (in the repo root) for the frozen API contracts and buddy-pair stream allocation.
 
-- [ ] `tmelandscape.cluster.leiden` — kNN graph + Leiden community detection (stage 1)
-- [ ] `tmelandscape.cluster.meta` — Ward hierarchical clustering on Leiden cluster means (stage 2)
-- [ ] `tmelandscape.cluster.selection` — Leiden resolution sweep + Ward elbow / silhouette
-- [ ] `tmelandscape.cluster.labels` — state-label persistence + interpretable names (Effector-Dominant, etc.)
-- [ ] `Landscape` facade + `.tmelandscape/` bundle format (stores both Leiden labels and Ward final labels)
-- [ ] CLI: `tmelandscape fit`
-- [ ] MCP tools: `tmelandscape.fit_landscape`, `tmelandscape.describe_landscape`
-- [ ] End-to-end integration test on synthetic fixture (Python API + CLI + MCP)
-- [ ] Numerical agreement vs `reference/01_abm_generate_embedding.py` clustering output on the synthetic fixture
+Reference oracle: `reference/01_abm_generate_embedding.py` lines ~519-720.
 
-## Phase 6 — Visualisation (v0.5.0)
+- [ ] `tmelandscape.cluster.leiden_ward.cluster_leiden_ward` — pure two-stage algorithm: kNN graph → Leiden (default partition `CPMVertexPartition`, matching the reference) → Ward on Leiden cluster means → `fcluster(maxclust)` to cut the dendrogram.
+- [ ] `tmelandscape.cluster.alternatives.cluster_identity` — passthrough baseline.
+- [ ] `tmelandscape.cluster.cluster_ensemble` — Zarr orchestrator. Reads input lazily; refuses to overwrite output; passes through `embedding` and `window_averages`; adds `leiden_labels`, `cluster_labels` (final), `leiden_cluster_means`, `linkage_matrix`.
+- [ ] `tmelandscape.config.cluster.ClusterConfig` — Pydantic. `n_final_clusters` required (no default per ADR 0009). Five-way variable-name collision validator.
+- [ ] CLI: `tmelandscape cluster` + `tmelandscape cluster-strategies list`.
+- [ ] MCP tools: `cluster_ensemble`, `list_cluster_strategies`.
+- [ ] Integration test: Python API + CLI + MCP byte-equal equivalence on a synthetic embedding Zarr.
+- [ ] `docs/concepts/cluster.md` filled in (currently a placeholder).
+- [ ] Bump to `v0.6.0` once all checks green.
+
+Deferred (out of scope for v0.6.0 unless the owner says otherwise):
+
+- Leiden resolution sweep / silhouette-based selection helpers.
+- The `Landscape` facade and `.tmelandscape/` bundle format (revisit when projection is on the table — see [ADR 0005](../adr/0005-no-msm-in-v1.md)).
+- Interpretable state names ("Effector-Dominant" etc.) — purely a downstream labelling concern.
+
+## Phase 6 — Visualisation (target v0.7.0)
 
 - [ ] `tmelandscape.viz.diagnostics` (FNN curve, elbow, MI-vs-lag)
 - [ ] `tmelandscape.viz.embedding` (UMAP scatter; vector-field-style)

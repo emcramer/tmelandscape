@@ -79,4 +79,5 @@ nav:
   - Development:
       - Roadmap: development/ROADMAP.md
       - Status: development/STATUS.md
+      - Handoff guide: development/HANDOFF.md
       - ADRs: adr/README.md
