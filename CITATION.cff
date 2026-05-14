@@ -7,7 +7,7 @@ type: software
 authors:
   - given-names: Eric M.
     family-names: Cramer
-    email: ericscrum@gmail.com
+    email: cramere@ohsu.edu
     affiliation: Oregon Health & Science University
 repository-code: "https://github.com/emcramer/tmelandscape"
 abstract: >-
