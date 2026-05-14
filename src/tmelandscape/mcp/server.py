@@ -12,10 +12,12 @@ from fastmcp import FastMCP
 
 from tmelandscape import __version__
 from tmelandscape.mcp.tools import (
+    cluster_ensemble_tool,
     describe_statistic_tool,
     embed_ensemble_tool,
     generate_sweep_tool,
     list_available_statistics_tool,
+    list_cluster_strategies_tool,
     list_embed_strategies_tool,
     list_normalize_strategies_tool,
     normalize_ensemble_tool,
@@ -26,10 +28,13 @@ mcp: FastMCP = FastMCP(
     name="tmelandscape",
     instructions=(
         "Tumor microenvironment state-landscape generation. "
-        "Available tools: ping (health check), generate_sweep (step 1 — "
-        "parameter sampling + IC replicate generation). Step 3 "
-        "(spatialtissuepy summarisation), normalize, embed, cluster land in "
-        "later releases."
+        "Pipeline tools: generate_sweep (step 1 — parameter sampling + IC "
+        "replicate generation), summarize_ensemble (step 3 — spatialtissuepy "
+        "summarisation), normalize_ensemble (step 3.5 — within-timestep "
+        "normalisation), embed_ensemble (step 4 — sliding-window embedding), "
+        "cluster_ensemble (step 5 — two-stage Leiden + Ward clustering). "
+        "Discovery: list_available_statistics, list_normalize_strategies, "
+        "list_embed_strategies, list_cluster_strategies."
     ),
 )
 
@@ -48,6 +53,8 @@ mcp.tool(normalize_ensemble_tool, name="normalize_ensemble")
 mcp.tool(list_normalize_strategies_tool, name="list_normalize_strategies")
 mcp.tool(embed_ensemble_tool, name="embed_ensemble")
 mcp.tool(list_embed_strategies_tool, name="list_embed_strategies")
+mcp.tool(cluster_ensemble_tool, name="cluster_ensemble")
+mcp.tool(list_cluster_strategies_tool, name="list_cluster_strategies")
 
 
 def main() -> None:

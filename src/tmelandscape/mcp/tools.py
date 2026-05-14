@@ -8,6 +8,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from tmelandscape.cluster import cluster_ensemble
+from tmelandscape.config.cluster import ClusterConfig
 from tmelandscape.config.embedding import EmbeddingConfig
 from tmelandscape.config.normalize import NormalizeConfig
 from tmelandscape.config.summarize import SummarizeConfig
@@ -291,5 +293,94 @@ def list_embed_strategies_tool() -> list[dict[str, str]]:
                 "as a baseline / for diagnosing orchestrator plumbing."
             ),
             "module": "tmelandscape.embedding.alternatives",
+        },
+    ]
+
+
+def cluster_ensemble_tool(
+    input_zarr: str,
+    output_zarr: str,
+    *,
+    cluster_config: dict[str, Any],
+) -> dict[str, Any]:
+    """Run step 5: two-stage Leiden + Ward clustering of the embedding Zarr.
+
+    Reads an input Zarr produced by :func:`embed_ensemble_tool` and writes a
+    NEW Zarr at ``output_zarr`` containing the per-window cluster labels
+    (Leiden and final), the per-Leiden-cluster mean embedding vectors, the
+    Ward linkage matrix, and (when auto-selection was used) the per-candidate
+    metric scores. The input store is never overwritten.
+
+    Parameters
+    ----------
+    input_zarr
+        Path to the input ensemble Zarr (the artefact from Phase 4).
+    output_zarr
+        Path of the NEW Zarr store to write. Must not already exist; the
+        orchestrator refuses to overwrite by design (ADR 0006).
+    cluster_config
+        Required serialised :class:`ClusterConfig` dict. ``n_final_clusters``
+        may be omitted (``null`` / absent) to trigger auto-selection via
+        ``cluster_count_metric`` (default: WSS elbow). The package ships no
+        silent default for the number of TME states — see ADR 0010. Call
+        :func:`list_cluster_strategies_tool` to discover available algorithms.
+
+    Returns
+    -------
+    dict
+        Summary with the output Zarr path and the applied config.
+    """
+    cfg = ClusterConfig.model_validate(cluster_config)
+    out_path = cluster_ensemble(input_zarr, output_zarr, config=cfg)
+    return {
+        "output_zarr": str(out_path),
+        "strategy": cfg.strategy,
+        "knn_neighbors": cfg.knn_neighbors,
+        "leiden_partition": cfg.leiden_partition,
+        "leiden_resolution": cfg.leiden_resolution,
+        "leiden_seed": cfg.leiden_seed,
+        "n_final_clusters": cfg.n_final_clusters,
+        "cluster_count_metric": cfg.cluster_count_metric,
+        "cluster_count_min": cfg.cluster_count_min,
+        "cluster_count_max": cfg.cluster_count_max,
+        "source_variable": cfg.source_variable,
+        "leiden_labels_variable": cfg.leiden_labels_variable,
+        "final_labels_variable": cfg.final_labels_variable,
+        "cluster_means_variable": cfg.cluster_means_variable,
+        "linkage_variable": cfg.linkage_variable,
+        "cluster_count_scores_variable": cfg.cluster_count_scores_variable,
+    }
+
+
+def list_cluster_strategies_tool() -> list[dict[str, str]]:
+    """List available clustering strategies (name + description).
+
+    v0.6.0 ships ``leiden_ward`` (the reference two-stage algorithm) plus
+    ``identity`` as a passthrough baseline. Future strategies in
+    ``tmelandscape.cluster.alternatives`` will land here.
+    """
+    return [
+        {
+            "name": "leiden_ward",
+            "description": (
+                "Two-stage clustering: Leiden community detection on a kNN "
+                "graph over the embedding (Stage 1), then Ward hierarchical "
+                "clustering on the per-Leiden-community mean embedding "
+                "vectors (Stage 2). The dendrogram is cut at "
+                "`n_final_clusters` if supplied; otherwise auto-selected via "
+                "`cluster_count_metric` (default: WSS elbow). Reference "
+                "oracle: reference/01_abm_generate_embedding.py lines "
+                "~519-720. See ADR 0007 and ADR 0010."
+            ),
+            "module": "tmelandscape.cluster.leiden_ward",
+        },
+        {
+            "name": "identity",
+            "description": (
+                "Passthrough baseline: assigns every row to cluster 0. "
+                "Useful for diagnosing orchestrator plumbing or as a "
+                "no-op anchor in tests."
+            ),
+            "module": "tmelandscape.cluster.alternatives",
         },
     ]

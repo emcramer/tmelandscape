@@ -9,6 +9,8 @@ from __future__ import annotations
 import typer
 
 from tmelandscape import __version__
+from tmelandscape.cli.cluster import cluster
+from tmelandscape.cli.cluster_strategies import app as cluster_strategies_app
 from tmelandscape.cli.embed import embed
 from tmelandscape.cli.embed_strategies import app as embed_strategies_app
 from tmelandscape.cli.normalize import normalize
@@ -16,6 +18,7 @@ from tmelandscape.cli.normalize_strategies import app as normalize_strategies_ap
 from tmelandscape.cli.sample import sample
 from tmelandscape.cli.statistics import app as statistics_app
 from tmelandscape.cli.summarize import summarize
+from tmelandscape.utils.logging import configure_logging
 
 app = typer.Typer(
     name="tmelandscape",
@@ -28,6 +31,9 @@ app = typer.Typer(
 @app.callback()
 def _root() -> None:
     """Root callback. Forces Typer to register subcommands explicitly."""
+    # Route structlog output to stderr so CLI verbs that emit JSON to stdout
+    # (`cluster`, `embed`, etc.) keep their machine-readable channel pure.
+    configure_logging()
 
 
 @app.command()
@@ -40,9 +46,11 @@ app.command(name="sample")(sample)
 app.command(name="summarize")(summarize)
 app.command(name="normalize")(normalize)
 app.command(name="embed")(embed)
+app.command(name="cluster")(cluster)
 app.add_typer(statistics_app, name="statistics")
 app.add_typer(normalize_strategies_app, name="normalize-strategies")
 app.add_typer(embed_strategies_app, name="embed-strategies")
+app.add_typer(cluster_strategies_app, name="cluster-strategies")
 
 
 if __name__ == "__main__":  # pragma: no cover

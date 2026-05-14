@@ -112,25 +112,32 @@ Deferred (in line with project-owner "don't add features beyond what's required"
 - FNN / MI optimisation: the reference doesn't use them; user can request as v0.5.x.
 - Takens lag-coordinate delay embedding: the reference uses sliding window (same purpose, different math); user can request as v0.5.x.
 
-## Phase 5 — Step 5 clustering (target v0.6.0) — NEXT
+## Phase 5 — Step 5 clustering (v0.6.0) — COMPLETE
 
-> See [ADR 0007](../adr/0007-two-stage-leiden-ward-clustering.md) and the pre-drafted `tasks/06-clustering-implementation.md` (in the repo root) for the frozen API contracts and buddy-pair stream allocation.
+Shipped 2026-05-14 via the buddy-pair team (3 Implementer + 3 Reviewer agents). Reference oracle: `reference/01_abm_generate_embedding.py` lines ~519-720. See [ADR 0007](../adr/0007-two-stage-leiden-ward-clustering.md) and [ADR 0010](../adr/0010-cluster-count-auto-selection.md).
 
-Reference oracle: `reference/01_abm_generate_embedding.py` lines ~519-720.
+- [x] `tmelandscape.cluster.leiden_ward.cluster_leiden_ward` — pure two-stage algorithm: kNN graph → Leiden (default partition `CPMVertexPartition`, matching the reference) → Ward on Leiden cluster means → `fcluster(maxclust)` to cut the dendrogram.
+- [x] `tmelandscape.cluster.selection.select_n_clusters` — cluster-count auto-selection over a candidate range via `wss_elbow` (default; kneed-based knee), `calinski_harabasz`, or `silhouette`.
+- [x] `tmelandscape.cluster.alternatives.cluster_identity` — passthrough baseline.
+- [x] `tmelandscape.cluster.cluster_ensemble` — Zarr orchestrator. Reads input lazily; refuses to overwrite; six-way variable-collision defence; 2D source-array guard; partial-output cleanup; lifts `embedding_config` from input attrs into `source_embedding_config` on output.
+- [x] `tmelandscape.config.cluster.ClusterConfig` — Pydantic. `n_final_clusters` is `int | None` with no package default (ADR 0010); auto-selection via `cluster_count_metric`. Six-way variable-collision validator + range-consistency validator.
+- [x] CLI: `tmelandscape cluster` + `tmelandscape cluster-strategies list`. Structured logs routed to stderr via `configure_logging()` so CLI JSON-stdout stays pure.
+- [x] MCP tools: `cluster_ensemble`, `list_cluster_strategies` (total tool count now **11**).
+- [x] Integration test: Python API + CLI + MCP byte-equal equivalence on a synthetic embedding Zarr, both explicit-k and auto-select paths.
+- [x] `docs/concepts/cluster.md` filled in.
+- [x] New ADR: [cluster-count auto-selection policy](../adr/0010-cluster-count-auto-selection.md).
+- [x] Reviewer findings applied:
+  - **A2 SMELL**: 7 per-import `# type: ignore[import-untyped]` collapsed into `[[tool.mypy.overrides]]`.
+  - **B2 RISK**: orchestrator asserts `linkage_matrix.shape[1] == 4` defence-in-depth.
+  - **B2 SMELL**: orchestrator docstring documents the float64 upcast and the intentionally-unsurfaced `leiden_to_final`.
+  - **B2 SMELL**: missing-source-variable error-message test tightened to require a non-empty listing.
+- [x] 375 tests passing (existing 247 + 121 unit + 7 integration). ruff + format + mypy strict + mkdocs strict all clean. Tagged at v0.6.0.
 
-- [ ] `tmelandscape.cluster.leiden_ward.cluster_leiden_ward` — pure two-stage algorithm: kNN graph → Leiden (default partition `CPMVertexPartition`, matching the reference) → Ward on Leiden cluster means → `fcluster(maxclust)` to cut the dendrogram.
-- [ ] `tmelandscape.cluster.alternatives.cluster_identity` — passthrough baseline.
-- [ ] `tmelandscape.cluster.cluster_ensemble` — Zarr orchestrator. Reads input lazily; refuses to overwrite output; passes through `embedding` and `window_averages`; adds `leiden_labels`, `cluster_labels` (final), `leiden_cluster_means`, `linkage_matrix`.
-- [ ] `tmelandscape.config.cluster.ClusterConfig` — Pydantic. `n_final_clusters` required (no default per ADR 0009). Five-way variable-name collision validator.
-- [ ] CLI: `tmelandscape cluster` + `tmelandscape cluster-strategies list`.
-- [ ] MCP tools: `cluster_ensemble`, `list_cluster_strategies`.
-- [ ] Integration test: Python API + CLI + MCP byte-equal equivalence on a synthetic embedding Zarr.
-- [ ] `docs/concepts/cluster.md` filled in (currently a placeholder).
-- [ ] Bump to `v0.6.0` once all checks green.
+Deferred to follow-up tickets:
 
-Deferred (out of scope for v0.6.0 unless the owner says otherwise):
-
-- Leiden resolution sweep / silhouette-based selection helpers.
+- Marginal-decrease fallback semantics (currently dominated by the WSS k=1 anchor).
+- Tighten the auto-selection range assertion from `[2,4]` to `==2` once kneed stability is confirmed across CI runs.
+- Leiden resolution sweep helpers (resolution sweep is not used by the reference).
 - The `Landscape` facade and `.tmelandscape/` bundle format (revisit when projection is on the table — see [ADR 0005](../adr/0005-no-msm-in-v1.md)).
 - Interpretable state names ("Effector-Dominant" etc.) — purely a downstream labelling concern.
 
