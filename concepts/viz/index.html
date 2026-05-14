@@ -1088,9 +1088,14 @@ exposed as:</p>
 <li>LCSS Figures <strong>1, 3, 4, 6</strong></li>
 <li>TNBC Figures <strong>2a, 2b, 2c, 2d, 2e, 6a, 6b, 6c</strong></li>
 </ul>
-<p>LCSS Figure 1 is a hand-drawn schematic of the ABM signalling
-architecture; it ships as a static asset under <code>docs/assets/</code> (not a
-Python function). All other figures are programmatic.</p>
+<p>All twelve figures are programmatic. <strong>LCSS Figure 1</strong> was originally
+out of scope (slated as a static asset under <code>docs/assets/</code>), but as
+of v0.7.1 it ships as a generic schematic-generator function — see
+<a href="../../development/decisions/2026-05-14-lcss-1-schematic-in-scope/">decision log</a>.
+The function takes a user-supplied model description — cell-type
+names and interaction rules — and renders a coloured-node /
+typed-arrow diagram. It is <strong>generic across any ABM</strong>: pass any
+cell-type list, not just the LCSS paper's specific TME model.</p>
 <h2 id="discovery">Discovery<a class="headerlink" href="#discovery" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>tmelandscape<span class="w"> </span>viz-figures<span class="w"> </span>list
 </code></pre></div>
@@ -1109,6 +1114,12 @@ Python function). All other figures are programmatic.</p>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>LCSS-1</td>
+<td>LCSS</td>
+<td><code>viz.model_schematic.plot_model_schematic</code></td>
+<td>Programmatic ABM schematic — coloured nodes for cell types + typed arrows for interactions (added v0.7.1)</td>
+</tr>
 <tr>
 <td>LCSS-3</td>
 <td>LCSS</td>
@@ -1198,6 +1209,12 @@ Python function). All other figures are programmatic.</p>
   always user-supplied per <a href="../../adr/0009-no-hardcoded-statistics-panel/">ADR 0009</a>;
   the manuscript-specific values (<code>(epithelial, T_eff)</code>,
   <code>CD8_Teff→CD8_Tex</code>-rate, <code>(rexh, radh)</code>) become tutorial defaults.</li>
+<li><strong><code>tmelandscape.viz.model_schematic</code></strong> <em>(added v0.7.1)</em> — programmatic
+  schematic generator for any ABM. Owns <code>CellType</code>, <code>Interaction</code>, and
+  <code>plot_model_schematic</code> (LCSS-1). Renders coloured-circle nodes with
+  text labels and typed arrows (<code>promotes</code> / <code>inhibits</code> /
+  <code>transitions_to</code> / <code>secretes</code>). Output supports PNG (raster) and SVG
+  (vector) via matplotlib's extension dispatch. See <a href="../../development/decisions/2026-05-14-lcss-1-schematic-in-scope/">decision log</a>.</li>
 <li><strong><code>tmelandscape.landscape.join_manifest_cluster</code></strong> — Stream-C
   prerequisite. Joins the Phase 2 sweep manifest with the Phase 5
   cluster Zarr; returns a DataFrame indexed by <code>simulation_id</code> with one
@@ -1275,14 +1292,12 @@ path:</p>
 named tool.</p>
 <h2 id="whats-not-in-step-6">What's <em>not</em> in step 6<a class="headerlink" href="#whats-not-in-step-6" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Per-figure CLI verbs.</strong> Eleven verbs in a single namespace would
-  overwhelm <code>--help</code>. Use the Python API or the MCP tools.</li>
+<li><strong>Per-figure CLI verbs.</strong> Eleven figure-tool verbs in a single
+  namespace would overwhelm <code>--help</code>. Use the Python API or the MCP
+  tools.</li>
 <li><strong>Pixel-baseline tests.</strong> v0.7.0 ships smoke + determinism +
   data-correctness + save-path-roundtrip tests. Baseline-image diffing
   (e.g. <code>pytest-mpl</code>) is deferred to v0.7.x once the API stabilises.</li>
-<li><strong>LCSS Figure 1.</strong> Schematic, not a data plot; ships as a static SVG
-  asset under <code>docs/assets/</code> (currently a placeholder — see Phase 6
-  task file's "Out-of-scope concerns" #1).</li>
 <li><strong>Animated trajectories.</strong> Reference
   <code>02_abm_state_space_analysis.marimo.py:1176-1234</code> animates the
   state-coloured UMAP trajectories; <code>plot_trajectory_umap</code> produces a

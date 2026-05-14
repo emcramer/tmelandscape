@@ -1116,9 +1116,21 @@ the reference; see
 <li><strong>If <code>n_final_clusters is None</code></strong>, <em>auto-select</em> <code>k</code> over the
      candidate range <code>[cluster_count_min, cluster_count_max]</code>
      (default upper bound <code>min(12, n_leiden_clusters)</code>) using the
-     chosen <code>cluster_count_metric</code>:<ul>
+     chosen <code>cluster_count_metric</code>. Six metrics ship as of v0.7.1:<ul>
 <li><code>wss_elbow</code> <em>(default)</em>: minimise within-cluster sum of squares,
-   knee detected via <a href="https://github.com/arvkevi/kneed"><code>kneed.KneeLocator</code></a>.</li>
+   knee detected via <a href="https://github.com/arvkevi/kneed"><code>kneed.KneeLocator</code></a>.
+   Uses a private k=1 anchor to expose the convex shape; the public
+   candidates / scores arrays reflect only the user range.</li>
+<li><code>wss_lmethod</code> <em>(added v0.7.1)</em>: Salvador &amp; Chan 2004 L-method —
+   two-linear-fit knee detection. Robust to noise; requires ≥ 4
+   candidate ks.</li>
+<li><code>wss_asymptote_fit</code> <em>(added v0.7.1)</em>: exponential-decay fit
+   <code>WSS(k) = A·exp(−B·(k − k_min)) + C</code>; pick smallest k whose
+   remaining distance to the fitted asymptote ≤ 0.1 (i.e. 90% of
+   the achievable reduction). Falls back to <code>wss_variance_explained</code>
+   at threshold 0.9 on fit failure.</li>
+<li><code>wss_variance_explained</code> <em>(added v0.7.1)</em>: smallest k whose
+   <code>1 − WSS(k)/WSS(k_min)</code> reaches 0.85.</li>
 <li><code>calinski_harabasz</code>: argmax of
    <code>sklearn.metrics.calinski_harabasz_score</code>.</li>
 <li><code>silhouette</code>: argmax of <code>sklearn.metrics.silhouette_score</code>
@@ -1126,11 +1138,17 @@ the reference; see
    fixed <code>random_state=42</code>).</li>
 </ul>
 </li>
-<li>Broadcast the Leiden→final mapping back to per-window labels:
+</ol>
+<p>The four <code>wss_*</code> metrics share the WSS computation; they only
+   differ in how the chosen k is extracted from the WSS curve. The
+   per-candidate <code>cluster_count_scores</code> in the output Zarr is the WSS
+   curve for all four (uniform across the family); for CH and
+   silhouette it is the sklearn score. Decision log:
+   <code>2026-05-14-wss-elbow-option-5-accepted.md</code>.
+4. Broadcast the Leiden→final mapping back to per-window labels:
    <code>final_labels = leiden_to_final[leiden_labels]</code>. Final labels are
    1-based (<code>1..n_final_clusters_used</code>) per scipy's <code>fcluster</code>
-   convention.</li>
-</ol>
+   convention.</p>
 <h2 id="discovering-available-strategies">Discovering available strategies<a class="headerlink" href="#discovering-available-strategies" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>tmelandscape<span class="w"> </span>cluster-strategies<span class="w"> </span>list
 </code></pre></div>
@@ -1187,9 +1205,9 @@ the reference; see
 </tr>
 <tr>
 <td><code>cluster_count_metric</code></td>
-<td><code>Literal["wss_elbow", "calinski_harabasz", "silhouette"]</code></td>
+<td><code>Literal["wss_elbow", "wss_lmethod", "wss_asymptote_fit", "wss_variance_explained", "calinski_harabasz", "silhouette"]</code></td>
 <td><code>"wss_elbow"</code></td>
-<td>Auto-selection metric. Only used when <code>n_final_clusters is None</code>.</td>
+<td>Auto-selection metric. Only used when <code>n_final_clusters is None</code>. Six options as of v0.7.1 — see the algorithm section above for descriptions.</td>
 </tr>
 <tr>
 <td><code>cluster_count_min</code></td>
@@ -1337,8 +1355,9 @@ applied config; structured logs go to stderr.</p>
 <h2 id="whats-not-in-step-5">What's <em>not</em> in step 5<a class="headerlink" href="#whats-not-in-step-5" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Choosing the cluster-count metric automatically.</strong> The package
-  exposes three metrics (<code>wss_elbow</code>, <code>calinski_harabasz</code>,
-  <code>silhouette</code>); the user picks. There is no "best metric" the package
+  exposes six metrics (<code>wss_elbow</code>, <code>wss_lmethod</code>, <code>wss_asymptote_fit</code>,
+  <code>wss_variance_explained</code>, <code>calinski_harabasz</code>, <code>silhouette</code>); the
+  user picks. There is no "best metric" the package
   selects for you.</li>
 <li><strong>Human-readable state names.</strong> The output is integer labels
   (<code>1..n_final_clusters_used</code>). Mapping those to interpretable TME-state

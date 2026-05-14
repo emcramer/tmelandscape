@@ -900,7 +900,7 @@
 
 <h1 id="0010-cluster-count-auto-selection-no-silent-default-for-n_final_clusters">0010 — Cluster-count auto-selection (no silent default for <code>n_final_clusters</code>)<a class="headerlink" href="#0010-cluster-count-auto-selection-no-silent-default-for-n_final_clusters" title="Permanent link">&para;</a></h1>
 <ul>
-<li><strong>Status:</strong> Accepted (revised 2026-05-14: default <code>k_max</code> cap narrowed from 20 to 12 — see <a href="../../development/decisions/2026-05-14-cluster-count-max-default/">decision log</a>)</li>
+<li><strong>Status:</strong> Accepted (revised 2026-05-14: (a) default <code>k_max</code> cap narrowed from 20 to 12 — see <a href="../../development/decisions/2026-05-14-cluster-count-max-default/">decision log</a>; (b) Option-5 metric expansion adds three more metrics — see <a href="../../development/decisions/2026-05-14-wss-elbow-option-5-accepted/">decision log</a>)</li>
 <li><strong>Date:</strong> 2026-05-13 (revised 2026-05-14)</li>
 <li><strong>Deciders:</strong> Eric, Claude</li>
 </ul>
@@ -935,21 +935,46 @@ package default</strong>. Semantics:</p>
   by optimising <code>cluster_count_metric</code> over the range
   <code>[cluster_count_min, cluster_count_max]</code>.</li>
 </ul>
-<p>Three metrics are supported, with <strong>WSS elbow as the default</strong>:</p>
+<p><strong>Six metrics are supported</strong> as of v0.7.1, with <strong>WSS elbow as the
+default</strong>. Four operate on the WSS-vs-k curve directly; two delegate
+to sklearn:</p>
 <ol>
-<li><strong><code>wss_elbow</code></strong> <em>(default)</em>: for each candidate k, cut the
-   dendrogram, compute the within-cluster sum of squares
-   (Σ over clusters of Σ ‖x − μ_c‖²), then find the elbow of the WSS
-   vs. k curve via <a href="https://pypi.org/project/kneed/"><code>kneed.KneeLocator</code></a>
-   with <code>curve="convex"</code>, <code>direction="decreasing"</code>. If kneed cannot
-   detect a knee, fall back to the k with the largest marginal-decrease
-   slope in WSS. <code>kneed&gt;=0.8</code> is already in <code>pyproject.toml</code> core deps.</li>
+<li><strong><code>wss_elbow</code></strong> <em>(default)</em>: cut the dendrogram at each candidate k,
+   compute the within-cluster sum of squares (Σ over clusters of Σ ‖x − μ_c‖²),
+   then find the elbow of the WSS vs. k curve via
+   <a href="https://pypi.org/project/kneed/"><code>kneed.KneeLocator</code></a> with
+   <code>curve="convex"</code>, <code>direction="decreasing"</code>. The algorithm
+   internally evaluates an additional k=1 anchor so kneed sees the
+   convex shape; the returned candidates / scores arrays expose only
+   the user-requested range. If kneed cannot detect a knee, fall back
+   to the k with the largest marginal-decrease slope in WSS. (The
+   fallback's current behaviour under the k=1 anchor regime is
+   documented as a known limitation; users who hit it can switch to
+   one of the alternative WSS metrics below.)</li>
+<li><strong><code>wss_lmethod</code></strong> <em>(added v0.7.1)</em>: Salvador &amp; Chan 2004 L-method —
+   for each interior split-point k_c, fit two linear regressions
+   (left + right segments of the WSS curve); pick the split minimising
+   total residual SSE. Robust to noise; requires ≥ 4 candidate ks.</li>
+<li><strong><code>wss_asymptote_fit</code></strong> <em>(added v0.7.1)</em>: fit <code>WSS(k) = A·exp(−B·(k − k_min)) + C</code>
+   via <code>scipy.optimize.curve_fit</code>; pick smallest k where the remaining
+   distance to the fitted asymptote falls below 10% (default
+   threshold). Falls back to <code>wss_variance_explained</code> at threshold 0.9
+   on fit failure (rare on real Ward-WSS curves).</li>
+<li><strong><code>wss_variance_explained</code></strong> <em>(added v0.7.1)</em>: pick smallest k where
+   <code>1 − WSS(k)/WSS(k_min)</code> reaches 0.85 (default threshold). Returns
+   <code>k_max</code> if no k satisfies the threshold (asymptotic fallback).</li>
 <li><strong><code>calinski_harabasz</code></strong>: <code>sklearn.metrics.calinski_harabasz_score</code>,
    argmax over candidates.</li>
 <li><strong><code>silhouette</code></strong>: <code>sklearn.metrics.silhouette_score</code> (Euclidean),
    argmax over candidates. For large ensembles a subsample cap may be
    applied to keep this O(n).</li>
 </ol>
+<p>The four WSS-based metrics share the WSS computation; they differ only
+in how the chosen k is extracted from the WSS curve. The CH and
+silhouette metrics compute their own per-window scores from the
+candidate label assignments. See
+<a href="../../development/decisions/2026-05-14-wss-elbow-option-5-accepted/">decision log: Option-5 acceptance</a>
+for the rationale and the per-metric algorithm details.</p>
 <p>The candidate range defaults to <code>[2, min(12, n_leiden_clusters)]</code>. The
 upper-bound cap of 12 (revised 2026-05-14, was 20) reflects the
 biologically interpretable upper bound for TME states — anything past

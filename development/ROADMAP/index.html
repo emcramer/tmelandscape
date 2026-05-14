@@ -1304,11 +1304,17 @@
 <li>Reviewer follow-ups: <code>warnings.warn</code> polish, float-equality fragility, additional regression assertions. See STATUS deferred-follow-ups section.</li>
 </ul>
 <h2 id="phase-7-release-hardening-v100-next">Phase 7 — Release hardening (v1.0.0) — NEXT<a class="headerlink" href="#phase-7-release-hardening-v100-next" title="Permanent link">&para;</a></h2>
+<p>Per <a href="../decisions/2026-05-14-no-pypi-ever/">decision log: no PyPI ever</a>,
+the package is distributed via git only. Zenodo deposit is at Eric's
+discretion — he uploads a snapshot when ready ("when the package is
+done, I may upload the first completed version that I am satisfied
+with or that gets included in a publication to Zenodo"). v1.0 is the
+hardening milestone, not a publishing event.</p>
 <ul>
-<li>[ ] <code>pytest -m real</code> green against the three Zenodo-fetched sim_xxx directories</li>
-<li>[ ] mkdocs published to GitHub Pages</li>
-<li>[ ] PyPI release via trusted publisher</li>
-<li>[ ] Zenodo DOI for the software + updated CITATION.cff</li>
+<li>[ ] <code>pytest -m real</code> green against the three Zenodo-fetched sim_xxx directories.</li>
+<li>[ ] <code>mkdocs</code> published to GitHub Pages.</li>
+<li>[ ] Documentation up-to-date and tracked with git (standing practice).</li>
+<li>[ ] CITATION.cff kept current; ready for an owner-triggered Zenodo deposit.</li>
 </ul>
 <h2 id="beyond-v10-deferred-not-v1">Beyond v1.0 (deferred — not v1)<a class="headerlink" href="#beyond-v10-deferred-not-v1" title="Permanent link">&para;</a></h2>
 <ul>

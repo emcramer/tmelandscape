@@ -814,10 +814,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verification-snapshot-v070" class="md-nav__link">
+  <a href="#verification-snapshot-v071" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Verification snapshot (v0.7.0)
+        Verification snapshot (v0.7.1)
       
     </span>
   </a>
@@ -825,10 +825,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mcp-tools-22" class="md-nav__link">
+  <a href="#mcp-tools-23" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MCP tools (22)
+        MCP tools (23)
       
     </span>
   </a>
@@ -1018,10 +1018,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#verification-snapshot-v070" class="md-nav__link">
+  <a href="#verification-snapshot-v071" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Verification snapshot (v0.7.0)
+        Verification snapshot (v0.7.1)
       
     </span>
   </a>
@@ -1029,10 +1029,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mcp-tools-22" class="md-nav__link">
+  <a href="#mcp-tools-23" class="md-nav__link">
     <span class="md-ellipsis">
       
-        MCP tools (22)
+        MCP tools (23)
       
     </span>
   </a>
@@ -1163,7 +1163,13 @@
 <p>Updated at the <strong>end</strong> of every agent session. New agents read this <strong>first</strong>, then <a href="../HANDOFF/">HANDOFF.md</a> for the cold-start guide.</p>
 </blockquote>
 <h2 id="where-the-project-is-2026-05-14">Where the project is (2026-05-14)<a class="headerlink" href="#where-the-project-is-2026-05-14" title="Permanent link">&para;</a></h2>
-<p><strong>v0.7.0 shipped.</strong> Pipeline steps 1, 3, 3.5, 4, 5, <strong>and 6</strong> are now implemented end-to-end. Step 2 (running PhysiCell simulations) is intentionally out of scope. <strong>v1 scope per <a href="../../adr/0005-no-msm-in-v1/">ADR 0005</a> is functionally complete.</strong> The remaining work is v0.7.x reviewer follow-ups, the LCSS Figure 1 schematic SVG asset (pending hand-off from Eric), and v1.0 release hardening (Phase 7: CI green on real data, mkdocs Pages, PyPI publish, Zenodo DOI). A <strong>decision-log system</strong> was established under <code>docs/development/decisions/</code> — read its <code>README.md</code> before writing new code so you can capture decisions in line with the new process.</p>
+<p><strong>v0.7.1 shipped</strong> (small feature ship on top of v0.7.0). Pipeline steps 1, 3, 3.5, 4, 5, <strong>and 6</strong> are implemented end-to-end. Step 2 (running PhysiCell simulations) is intentionally out of scope. <strong>v1 scope per <a href="../../adr/0005-no-msm-in-v1/">ADR 0005</a> is functionally complete.</strong> Remaining work: v0.7.x reviewer follow-ups (none blocking) and v1.0 release hardening (Phase 7: real-data CI gate, GitHub Pages docs, CITATION.cff currency — <strong>no PyPI</strong> per owner directive; Zenodo deposit is owner-discretion). A <strong>decision-log system</strong> lives under <code>docs/development/decisions/</code> — read its <code>README.md</code> before writing new code so you can capture decisions in line with the established process.</p>
+<p><strong>What's new in v0.7.1</strong> (over v0.7.0):</p>
+<ul>
+<li>Three new <code>cluster_count_metric</code> options (<code>wss_lmethod</code>, <code>wss_asymptote_fit</code>, <code>wss_variance_explained</code>) — Option 5 from the WSS-elbow algorithm decision log; user picks among <strong>six</strong> WSS-curve interpretation strategies.</li>
+<li><code>viz.model_schematic.plot_model_schematic</code> — programmatic ABM schematic generator (LCSS-1). Generic across any model: takes cell-type list + interaction rules, renders coloured-node / typed-arrow figure in PNG or SVG.</li>
+<li>MCP tool count: 22 → <strong>23</strong>. CLI verbs unchanged. ROADMAP Phase 7 simplified (PyPI line removed).</li>
+</ul>
 <table>
 <thead>
 <tr>
@@ -1227,9 +1233,9 @@
 <tr>
 <td>6</td>
 <td>Visualisation</td>
-<td>v0.7.0</td>
+<td>v0.7.0 → v0.7.1 (Option 5 + LCSS-1 schematic)</td>
 <td><strong>just shipped</strong></td>
-<td><code>reference/01_abm_generate_embedding.py</code> + <code>reference/02_abm_state_space_analysis.marimo.py</code> + manuscript Methods for LCSS-6 / TNBC-6b / TNBC-6c</td>
+<td><code>reference/01_abm_generate_embedding.py</code> + <code>reference/02_abm_state_space_analysis.marimo.py</code> + manuscript Methods for LCSS-6 / TNBC-6b / TNBC-6c; LCSS-1 has no reference (generic generator)</td>
 </tr>
 <tr>
 <td>7</td>
@@ -1240,17 +1246,17 @@
 </tr>
 </tbody>
 </table>
-<h2 id="verification-snapshot-v070">Verification snapshot (v0.7.0)<a class="headerlink" href="#verification-snapshot-v070" title="Permanent link">&para;</a></h2>
+<h2 id="verification-snapshot-v071">Verification snapshot (v0.7.1)<a class="headerlink" href="#verification-snapshot-v071" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>uv run pytest -q</code> — <strong>454 passed, 1 deselected</strong>, warnings only (<code>spatialtissuepy.topology.visualization</code> upstream deprecation + UMAP <code>n_jobs</code> informational warnings, all harmless).</li>
+<li><code>uv run pytest -q</code> — <strong>487 passed, 1 deselected</strong>, warnings only (upstream <code>spatialtissuepy</code> deprecation + UMAP <code>n_jobs</code> informational + matplotlib <code>figure.max_open_warning</code> — all harmless).</li>
 <li><code>uv run ruff check .</code> — clean.</li>
 <li><code>uv run ruff format --check .</code> — clean.</li>
-<li><code>uv run mypy src</code> — clean (50 source files, strict mode).</li>
+<li><code>uv run mypy src</code> — clean (52 source files, strict mode).</li>
 <li><code>uv run mkdocs build --strict</code> — exit 0.</li>
-<li><code>tmelandscape version</code> — prints <code>0.7.0</code>.</li>
-<li><code>tmelandscape-mcp</code> — boots; <strong>22 tools registered</strong>.</li>
+<li><code>tmelandscape version</code> — prints <code>0.7.1</code>.</li>
+<li><code>tmelandscape-mcp</code> — boots; <strong>23 tools registered</strong>.</li>
 </ul>
-<h2 id="mcp-tools-22">MCP tools (22)<a class="headerlink" href="#mcp-tools-22" title="Permanent link">&para;</a></h2>
+<h2 id="mcp-tools-23">MCP tools (23)<a class="headerlink" href="#mcp-tools-23" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -1366,6 +1372,11 @@
 <td>LCSS-6 — parameter-space attractor basins via kNN</td>
 </tr>
 <tr>
+<td><code>plot_model_schematic</code></td>
+<td>6</td>
+<td>LCSS-1 (generalised) — programmatic ABM schematic from cell types + interactions (v0.7.1)</td>
+</tr>
+<tr>
 <td><code>list_viz_figures</code></td>
 <td>6</td>
 <td>Catalogue of Phase-6 figure tools</td>
@@ -1475,11 +1486,12 @@ The <code>viz-figures list</code> discovery verb returns the same catalogue as t
 <h2 id="in-flight-tasks">In-flight tasks<a class="headerlink" href="#in-flight-tasks" title="Permanent link">&para;</a></h2>
 <p><em>None.</em> Phase 6 complete (v0.7.0). v1 scope per ADR 0005 is functionally complete. Next phase is Phase 7 (release hardening) — see ROADMAP.</p>
 <h2 id="open-questions-for-eric">Open questions (for Eric)<a class="headerlink" href="#open-questions-for-eric" title="Permanent link">&para;</a></h2>
-<ol>
-<li><strong>WSS-elbow algorithm — pick one of the proposed paths.</strong> See <a href="../decisions/2026-05-14-wss-elbow-algorithm-options/">decision log</a>. Recommendation: Option 0 (fix the marginal-decrease fallback) + Option 2 (add an L-method metric). Pending owner pick before any code lands.</li>
-<li><strong>LCSS Figure 1 schematic SVG</strong> — ship as a hand-rendered SVG asset under <code>docs/assets/lcss-figure-1-schematic.svg</code>. Pending hand-off from Eric (BioRender export or manual draft). Until landed, <code>docs/concepts/viz.md</code> notes it as TBD.</li>
-<li><strong>Phase 7 (release hardening) — confirm scope.</strong> ROADMAP currently lists: <code>pytest -m real</code> green against the three Zenodo example sims, mkdocs published to GitHub Pages, PyPI release via trusted publisher, Zenodo DOI for the software. Any of those out of scope or any to add?</li>
-</ol>
+<p><em>None as of v0.7.1.</em> All three v0.7.0 open questions were resolved on 2026-05-14 (see decision log):</p>
+<ul>
+<li>~~WSS-elbow algorithm pick~~ → <strong>Option 5 accepted</strong>: ship multiple metrics; see <a href="../decisions/2026-05-14-wss-elbow-option-5-accepted/">decision log</a>. Three new metrics land in v0.7.1.</li>
+<li>~~LCSS Figure 1 schematic SVG~~ → <strong>now in scope as a programmatic generator</strong>; see <a href="../decisions/2026-05-14-lcss-1-schematic-in-scope/">decision log</a>. New <code>plot_model_schematic</code> function lands in v0.7.1.</li>
+<li>~~Phase 7 scope confirmation~~ → <strong>no PyPI</strong>; see <a href="../decisions/2026-05-14-no-pypi-ever/">decision log</a>. ROADMAP Phase 7 simplified to real-data CI gate, GitHub Pages, docs-up-to-date, CITATION.cff. Zenodo deposit is at Eric's discretion, not a phase-completion gate.</li>
+</ul>
 <p>Resolved earlier this session (see decision log):</p>
 <ul>
 <li>~~Phase 6 scope~~ — figures decided and shipped in v0.7.0.</li>
