@@ -8,9 +8,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from tmelandscape.config.embedding import EmbeddingConfig
 from tmelandscape.config.normalize import NormalizeConfig
 from tmelandscape.config.summarize import SummarizeConfig
 from tmelandscape.config.sweep import SweepConfig
+from tmelandscape.embedding import embed_ensemble
 from tmelandscape.normalize import normalize_ensemble
 from tmelandscape.sampling import generate_sweep
 from tmelandscape.sampling.manifest import SweepManifest
@@ -215,5 +217,79 @@ def list_normalize_strategies_tool() -> list[dict[str, str]]:
                 "a baseline / for diagnosing orchestrator plumbing."
             ),
             "module": "tmelandscape.normalize.alternatives",
+        },
+    ]
+
+
+def embed_ensemble_tool(
+    input_zarr: str,
+    output_zarr: str,
+    *,
+    embedding_config: dict[str, Any],
+) -> dict[str, Any]:
+    """Run step 4: sliding-window embedding of the normalised ensemble Zarr.
+
+    Reads an input Zarr produced by :func:`normalize_ensemble_tool` (or
+    earlier in the pipeline if the user picks a different ``source_variable``)
+    and writes a NEW Zarr at ``output_zarr`` containing the flattened
+    embedding array plus per-window metadata. The input is never overwritten.
+
+    Parameters
+    ----------
+    input_zarr
+        Path to the input ensemble Zarr.
+    output_zarr
+        Path of the NEW Zarr store to write. Must not already exist; the
+        orchestrator refuses to overwrite by design (ADR 0006).
+    embedding_config
+        Required serialised :class:`EmbeddingConfig` dict. ``window_size``
+        is required (no default). Call
+        :func:`list_embed_strategies_tool` to discover available
+        strategies first.
+
+    Returns
+    -------
+    dict
+        Summary with the output Zarr path and the applied config.
+    """
+    cfg = EmbeddingConfig.model_validate(embedding_config)
+    out_path = embed_ensemble(input_zarr, output_zarr, config=cfg)
+    return {
+        "output_zarr": str(out_path),
+        "strategy": cfg.strategy,
+        "window_size": cfg.window_size,
+        "step_size": cfg.step_size,
+        "source_variable": cfg.source_variable,
+        "output_variable": cfg.output_variable,
+        "averages_variable": cfg.averages_variable,
+        "drop_statistics": list(cfg.drop_statistics),
+    }
+
+
+def list_embed_strategies_tool() -> list[dict[str, str]]:
+    """List available embedding strategies (name + description).
+
+    v0.5.0 ships ``sliding_window`` (the reference algorithm) plus
+    ``identity`` as a passthrough baseline. Future strategies in
+    ``tmelandscape.embedding.alternatives`` will land here.
+    """
+    return [
+        {
+            "name": "sliding_window",
+            "description": (
+                "Per-simulation sliding window of length `window_size` (step "
+                "1 by default), flattening each window's `(window_size, "
+                "n_stat)` submatrix into a row vector. Reference oracle: "
+                "reference/utils.py::window_trajectory_data."
+            ),
+            "module": "tmelandscape.embedding.sliding_window",
+        },
+        {
+            "name": "identity",
+            "description": (
+                "Passthrough strategy: returns the input unchanged. Useful "
+                "as a baseline / for diagnosing orchestrator plumbing."
+            ),
+            "module": "tmelandscape.embedding.alternatives",
         },
     ]

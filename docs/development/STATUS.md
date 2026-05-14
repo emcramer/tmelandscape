@@ -4,7 +4,7 @@
 
 ## Current focus
 
-**Phase 3.5 — normalisation: complete (v0.4.0).** Within-timestep normalisation shipped end-to-end via the buddy-pair team (Implementer + Reviewer per stream, all reviewer findings applied pre-integration). The orchestrator reads the input Zarr read-only, writes a NEW Zarr containing both the raw `value` and a `value_normalized` array, refuses to overwrite, inherits the input's chunk grid. 168 tests pass; ruff/format/mypy/mkdocs strict all clean. Ready for Phase 4 (time-delay embedding).
+**Phase 4 — embedding: complete (v0.5.0).** Sliding-window embedding shipped end-to-end via the buddy-pair team. The orchestrator reads the normalised ensemble Zarr read-only, builds a flattened embedding (one row per window position per simulation), writes a NEW Zarr at the user-supplied path with both the embedding array and per-window metadata. 247 tests pass; ruff/format/mypy/mkdocs strict all clean. Ready for Phase 5 (two-stage Leiden + Ward clustering).
 
 ## In-flight tasks
 

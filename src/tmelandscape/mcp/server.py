@@ -13,8 +13,10 @@ from fastmcp import FastMCP
 from tmelandscape import __version__
 from tmelandscape.mcp.tools import (
     describe_statistic_tool,
+    embed_ensemble_tool,
     generate_sweep_tool,
     list_available_statistics_tool,
+    list_embed_strategies_tool,
     list_normalize_strategies_tool,
     normalize_ensemble_tool,
     summarize_ensemble_tool,
@@ -44,6 +46,8 @@ mcp.tool(list_available_statistics_tool, name="list_available_statistics")
 mcp.tool(describe_statistic_tool, name="describe_statistic")
 mcp.tool(normalize_ensemble_tool, name="normalize_ensemble")
 mcp.tool(list_normalize_strategies_tool, name="list_normalize_strategies")
+mcp.tool(embed_ensemble_tool, name="embed_ensemble")
+mcp.tool(list_embed_strategies_tool, name="list_embed_strategies")
 
 
 def main() -> None:

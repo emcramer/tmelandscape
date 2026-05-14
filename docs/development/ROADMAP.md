@@ -91,16 +91,26 @@ Shipped 2026-05-13 with the buddy-pair team pattern (3 Implementer + 3 Reviewer 
   - **A-SMELL**: float32 → float64 promotion documented in the algorithm's docstring.
 - [x] 168 tests passing (existing 158 + 5 new normalize unit tests in driver, 11 in orchestrator, 23 in config + alternatives, 5 integration = +27 new tests). ruff + format + mypy strict + mkdocs strict all clean.
 
-## Phase 4 — Step 4 embedding (v0.3.0)
+## Phase 4 — Step 4 embedding (v0.5.0) — COMPLETE
 
-- [ ] `tmelandscape.embedding.delay_embed` (Takens)
-- [ ] FNN dimension search (cross-check vs nolitsa)
-- [ ] Mutual-information lag selection
-- [ ] Joint `optimize_embedding`
-- [ ] Sliding-window construction (`W=50` default per LCSS paper / reference)
-- [ ] Golden-file regression vs reference
-- [ ] CLI: `tmelandscape embed`
-- [ ] MCP tools: `tmelandscape.optimize_embedding`, `tmelandscape.delay_embed`
+Shipped 2026-05-13 via the buddy-pair team (3 Implementer + 3 Reviewer agents). Reference oracle: `reference/utils.py::window_trajectory_data`.
+
+- [x] `tmelandscape.embedding.sliding_window.window_trajectory_ensemble` — pure function, reference-faithful (row-major flatten, step-1 default, `np.nanmean` for averages).
+- [x] `tmelandscape.embedding.alternatives.embed_identity` — passthrough baseline / future-strategy anchor.
+- [x] `tmelandscape.embedding.embed_ensemble` — Zarr orchestrator. Reads input lazily, writes a NEW Zarr containing the flattened embedding plus per-window metadata. Per-window coords broadcast from per-sim coords via `np.take(simulation_index)`. Refuses to overwrite; cleans up partial output on failure.
+- [x] `tmelandscape.config.embedding.EmbeddingConfig` (Pydantic): `window_size` required (no default), three pairwise variable-name collision checks via `@model_validator(mode="after")`, `drop_statistics=[]` default.
+- [x] CLI: `tmelandscape embed` + `tmelandscape embed-strategies list`.
+- [x] MCP tools: `embed_ensemble`, `list_embed_strategies`.
+- [x] Reviewer findings applied:
+  - **A2 SMELL**: A1's docstring perf claim softened to match empirical ~20 ms/1000 windows.
+  - **B2 SMELL**: `_serialise_config` dead `dict(config)` branch replaced with `vars(config)` for SimpleNamespace stubs.
+  - Three other reviewer SMELLs noted but non-blocking (chunking heuristic, source-hash forwarding, PEP 673 `Self` style).
+- [x] 247 tests passing (existing 168 + 17 A + 19 B + 38 C + 5 integration = +79 new tests across Phase 4). ruff + format + mypy strict + mkdocs strict all clean.
+
+Deferred (in line with project-owner "don't add features beyond what's required"):
+
+- FNN / MI optimisation: the reference doesn't use them; user can request as v0.5.x.
+- Takens lag-coordinate delay embedding: the reference uses sliding window (same purpose, different math); user can request as v0.5.x.
 
 ## Phase 5 — Step 5 clustering + Landscape facade (v0.4.0)
 
