@@ -72,9 +72,14 @@ class ClusterConfig(BaseModel):
         science-shaping default" stance.
     cluster_count_metric
         Metric used to auto-select ``n_final_clusters`` when it is ``None``.
-        ``"wss_elbow"`` (default) uses ``kneed`` on the WSS curve;
-        ``"calinski_harabasz"`` / ``"silhouette"`` use ``argmax`` of the
-        respective sklearn score.
+        Six options: ``"wss_elbow"`` (default; kneed on the WSS curve);
+        ``"wss_lmethod"`` (Salvador & Chan two-linear-fit knee detection);
+        ``"wss_asymptote_fit"`` (exponential-decay asymptote fit with a
+        90%-of-reduction threshold); ``"wss_variance_explained"``
+        (smallest k whose ``1 - WSS(k)/WSS(k_min)`` reaches 0.85);
+        ``"calinski_harabasz"`` / ``"silhouette"`` (argmax of the
+        respective sklearn score). See ADR 0010 and decision log
+        ``2026-05-14-wss-elbow-option-5-accepted.md``.
     cluster_count_min
         Inclusive lower bound on the candidate-k range. Must be ``>= 2``
         (a single-cluster cut is degenerate for every metric here).
@@ -159,13 +164,25 @@ class ClusterConfig(BaseModel):
         ),
     )
 
-    cluster_count_metric: Literal["wss_elbow", "calinski_harabasz", "silhouette"] = Field(
+    cluster_count_metric: Literal[
+        "wss_elbow",
+        "calinski_harabasz",
+        "silhouette",
+        "wss_lmethod",
+        "wss_asymptote_fit",
+        "wss_variance_explained",
+    ] = Field(
         default="wss_elbow",
         description=(
-            "Metric for auto-selection of n_final_clusters. "
-            "'wss_elbow' (default): kneed-based elbow of the WSS curve. "
-            "'calinski_harabasz' / 'silhouette': argmax of the sklearn "
-            "score."
+            "Metric for auto-selection of n_final_clusters. Six options "
+            "are supported: 'wss_elbow' (default, kneed-based knee with a "
+            "k=1 anchor + fixed marginal-decrease fallback); 'wss_lmethod' "
+            "(Salvador & Chan two-linear-fit knee detection); "
+            "'wss_asymptote_fit' (exponential decay fit + 90%-of-reduction "
+            "threshold); 'wss_variance_explained' (smallest k whose WSS "
+            "reduction crosses 0.85); 'calinski_harabasz' (argmax of "
+            "sklearn's CH); 'silhouette' (argmax of sklearn's silhouette). "
+            "See ADR 0010 and decision log 2026-05-14-wss-elbow-option-5-accepted.md."
         ),
     )
     cluster_count_min: int = Field(

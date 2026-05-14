@@ -48,14 +48,33 @@ the reference; see
    - **If `n_final_clusters is None`**, *auto-select* `k` over the
      candidate range `[cluster_count_min, cluster_count_max]`
      (default upper bound `min(12, n_leiden_clusters)`) using the
-     chosen `cluster_count_metric`:
+     chosen `cluster_count_metric`. Six metrics ship as of v0.7.1:
      - `wss_elbow` *(default)*: minimise within-cluster sum of squares,
        knee detected via [`kneed.KneeLocator`](https://github.com/arvkevi/kneed).
+       Uses a private k=1 anchor to expose the convex shape; the public
+       candidates / scores arrays reflect only the user range.
+     - `wss_lmethod` *(added v0.7.1)*: Salvador & Chan 2004 L-method —
+       two-linear-fit knee detection. Robust to noise; requires ≥ 4
+       candidate ks.
+     - `wss_asymptote_fit` *(added v0.7.1)*: exponential-decay fit
+       `WSS(k) = A·exp(−B·(k − k_min)) + C`; pick smallest k whose
+       remaining distance to the fitted asymptote ≤ 0.1 (i.e. 90% of
+       the achievable reduction). Falls back to `wss_variance_explained`
+       at threshold 0.9 on fit failure.
+     - `wss_variance_explained` *(added v0.7.1)*: smallest k whose
+       `1 − WSS(k)/WSS(k_min)` reaches 0.85.
      - `calinski_harabasz`: argmax of
        `sklearn.metrics.calinski_harabasz_score`.
      - `silhouette`: argmax of `sklearn.metrics.silhouette_score`
        (subsampled at 5000 rows for ensembles larger than that, with a
        fixed `random_state=42`).
+
+   The four `wss_*` metrics share the WSS computation; they only
+   differ in how the chosen k is extracted from the WSS curve. The
+   per-candidate `cluster_count_scores` in the output Zarr is the WSS
+   curve for all four (uniform across the family); for CH and
+   silhouette it is the sklearn score. Decision log:
+   `2026-05-14-wss-elbow-option-5-accepted.md`.
 4. Broadcast the Leiden→final mapping back to per-window labels:
    `final_labels = leiden_to_final[leiden_labels]`. Final labels are
    1-based (`1..n_final_clusters_used`) per scipy's `fcluster`
@@ -84,7 +103,7 @@ MCP agents call `list_cluster_strategies`.
 | `leiden_resolution` | `float (>0)` | `1.0` | Leiden resolution parameter (ignored for `Modularity`, which doesn't take one). |
 | `leiden_seed` | `int` | `42` | Determinism anchor for `leidenalg.find_partition`. |
 | `n_final_clusters` | `int \| None (>=2)` | `None` | Number of TME states. `None` ⇒ auto-select via `cluster_count_metric`. **No package default — see [ADR 0010](../adr/0010-cluster-count-auto-selection.md).** |
-| `cluster_count_metric` | `Literal["wss_elbow", "calinski_harabasz", "silhouette"]` | `"wss_elbow"` | Auto-selection metric. Only used when `n_final_clusters is None`. |
+| `cluster_count_metric` | `Literal["wss_elbow", "wss_lmethod", "wss_asymptote_fit", "wss_variance_explained", "calinski_harabasz", "silhouette"]` | `"wss_elbow"` | Auto-selection metric. Only used when `n_final_clusters is None`. Six options as of v0.7.1 — see the algorithm section above for descriptions. |
 | `cluster_count_min` | `int (>=2)` | `2` | Inclusive lower bound on the candidate-k range. |
 | `cluster_count_max` | `int \| None (>=2)` | `None` | Inclusive upper bound. `None` ⇒ `min(12, n_leiden_clusters)`. |
 | `source_variable` | `str` | `"embedding"` | Input array name. |
@@ -206,8 +225,9 @@ Provenance `.zattrs`:
 ## What's *not* in step 5
 
 - **Choosing the cluster-count metric automatically.** The package
-  exposes three metrics (`wss_elbow`, `calinski_harabasz`,
-  `silhouette`); the user picks. There is no "best metric" the package
+  exposes six metrics (`wss_elbow`, `wss_lmethod`, `wss_asymptote_fit`,
+  `wss_variance_explained`, `calinski_harabasz`, `silhouette`); the
+  user picks. There is no "best metric" the package
   selects for you.
 - **Human-readable state names.** The output is integer labels
   (`1..n_final_clusters_used`). Mapping those to interpretable TME-state

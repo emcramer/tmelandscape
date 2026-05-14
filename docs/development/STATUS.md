@@ -4,7 +4,13 @@
 
 ## Where the project is (2026-05-14)
 
-**v0.7.0 shipped.** Pipeline steps 1, 3, 3.5, 4, 5, **and 6** are now implemented end-to-end. Step 2 (running PhysiCell simulations) is intentionally out of scope. **v1 scope per [ADR 0005](../adr/0005-no-msm-in-v1.md) is functionally complete.** The remaining work is v0.7.x reviewer follow-ups, the LCSS Figure 1 schematic SVG asset (pending hand-off from Eric), and v1.0 release hardening (Phase 7: CI green on real data, mkdocs Pages, PyPI publish, Zenodo DOI). A **decision-log system** was established under `docs/development/decisions/` — read its `README.md` before writing new code so you can capture decisions in line with the new process.
+**v0.7.1 shipped** (small feature ship on top of v0.7.0). Pipeline steps 1, 3, 3.5, 4, 5, **and 6** are implemented end-to-end. Step 2 (running PhysiCell simulations) is intentionally out of scope. **v1 scope per [ADR 0005](../adr/0005-no-msm-in-v1.md) is functionally complete.** Remaining work: v0.7.x reviewer follow-ups (none blocking) and v1.0 release hardening (Phase 7: real-data CI gate, GitHub Pages docs, CITATION.cff currency — **no PyPI** per owner directive; Zenodo deposit is owner-discretion). A **decision-log system** lives under `docs/development/decisions/` — read its `README.md` before writing new code so you can capture decisions in line with the established process.
+
+**What's new in v0.7.1** (over v0.7.0):
+
+- Three new `cluster_count_metric` options (`wss_lmethod`, `wss_asymptote_fit`, `wss_variance_explained`) — Option 5 from the WSS-elbow algorithm decision log; user picks among **six** WSS-curve interpretation strategies.
+- `viz.model_schematic.plot_model_schematic` — programmatic ABM schematic generator (LCSS-1). Generic across any model: takes cell-type list + interaction rules, renders coloured-node / typed-arrow figure in PNG or SVG.
+- MCP tool count: 22 → **23**. CLI verbs unchanged. ROADMAP Phase 7 simplified (PyPI line removed).
 
 | Phase | Step | Version | Status | Reference oracle |
 | --- | --- | --- | --- | --- |
@@ -15,20 +21,20 @@
 | 3.5 | Normalisation | v0.4.0 | shipped | `reference/00_abm_normalization.py` |
 | 4 | Embedding | v0.5.0 | shipped | `reference/utils.py::window_trajectory_data` |
 | 5 | Clustering | v0.6.0 → v0.6.1 (housekeeping) | shipped | `reference/01_abm_generate_embedding.py` lines ~519-720 |
-| 6 | Visualisation | v0.7.0 | **just shipped** | `reference/01_abm_generate_embedding.py` + `reference/02_abm_state_space_analysis.marimo.py` + manuscript Methods for LCSS-6 / TNBC-6b / TNBC-6c |
+| 6 | Visualisation | v0.7.0 → v0.7.1 (Option 5 + LCSS-1 schematic) | **just shipped** | `reference/01_abm_generate_embedding.py` + `reference/02_abm_state_space_analysis.marimo.py` + manuscript Methods for LCSS-6 / TNBC-6b / TNBC-6c; LCSS-1 has no reference (generic generator) |
 | 7 | v1.0 release hardening | (target v1.0.0) | **NEXT** | — |
 
-## Verification snapshot (v0.7.0)
+## Verification snapshot (v0.7.1)
 
-- `uv run pytest -q` — **454 passed, 1 deselected**, warnings only (`spatialtissuepy.topology.visualization` upstream deprecation + UMAP `n_jobs` informational warnings, all harmless).
+- `uv run pytest -q` — **487 passed, 1 deselected**, warnings only (upstream `spatialtissuepy` deprecation + UMAP `n_jobs` informational + matplotlib `figure.max_open_warning` — all harmless).
 - `uv run ruff check .` — clean.
 - `uv run ruff format --check .` — clean.
-- `uv run mypy src` — clean (50 source files, strict mode).
+- `uv run mypy src` — clean (52 source files, strict mode).
 - `uv run mkdocs build --strict` — exit 0.
-- `tmelandscape version` — prints `0.7.0`.
-- `tmelandscape-mcp` — boots; **22 tools registered**.
+- `tmelandscape version` — prints `0.7.1`.
+- `tmelandscape-mcp` — boots; **23 tools registered**.
 
-## MCP tools (22)
+## MCP tools (23)
 
 | Tool | Phase | What it does |
 | --- | --- | --- |
@@ -53,6 +59,7 @@
 | `plot_phase_space_vector_field` | 6 | TNBC-6b — per-state vector field in 2D feature phase space |
 | `plot_parameter_by_state` | 6 | TNBC-6c — violin of a sweep parameter by terminal state |
 | `plot_attractor_basins` | 6 | LCSS-6 — parameter-space attractor basins via kNN |
+| `plot_model_schematic` | 6 | LCSS-1 (generalised) — programmatic ABM schematic from cell types + interactions (v0.7.1) |
 | `list_viz_figures` | 6 | Catalogue of Phase-6 figure tools |
 
 ## CLI verbs
@@ -107,9 +114,11 @@ _None._ Phase 6 complete (v0.7.0). v1 scope per ADR 0005 is functionally complet
 
 ## Open questions (for Eric)
 
-1. **WSS-elbow algorithm — pick one of the proposed paths.** See [decision log](decisions/2026-05-14-wss-elbow-algorithm-options.md). Recommendation: Option 0 (fix the marginal-decrease fallback) + Option 2 (add an L-method metric). Pending owner pick before any code lands.
-2. **LCSS Figure 1 schematic SVG** — ship as a hand-rendered SVG asset under `docs/assets/lcss-figure-1-schematic.svg`. Pending hand-off from Eric (BioRender export or manual draft). Until landed, `docs/concepts/viz.md` notes it as TBD.
-3. **Phase 7 (release hardening) — confirm scope.** ROADMAP currently lists: `pytest -m real` green against the three Zenodo example sims, mkdocs published to GitHub Pages, PyPI release via trusted publisher, Zenodo DOI for the software. Any of those out of scope or any to add?
+_None as of v0.7.1._ All three v0.7.0 open questions were resolved on 2026-05-14 (see decision log):
+
+- ~~WSS-elbow algorithm pick~~ → **Option 5 accepted**: ship multiple metrics; see [decision log](decisions/2026-05-14-wss-elbow-option-5-accepted.md). Three new metrics land in v0.7.1.
+- ~~LCSS Figure 1 schematic SVG~~ → **now in scope as a programmatic generator**; see [decision log](decisions/2026-05-14-lcss-1-schematic-in-scope.md). New `plot_model_schematic` function lands in v0.7.1.
+- ~~Phase 7 scope confirmation~~ → **no PyPI**; see [decision log](decisions/2026-05-14-no-pypi-ever.md). ROADMAP Phase 7 simplified to real-data CI gate, GitHub Pages, docs-up-to-date, CITATION.cff. Zenodo deposit is at Eric's discretion, not a phase-completion gate.
 
 Resolved earlier this session (see decision log):
 

@@ -17,9 +17,14 @@ Figures reproduced (per Eric's directive, 2026-05-14):
 - LCSS Figures **1, 3, 4, 6**
 - TNBC Figures **2a, 2b, 2c, 2d, 2e, 6a, 6b, 6c**
 
-LCSS Figure 1 is a hand-drawn schematic of the ABM signalling
-architecture; it ships as a static asset under `docs/assets/` (not a
-Python function). All other figures are programmatic.
+All twelve figures are programmatic. **LCSS Figure 1** was originally
+out of scope (slated as a static asset under `docs/assets/`), but as
+of v0.7.1 it ships as a generic schematic-generator function — see
+[decision log](../development/decisions/2026-05-14-lcss-1-schematic-in-scope.md).
+The function takes a user-supplied model description — cell-type
+names and interaction rules — and renders a coloured-node /
+typed-arrow diagram. It is **generic across any ABM**: pass any
+cell-type list, not just the LCSS paper's specific TME model.
 
 ## Discovery
 
@@ -38,6 +43,7 @@ MCP agents call `list_viz_figures`.
 
 | Tag | Manuscript | Function | Quick description |
 | --- | --- | --- | --- |
+| LCSS-1 | LCSS | `viz.model_schematic.plot_model_schematic` | Programmatic ABM schematic — coloured nodes for cell types + typed arrows for interactions (added v0.7.1) |
 | LCSS-3 | LCSS | `viz.embedding.plot_state_umap_with_vector_field` | State-coloured UMAP + per-state vector field + density contours |
 | LCSS-4 | LCSS | `viz.embedding.plot_feature_umap` | Multi-panel UMAP coloured by per-feature window averages |
 | LCSS-6 | LCSS | `viz.dynamics.plot_attractor_basins` | 2D parameter-space scatter with kNN decision-boundary regions |
@@ -71,6 +77,12 @@ MCP agents call `list_viz_figures`.
   always user-supplied per [ADR 0009](../adr/0009-no-hardcoded-statistics-panel.md);
   the manuscript-specific values (`(epithelial, T_eff)`,
   `CD8_Teff→CD8_Tex`-rate, `(rexh, radh)`) become tutorial defaults.
+- **`tmelandscape.viz.model_schematic`** *(added v0.7.1)* — programmatic
+  schematic generator for any ABM. Owns `CellType`, `Interaction`, and
+  `plot_model_schematic` (LCSS-1). Renders coloured-circle nodes with
+  text labels and typed arrows (`promotes` / `inhibits` /
+  `transitions_to` / `secretes`). Output supports PNG (raster) and SVG
+  (vector) via matplotlib's extension dispatch. See [decision log](../development/decisions/2026-05-14-lcss-1-schematic-in-scope.md).
 - **`tmelandscape.landscape.join_manifest_cluster`** — Stream-C
   prerequisite. Joins the Phase 2 sweep manifest with the Phase 5
   cluster Zarr; returns a DataFrame indexed by `simulation_id` with one
@@ -161,14 +173,12 @@ named tool.
 
 ## What's *not* in step 6
 
-- **Per-figure CLI verbs.** Eleven verbs in a single namespace would
-  overwhelm `--help`. Use the Python API or the MCP tools.
+- **Per-figure CLI verbs.** Eleven figure-tool verbs in a single
+  namespace would overwhelm `--help`. Use the Python API or the MCP
+  tools.
 - **Pixel-baseline tests.** v0.7.0 ships smoke + determinism +
   data-correctness + save-path-roundtrip tests. Baseline-image diffing
   (e.g. `pytest-mpl`) is deferred to v0.7.x once the API stabilises.
-- **LCSS Figure 1.** Schematic, not a data plot; ships as a static SVG
-  asset under `docs/assets/` (currently a placeholder — see Phase 6
-  task file's "Out-of-scope concerns" #1).
 - **Animated trajectories.** Reference
   `02_abm_state_space_analysis.marimo.py:1176-1234` animates the
   state-coloured UMAP trajectories; `plot_trajectory_umap` produces a

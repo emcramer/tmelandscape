@@ -1,8 +1,8 @@
 # Decision: WSS-elbow algorithm — options for replacing the marginal-decrease fallback
 
 - **Date:** 2026-05-14 (UTC)
-- **Status:** Proposed
-- **Owner / decider:** Eric (decision pending)
+- **Status:** **Superseded by [2026-05-14-wss-elbow-option-5-accepted.md](./2026-05-14-wss-elbow-option-5-accepted.md)** (Option 5 picked, 2026-05-14 same day)
+- **Owner / decider:** Eric (decision rendered: Option 5)
 
 ## Context
 

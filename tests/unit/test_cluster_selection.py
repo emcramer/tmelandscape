@@ -199,7 +199,14 @@ def test_k_max_capped_at_n_leiden() -> None:
 def test_scores_shape_matches_candidates() -> None:
     """``k_scores`` length equals ``k_candidates`` length for each metric."""
     embedding, leiden_labels, linkage = _three_blob_setup()
-    for metric in ("wss_elbow", "calinski_harabasz", "silhouette"):
+    for metric in (
+        "wss_elbow",
+        "calinski_harabasz",
+        "silhouette",
+        "wss_lmethod",
+        "wss_asymptote_fit",
+        "wss_variance_explained",
+    ):
         result = select_n_clusters(embedding, leiden_labels, linkage, metric=metric)
         assert result.k_candidates.shape == result.k_scores.shape
 
@@ -213,7 +220,14 @@ def test_determinism_repeated_calls_equal_result() -> None:
     """Same input ⇒ identical ``SelectionResult`` across calls."""
     embedding, leiden_labels, linkage = _three_blob_setup()
 
-    for metric in ("wss_elbow", "calinski_harabasz", "silhouette"):
+    for metric in (
+        "wss_elbow",
+        "calinski_harabasz",
+        "silhouette",
+        "wss_lmethod",
+        "wss_asymptote_fit",
+        "wss_variance_explained",
+    ):
         a = select_n_clusters(embedding, leiden_labels, linkage, metric=metric)
         b = select_n_clusters(embedding, leiden_labels, linkage, metric=metric)
         assert a.n_clusters == b.n_clusters
@@ -304,3 +318,106 @@ def test_wss_elbow_five_blobs_calinski_harabasz_also_finds_k_at_or_above_four() 
 
     assert result.metric == "calinski_harabasz"
     assert 4 <= result.n_clusters <= 6
+
+
+# ---------------------------------------------------------------------------
+# wss_lmethod / wss_asymptote_fit / wss_variance_explained — Option 5 metrics
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "metric",
+    ["wss_lmethod", "wss_asymptote_fit", "wss_variance_explained"],
+)
+def test_option5_metric_shape_and_smoke(metric: str) -> None:
+    """Each Option-5 metric returns a well-shaped ``SelectionResult``."""
+    embedding, leiden_labels, linkage = _three_blob_setup()
+
+    result = select_n_clusters(embedding, leiden_labels, linkage, metric=metric)
+
+    assert isinstance(result, SelectionResult)
+    assert result.metric == metric
+    assert result.k_candidates.size > 0
+    assert result.k_candidates.shape == result.k_scores.shape
+
+
+@pytest.mark.parametrize(
+    "metric",
+    ["wss_lmethod", "wss_asymptote_fit", "wss_variance_explained"],
+)
+def test_option5_metric_recovers_three_blob_structure(metric: str) -> None:
+    """Each Option-5 metric picks k in ``[2, 4]`` on a 3-blob fixture."""
+    embedding, leiden_labels, linkage = _three_blob_setup()
+
+    result = select_n_clusters(embedding, leiden_labels, linkage, metric=metric)
+
+    assert 2 <= result.n_clusters <= 4, (
+        f"{metric} picked k={result.n_clusters} on the 3-blob fixture; expected k in [2, 4]."
+    )
+
+
+def test_wss_lmethod_requires_at_least_four_candidates() -> None:
+    """L-method needs ≥4 candidate ks; otherwise raise ``ValueError``."""
+    embedding, leiden_labels, linkage = _three_blob_setup()
+
+    # k_min=2, k_max=3 ⇒ 2 candidates < 4, no interior split possible.
+    with pytest.raises(ValueError, match="wss_lmethod requires at least 4"):
+        select_n_clusters(
+            embedding,
+            leiden_labels,
+            linkage,
+            metric="wss_lmethod",
+            k_min=2,
+            k_max=3,
+        )
+
+
+def test_wss_asymptote_fit_falls_back_on_degenerate_constant_wss(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A constant WSS curve forces the fit to fail; verify graceful fallback.
+
+    We monkeypatch :func:`_wss_at_k` to return a constant value
+    regardless of k. The exponential-decay fit on a flat curve is
+    degenerate, but the function must still return a sane integer in
+    the candidate range — no crash, no NaN.
+    """
+    from tmelandscape.cluster import selection
+
+    monkeypatch.setattr(
+        selection,
+        "_wss_at_k",
+        lambda embedding, leiden_labels, linkage_matrix, k: 100.0,
+    )
+
+    embedding, leiden_labels, linkage = _three_blob_setup()
+    n_leiden = int(np.unique(leiden_labels).size)
+
+    result = select_n_clusters(embedding, leiden_labels, linkage, metric="wss_asymptote_fit")
+
+    assert result.metric == "wss_asymptote_fit"
+    assert 2 <= result.n_clusters <= n_leiden
+    assert int(result.k_candidates[0]) <= result.n_clusters <= int(result.k_candidates[-1])
+
+
+def test_wss_variance_explained_picks_smallest_k_above_threshold() -> None:
+    """`wss_variance_explained` returns the smallest k whose
+    `1 - wss/wss[0]` crosses 0.85.
+
+    Independently recompute the variance-explained array from the
+    result's WSS scores and verify the chosen k matches the smallest
+    candidate position that meets the threshold (with fallback to the
+    last candidate if none do).
+    """
+    embedding, leiden_labels, linkage = _three_blob_setup()
+
+    result = select_n_clusters(embedding, leiden_labels, linkage, metric="wss_variance_explained")
+
+    wss = result.k_scores
+    var_explained = 1.0 - wss / wss[0]
+    mask = var_explained >= 0.85
+    if not np.any(mask):
+        expected_k = int(result.k_candidates[-1])
+    else:
+        expected_k = int(result.k_candidates[int(np.argmax(mask))])
+    assert result.n_clusters == expected_k

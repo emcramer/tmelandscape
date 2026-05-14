@@ -24,6 +24,7 @@ from tmelandscape.mcp.tools import (
     normalize_ensemble_tool,
     plot_attractor_basins_tool,
     plot_feature_umap_tool,
+    plot_model_schematic_tool,
     plot_parameter_by_state_tool,
     plot_phase_space_vector_field_tool,
     plot_state_feature_clustermap_tool,
@@ -48,7 +49,8 @@ mcp: FastMCP = FastMCP(
         "plot_time_umap, plot_feature_umap, plot_trajectory_umap, "
         "plot_state_umap_with_vector_field, plot_state_feature_clustermap, "
         "plot_trajectory_clustergram, plot_phase_space_vector_field, "
-        "plot_parameter_by_state, plot_attractor_basins. Each viz tool "
+        "plot_parameter_by_state, plot_attractor_basins, plot_model_schematic. "
+        "Each viz tool "
         "requires a `save_path` argument and returns the resolved path of "
         "the rendered PNG. Discovery: list_available_statistics, "
         "list_normalize_strategies, list_embed_strategies, "
@@ -87,6 +89,7 @@ mcp.tool(plot_trajectory_clustergram_tool, name="plot_trajectory_clustergram")
 mcp.tool(plot_phase_space_vector_field_tool, name="plot_phase_space_vector_field")
 mcp.tool(plot_parameter_by_state_tool, name="plot_parameter_by_state")
 mcp.tool(plot_attractor_basins_tool, name="plot_attractor_basins")
+mcp.tool(plot_model_schematic_tool, name="plot_model_schematic")
 mcp.tool(list_viz_figures_tool, name="list_viz_figures")
 
 

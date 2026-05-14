@@ -1,6 +1,6 @@
 # 0010 — Cluster-count auto-selection (no silent default for `n_final_clusters`)
 
-- **Status:** Accepted (revised 2026-05-14: default `k_max` cap narrowed from 20 to 12 — see [decision log](../development/decisions/2026-05-14-cluster-count-max-default.md))
+- **Status:** Accepted (revised 2026-05-14: (a) default `k_max` cap narrowed from 20 to 12 — see [decision log](../development/decisions/2026-05-14-cluster-count-max-default.md); (b) Option-5 metric expansion adds three more metrics — see [decision log](../development/decisions/2026-05-14-wss-elbow-option-5-accepted.md))
 - **Date:** 2026-05-13 (revised 2026-05-14)
 - **Deciders:** Eric, Claude
 
@@ -39,20 +39,46 @@ package default**. Semantics:
   by optimising `cluster_count_metric` over the range
   `[cluster_count_min, cluster_count_max]`.
 
-Three metrics are supported, with **WSS elbow as the default**:
+**Six metrics are supported** as of v0.7.1, with **WSS elbow as the
+default**. Four operate on the WSS-vs-k curve directly; two delegate
+to sklearn:
 
-1. **`wss_elbow`** *(default)*: for each candidate k, cut the
-   dendrogram, compute the within-cluster sum of squares
-   (Σ over clusters of Σ ‖x − μ_c‖²), then find the elbow of the WSS
-   vs. k curve via [`kneed.KneeLocator`](https://pypi.org/project/kneed/)
-   with `curve="convex"`, `direction="decreasing"`. If kneed cannot
-   detect a knee, fall back to the k with the largest marginal-decrease
-   slope in WSS. `kneed>=0.8` is already in `pyproject.toml` core deps.
-2. **`calinski_harabasz`**: `sklearn.metrics.calinski_harabasz_score`,
+1. **`wss_elbow`** *(default)*: cut the dendrogram at each candidate k,
+   compute the within-cluster sum of squares (Σ over clusters of Σ ‖x − μ_c‖²),
+   then find the elbow of the WSS vs. k curve via
+   [`kneed.KneeLocator`](https://pypi.org/project/kneed/) with
+   `curve="convex"`, `direction="decreasing"`. The algorithm
+   internally evaluates an additional k=1 anchor so kneed sees the
+   convex shape; the returned candidates / scores arrays expose only
+   the user-requested range. If kneed cannot detect a knee, fall back
+   to the k with the largest marginal-decrease slope in WSS. (The
+   fallback's current behaviour under the k=1 anchor regime is
+   documented as a known limitation; users who hit it can switch to
+   one of the alternative WSS metrics below.)
+2. **`wss_lmethod`** *(added v0.7.1)*: Salvador & Chan 2004 L-method —
+   for each interior split-point k_c, fit two linear regressions
+   (left + right segments of the WSS curve); pick the split minimising
+   total residual SSE. Robust to noise; requires ≥ 4 candidate ks.
+3. **`wss_asymptote_fit`** *(added v0.7.1)*: fit `WSS(k) = A·exp(−B·(k − k_min)) + C`
+   via `scipy.optimize.curve_fit`; pick smallest k where the remaining
+   distance to the fitted asymptote falls below 10% (default
+   threshold). Falls back to `wss_variance_explained` at threshold 0.9
+   on fit failure (rare on real Ward-WSS curves).
+4. **`wss_variance_explained`** *(added v0.7.1)*: pick smallest k where
+   `1 − WSS(k)/WSS(k_min)` reaches 0.85 (default threshold). Returns
+   `k_max` if no k satisfies the threshold (asymptotic fallback).
+5. **`calinski_harabasz`**: `sklearn.metrics.calinski_harabasz_score`,
    argmax over candidates.
-3. **`silhouette`**: `sklearn.metrics.silhouette_score` (Euclidean),
+6. **`silhouette`**: `sklearn.metrics.silhouette_score` (Euclidean),
    argmax over candidates. For large ensembles a subsample cap may be
    applied to keep this O(n).
+
+The four WSS-based metrics share the WSS computation; they differ only
+in how the chosen k is extracted from the WSS curve. The CH and
+silhouette metrics compute their own per-window scores from the
+candidate label assignments. See
+[decision log: Option-5 acceptance](../development/decisions/2026-05-14-wss-elbow-option-5-accepted.md)
+for the rationale and the per-metric algorithm details.
 
 The candidate range defaults to `[2, min(12, n_leiden_clusters)]`. The
 upper-bound cap of 12 (revised 2026-05-14, was 20) reflects the

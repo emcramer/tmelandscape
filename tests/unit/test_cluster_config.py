@@ -7,7 +7,9 @@ ADR 0007 and ADR 0010):
   (no silent "6 TME states" default per ADR 0010); other auto-selection
   knobs have well-defined defaults.
 * Explicit ``n_final_clusters`` integer is accepted iff ``>= 2``.
-* ``cluster_count_metric`` is a ``Literal`` over exactly three options.
+* ``cluster_count_metric`` is a ``Literal`` over exactly six options
+  (three original + three added in v0.7.1 per decision log
+  ``2026-05-14-wss-elbow-option-5-accepted.md``).
 * ``leiden_partition`` is a ``Literal`` over exactly three partition types.
 * ``leiden_resolution`` must be ``> 0``.
 * ``cluster_count_min`` and ``cluster_count_max`` must each be ``>= 2``.
@@ -94,8 +96,18 @@ class TestClusterConfigNFinalClusters:
 
 
 class TestClusterConfigClusterCountMetric:
-    @pytest.mark.parametrize("metric", ["wss_elbow", "calinski_harabasz", "silhouette"])
-    def test_all_three_options_accepted(self, metric: str) -> None:
+    @pytest.mark.parametrize(
+        "metric",
+        [
+            "wss_elbow",
+            "calinski_harabasz",
+            "silhouette",
+            "wss_lmethod",
+            "wss_asymptote_fit",
+            "wss_variance_explained",
+        ],
+    )
+    def test_all_six_options_accepted(self, metric: str) -> None:
         cfg = ClusterConfig(cluster_count_metric=metric)  # type: ignore[arg-type]
         assert cfg.cluster_count_metric == metric
 

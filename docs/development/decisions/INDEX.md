@@ -4,6 +4,10 @@ Chronological index of decisions. Newest at top.
 
 | Date (UTC) | Status | Title |
 | --- | --- | --- |
+| 2026-05-14 | Accepted | [v0.7.1 session log — WSS Option 5 + LCSS-1 schematic generator](./2026-05-14-v0-7-1-session.md) |
+| 2026-05-14 | Accepted | [Drop all PyPI publishing plans for `tmelandscape` itself](./2026-05-14-no-pypi-ever.md) |
+| 2026-05-14 | Accepted | [LCSS Figure 1 is in scope as a programmatic schematic generator](./2026-05-14-lcss-1-schematic-in-scope.md) |
+| 2026-05-14 | Accepted | [Accept Option 5 for WSS-elbow auto-selection — ship multiple metrics](./2026-05-14-wss-elbow-option-5-accepted.md) |
 | 2026-05-14 | Accepted | [Phase 6 — visualisation session log (v0.7.0)](./2026-05-14-phase-6-session.md) |
 | 2026-05-14 | Accepted | [Centralise `seaborn.*` in mypy overrides; remove per-import ignores](./2026-05-14-seaborn-mypy-override.md) |
 | 2026-05-14 | Accepted | [`viz.trajectories` deviations: ragged-raise, `leiden_labels` optional, first-appearance sim ordering](./2026-05-14-viz-trajectories-deviations.md) |
@@ -14,7 +18,7 @@ Chronological index of decisions. Newest at top.
 | 2026-05-14 | Accepted | [Terminal cluster label is the mode of the last N windows (Stream C)](./2026-05-14-terminal-cluster-label-mode.md) |
 | 2026-05-14 | Accepted | [Cluster-count auto-selection: drop PyPI-target language from ADR 0008](./2026-05-14-no-pypi-plan.md) |
 | 2026-05-14 | Accepted | [Narrow `cluster_count_max` heuristic default from 20 to 12](./2026-05-14-cluster-count-max-default.md) |
-| 2026-05-14 | Proposed | [WSS-elbow algorithm — options for replacing the marginal-decrease fallback](./2026-05-14-wss-elbow-algorithm-options.md) |
+| 2026-05-14 | Superseded | [WSS-elbow algorithm — options for replacing the marginal-decrease fallback](./2026-05-14-wss-elbow-algorithm-options.md) (Option 5 chosen — see entry above) |
 | 2026-05-14 | Accepted | [Phase 5 — two-stage Leiden + Ward clustering session log (v0.6.0)](./2026-05-14-phase-5-session.md) |
 | 2026-05-14 | Accepted | [Decision-log system established](./2026-05-14-decision-log-system.md) |
 

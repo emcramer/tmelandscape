@@ -165,10 +165,17 @@ Deferred (out of v0.7.0; tracked in STATUS):
 
 ## Phase 7 — Release hardening (v1.0.0) — NEXT
 
-- [ ] `pytest -m real` green against the three Zenodo-fetched sim_xxx directories
-- [ ] mkdocs published to GitHub Pages
-- [ ] PyPI release via trusted publisher
-- [ ] Zenodo DOI for the software + updated CITATION.cff
+Per [decision log: no PyPI ever](decisions/2026-05-14-no-pypi-ever.md),
+the package is distributed via git only. Zenodo deposit is at Eric's
+discretion — he uploads a snapshot when ready ("when the package is
+done, I may upload the first completed version that I am satisfied
+with or that gets included in a publication to Zenodo"). v1.0 is the
+hardening milestone, not a publishing event.
+
+- [ ] `pytest -m real` green against the three Zenodo-fetched sim_xxx directories.
+- [ ] `mkdocs` published to GitHub Pages.
+- [ ] Documentation up-to-date and tracked with git (standing practice).
+- [ ] CITATION.cff kept current; ready for an owner-triggered Zenodo deposit.
 
 ## Beyond v1.0 (deferred — not v1)
 

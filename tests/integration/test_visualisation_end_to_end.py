@@ -384,7 +384,12 @@ def test_cli_viz_figures_list_matches_mcp_tool() -> None:
     assert cli_catalogue == mcp_catalogue
 
 
-def test_list_viz_figures_covers_all_ten_figure_tools() -> None:
+def test_list_viz_figures_covers_all_figure_tools() -> None:
+    """Catalogue covers every figure-producing MCP tool by name.
+
+    11 tools as of v0.7.1: the 10 from v0.7.0 plus the LCSS-1
+    schematic generator added in v0.7.1.
+    """
     catalogue = list_viz_figures_tool()
     names = {entry["tool_name"] for entry in catalogue}
     assert names == {
@@ -398,4 +403,70 @@ def test_list_viz_figures_covers_all_ten_figure_tools() -> None:
         "plot_phase_space_vector_field",
         "plot_parameter_by_state",
         "plot_attractor_basins",
+        "plot_model_schematic",
     }
+
+
+def test_plot_model_schematic_api_matches_mcp_tool(tmp_path: Path) -> None:
+    """LCSS-1 — Python API and MCP tool produce equivalent PNG bytes.
+
+    The schematic generator takes a model description (cell types +
+    interactions) rather than a cluster Zarr, so this test is
+    self-contained (no fixture dependency).
+    """
+    from tmelandscape.mcp.tools import plot_model_schematic_tool
+    from tmelandscape.viz.model_schematic import (
+        CellType,
+        Interaction,
+        plot_model_schematic,
+    )
+
+    cells = [
+        CellType(name="tumour", color="#d62728", category="malignant"),
+        CellType(name="CD8_Teff", color="#2ca02c", category="immune"),
+        CellType(name="CD8_Tex", color="#7f7f7f", category="immune"),
+    ]
+    interactions = [
+        Interaction(source="CD8_Teff", target="tumour", kind="inhibits"),
+        Interaction(source="tumour", target="CD8_Teff", kind="inhibits"),
+        Interaction(source="CD8_Teff", target="CD8_Tex", kind="transitions_to"),
+    ]
+
+    api_out = tmp_path / "api.png"
+    mcp_out = tmp_path / "mcp.png"
+
+    plot_model_schematic(cells, interactions, save_path=api_out)
+
+    cell_dicts = [{"name": c.name, "color": c.color, "category": c.category} for c in cells]
+    interaction_dicts = [
+        {"source": i.source, "target": i.target, "kind": i.kind, "label": i.label}
+        for i in interactions
+    ]
+    result = plot_model_schematic_tool(
+        cell_dicts,
+        interaction_dicts,
+        str(mcp_out),
+    )
+
+    assert api_out.is_file()
+    assert mcp_out.is_file()
+    assert Path(result["save_path"]) == mcp_out.resolve()
+    assert result["figure_tag"] == "lcss-1"
+    assert _png_sha256(api_out) == _png_sha256(mcp_out)
+
+
+def test_plot_model_schematic_svg_round_trip(tmp_path: Path) -> None:
+    """The schematic supports SVG output via matplotlib's extension dispatch."""
+    from tmelandscape.viz.model_schematic import (
+        CellType,
+        Interaction,
+        plot_model_schematic,
+    )
+
+    cells = [CellType(name="A"), CellType(name="B")]
+    interactions = [Interaction(source="A", target="B", kind="promotes")]
+    out = tmp_path / "schematic.svg"
+    plot_model_schematic(cells, interactions, save_path=out)
+    assert out.is_file()
+    head = out.read_bytes()[:64].lstrip()
+    assert head.startswith(b"<?xml") or head.startswith(b"<svg ")

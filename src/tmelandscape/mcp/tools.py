@@ -37,6 +37,11 @@ from tmelandscape.viz.embedding import (
     plot_time_umap,
     plot_trajectory_umap,
 )
+from tmelandscape.viz.model_schematic import (
+    CellType,
+    Interaction,
+    plot_model_schematic,
+)
 from tmelandscape.viz.trajectories import (
     plot_state_feature_clustermap,
     plot_trajectory_clustergram,
@@ -680,6 +685,68 @@ def plot_parameter_by_state_tool(
     )
 
 
+def plot_model_schematic_tool(
+    cell_types: list[str | dict[str, Any]],
+    interactions: list[dict[str, Any]],
+    save_path: str,
+    *,
+    layout: str = "circular",
+    color_palette: list[str] | None = None,
+    node_radius: float = 0.15,
+) -> dict[str, Any]:
+    """LCSS-1 (generalised) — render a programmatic schematic of any
+    user-supplied ABM.
+
+    Nodes are cell types (coloured circles + labels); edges are typed
+    interactions (``"promotes"``, ``"inhibits"``, ``"transitions_to"``,
+    ``"secretes"``). Per `decision log
+    2026-05-14-lcss-1-schematic-in-scope.md`, the figure is generic
+    across any model — pass any cell-type list + interaction list, not
+    just the LCSS paper's specific TME ABM.
+
+    Parameters
+    ----------
+    cell_types
+        List of cell-type descriptors. Each entry is either a string
+        (bare name; auto-coloured) or a dict ``{"name": str, "color":
+        str | None, "category": str | None}``.
+    interactions
+        List of interaction descriptors. Each entry is a dict
+        ``{"source": str, "target": str, "kind": str, "label": str | None}``
+        where ``kind`` is one of ``"promotes"``, ``"inhibits"``,
+        ``"transitions_to"``, ``"secretes"``.
+    save_path
+        Output path. ``.svg`` ⇒ vector; ``.png`` ⇒ raster. matplotlib's
+        extension dispatch selects the format.
+    layout, color_palette, node_radius
+        Forwarded to :func:`tmelandscape.viz.model_schematic.plot_model_schematic`.
+    """
+    cells: list[str | CellType] = [c if isinstance(c, str) else CellType(**c) for c in cell_types]
+    edges = [Interaction(**i) for i in interactions]
+    plot_model_schematic(
+        cells,
+        edges,
+        layout=layout,  # type: ignore[arg-type]
+        color_palette=color_palette,
+        node_radius=node_radius,
+        save_path=save_path,
+    )
+    return _viz_summary(
+        save_path,
+        "lcss-1",
+        manuscript="LCSS",
+        description=(
+            "programmatic ABM model schematic — coloured nodes for cell "
+            "types and typed arrows for interactions"
+        ),
+        extra={
+            "n_cell_types": len(cell_types),
+            "n_interactions": len(interactions),
+            "layout": layout,
+        },
+    )
+
+
 def plot_attractor_basins_tool(
     cluster_zarr: str,
     save_path: str,
@@ -802,6 +869,18 @@ def list_viz_figures_tool() -> list[dict[str, str]]:
             "description": (
                 "2D parameter-space scatter coloured by terminal cluster "
                 "with kNN decision-boundary regions"
+            ),
+        },
+        {
+            "tool_name": "plot_model_schematic",
+            "figure_tag": "lcss-1",
+            "manuscript": "LCSS",
+            "description": (
+                "programmatic ABM schematic: coloured nodes for cell types "
+                "and typed arrows for interactions (promotes / inhibits / "
+                "transitions_to / secretes). Generic across any user-supplied "
+                "model, not just the LCSS paper's. Output supports both PNG "
+                "and SVG via the save_path extension."
             ),
         },
     ]

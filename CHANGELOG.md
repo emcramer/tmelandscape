@@ -2,6 +2,59 @@
 
 All notable changes to `tmelandscape`. Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The project follows SemVer pre-1.0 (breaking changes are allowed on minor bumps but called out below).
 
+## [0.7.1] — 2026-05-14 — WSS-elbow Option 5 + LCSS-1 schematic generator
+
+Three owner directives received after v0.7.0; all three resolved in
+this release. See [v0.7.1 session log](docs/development/decisions/2026-05-14-v0-7-1-session.md).
+
+### Added
+
+- **Three new `cluster_count_metric` options** (WSS-elbow Option 5 per
+  [decision log](docs/development/decisions/2026-05-14-wss-elbow-option-5-accepted.md)):
+  - `wss_lmethod` — Salvador & Chan 2004 L-method (two-linear-fit knee detection).
+  - `wss_asymptote_fit` — exponential decay fit; pick smallest k whose remaining distance to the fitted asymptote ≤ 0.1 (90%-of-reduction).
+  - `wss_variance_explained` — smallest k whose `1 − WSS(k)/WSS(k_min)` reaches 0.85.
+  - Existing `wss_elbow` / `calinski_harabasz` / `silhouette` are unchanged. `ClusterConfig.cluster_count_metric` Literal grows from 3 → 6 options. The four `wss_*` metrics share the WSS computation; only the chosen-k extraction differs.
+- **`tmelandscape.viz.model_schematic`** — new module shipping a programmatic ABM schematic generator (`plot_model_schematic`). Renders coloured-circle nodes (cell types) with text labels and typed arrows (`promotes` / `inhibits` / `transitions_to` / `secretes`) from a user-supplied model description. **Generic across any ABM**, not just the LCSS paper's TME model — see [decision log](docs/development/decisions/2026-05-14-lcss-1-schematic-in-scope.md). Output supports PNG (raster) and SVG (vector) via matplotlib's extension dispatch. Reproduces LCSS Figure 1 conceptually (the original "ships as a static SVG asset" plan is retired).
+- **`CellType` + `Interaction` dataclasses** (both `frozen=True`) in `viz.model_schematic`.
+- **MCP tool `plot_model_schematic_tool`** registered on the server. **Total MCP tool count: 22 → 23.** `list_viz_figures` catalogue extended with the LCSS-1 entry.
+- **2 new integration tests** for schematic Python-API ↔ MCP equivalence (PNG byte-equality + SVG round-trip).
+- **28 new unit tests** total (9 across the three new WSS metrics + 19 for the schematic generator).
+- **Four new decision-log entries**: WSS-elbow Option 5 accepted, LCSS-1 in scope, no PyPI ever, v0.7.1 session log.
+
+### Changed
+
+- **`SelectionResult.metric` docstring** updated to list all six metric values (was: three).
+- **`tests/unit/test_cluster_config.py` `cluster_count_metric` parametrize** extended from 3 → 6 options (renamed `test_all_three_options_accepted` → `test_all_six_options_accepted`).
+- **`networkx.*` added to `pyproject.toml [[tool.mypy.overrides]]`**; per-import `# type: ignore[import-untyped]` stripped from `viz/model_schematic.py` (same centralisation pattern as seaborn in v0.7.0).
+- **ADR 0010 amended** to enumerate all six metrics and reference the Option-5 decision log.
+- **ROADMAP Phase 7** simplified — PyPI publishing line removed; Zenodo deposit framed as owner-discretion rather than a phase-completion gate. See [decision log](docs/development/decisions/2026-05-14-no-pypi-ever.md).
+- **`docs/concepts/cluster.md`** and **`docs/concepts/viz.md`** updated to reflect both new feature sets.
+- **`tasks/07-visualisation-implementation.md`** marks LCSS-1 as in-scope; the figure catalogue table gains an LCSS-1 row.
+
+### Reviewer findings applied (buddy-pair team)
+
+- A2 SMELL: `SelectionResult.metric` docstring (cosmetic — listed only 3 metrics post-Option-5).
+- A2 SMELL: extend `test_cluster_config.py`'s `cluster_count_metric` parametrize to all six options.
+- A2 R2: inline comment in `_asymptote_fit_knee` documenting the `denom = max(..., 1e-12)` degenerate-fit behaviour.
+- B2 SMELL: centralised `networkx.*` in mypy overrides; stripped the inline ignore.
+
+### Deferred to v0.7.x (none blocking)
+
+- Reciprocal-edge curvature in `plot_model_schematic` (overlapping arrows when A↔B both have edges).
+- Self-loop endcap geometry polish.
+- `arrow_style` public type widening (`dict[str, dict[str, str]]` → `dict[str, dict[str, Any]]`).
+- `_data_radius_to_points` snapshot-at-call-time concern.
+- Theoretical non-monotone-WSS risk on the `wss_asymptote_fit` and `wss_variance_explained` argmax (real Ward-WSS curves are monotone).
+
+### Verification snapshot
+
+- `uv run pytest -q` — 487 passed, 1 deselected.
+- `uv run ruff check .` / `uv run ruff format --check .` / `uv run mypy src` — clean.
+- `uv run mkdocs build --strict` — exit 0.
+- `tmelandscape version` — prints `0.7.1`.
+- `tmelandscape-mcp` — boots; **23 tools registered**.
+
 ## [0.7.0] — 2026-05-14 — Phase 6: visualisation (LCSS + TNBC manuscript figures)
 
 ### Added
@@ -214,6 +267,7 @@ This release implements the project owner's directive that *the user* picks whic
 - CI workflows (lint + type + tests on macOS + Linux × Python 3.11 + 3.12); docs deploy workflow.
 - `scripts/fetch_example_data.py` for Zenodo-backed example PhysiCell sims.
 
+[0.7.1]: https://github.com/emcramer/tmelandscape/releases/tag/v0.7.1
 [0.7.0]: https://github.com/emcramer/tmelandscape/releases/tag/v0.7.0
 [0.6.1]: https://github.com/emcramer/tmelandscape/releases/tag/v0.6.1
 [0.6.0]: https://github.com/emcramer/tmelandscape/releases/tag/v0.6.0
