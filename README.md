@@ -2,7 +2,7 @@
 
 [![License: BSD-3-Clause](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](LICENSE)
 
-**tmelandscape** generates tumor microenvironment (TME) state landscapes from agent-based model (ABM) simulation ensembles. It implements the parameter sampling, spatial-statistic summarisation, time-delay embedding, and clustering steps of the trajectory-landscape pipeline described in EM. Cramer, LM. Heiser and YH. Chang, "Trajectory Landscapes for Therapeutic Strategy Design in Agent-Based Tumor Microenvironment Models," in _IEEE Control Systems Letters_, doi: 10.1109/LCSYS.2026.3697136.
+**tmelandscape** generates tumor microenvironment (TME) state landscapes from agent-based model (ABM) simulation ensembles. It implements the parameter sampling, spatial-statistic summarisation, time-delay embedding, and clustering steps of the trajectory-landscape pipeline described in EM. Cramer, LM. Heiser and YH. Chang, "Trajectory Landscapes for Therapeutic Strategy Design in Agent-Based Tumor Microenvironment Models," in _IEEE Control Systems Letters_, [doi: 10.1109/LCSYS.2026.3697136](<https://doi.org/10.1109/LCSYS.2026.3697136>).
 
 > **Status:** pre-alpha (v0.0.1). API is not yet stable.
 
