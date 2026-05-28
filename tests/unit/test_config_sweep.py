@@ -5,11 +5,23 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from tmelandscape.config.sweep import ParameterSpec, SweepConfig
+from tmelandscape.config.sweep import (
+    IcSourceOwnData,
+    IcSourceStructured,
+    ParameterSpec,
+    SAParams,
+    SweepConfig,
+)
+
+_STUB_SOURCE_CSV = "tests/data/ic_source_structured.csv"
 
 
 def _valid_param() -> ParameterSpec:
     return ParameterSpec(name="oxygen_uptake", low=0.1, high=2.0)
+
+
+def _valid_ic_source() -> IcSourceOwnData:
+    return IcSourceOwnData(source_csv=_STUB_SOURCE_CSV)
 
 
 def _valid_config() -> SweepConfig:
@@ -18,6 +30,7 @@ def _valid_config() -> SweepConfig:
         n_parameter_samples=8,
         n_initial_conditions=2,
         seed=42,
+        ic_source=_valid_ic_source(),
     )
 
 
@@ -74,6 +87,7 @@ class TestSweepConfig:
                 n_parameter_samples=8,
                 n_initial_conditions=2,
                 seed=0,
+                ic_source=_valid_ic_source(),
             )
 
     def test_n_parameter_samples_must_be_positive(self) -> None:
@@ -83,6 +97,7 @@ class TestSweepConfig:
                 n_parameter_samples=0,
                 n_initial_conditions=2,
                 seed=0,
+                ic_source=_valid_ic_source(),
             )
         with pytest.raises(ValidationError):
             SweepConfig(
@@ -90,6 +105,7 @@ class TestSweepConfig:
                 n_parameter_samples=-1,
                 n_initial_conditions=2,
                 seed=0,
+                ic_source=_valid_ic_source(),
             )
 
     def test_n_initial_conditions_must_be_positive(self) -> None:
@@ -99,6 +115,7 @@ class TestSweepConfig:
                 n_parameter_samples=4,
                 n_initial_conditions=0,
                 seed=0,
+                ic_source=_valid_ic_source(),
             )
 
     def test_sampler_accepts_documented_backends(self) -> None:
@@ -108,6 +125,7 @@ class TestSweepConfig:
                 n_parameter_samples=4,
                 n_initial_conditions=2,
                 seed=0,
+                ic_source=_valid_ic_source(),
                 sampler=sampler,  # type: ignore[arg-type]
             )
             assert cfg.sampler == sampler
@@ -119,8 +137,73 @@ class TestSweepConfig:
                 n_parameter_samples=4,
                 n_initial_conditions=2,
                 seed=0,
+                ic_source=_valid_ic_source(),
                 sampler="random",  # type: ignore[arg-type]
             )
+
+
+class TestIcSource:
+    def test_ic_source_is_required(self) -> None:
+        with pytest.raises(ValidationError, match="ic_source"):
+            SweepConfig(  # type: ignore[call-arg]
+                parameters=[_valid_param()],
+                n_parameter_samples=4,
+                n_initial_conditions=2,
+                seed=0,
+            )
+
+    def test_own_data_mode_parses(self) -> None:
+        cfg = SweepConfig.model_validate(
+            {
+                "parameters": [{"name": "x", "low": 0.0, "high": 1.0}],
+                "n_parameter_samples": 4,
+                "n_initial_conditions": 2,
+                "seed": 0,
+                "ic_source": {"mode": "own_data", "source_csv": _STUB_SOURCE_CSV},
+            }
+        )
+        assert isinstance(cfg.ic_source, IcSourceOwnData)
+        assert cfg.ic_source.source_csv == _STUB_SOURCE_CSV
+
+    def test_structured_mode_parses_with_description(self) -> None:
+        cfg = SweepConfig.model_validate(
+            {
+                "parameters": [{"name": "x", "low": 0.0, "high": 1.0}],
+                "n_parameter_samples": 4,
+                "n_initial_conditions": 2,
+                "seed": 0,
+                "ic_source": {
+                    "mode": "structured",
+                    "source_csv": _STUB_SOURCE_CSV,
+                    "description": "tumor disc + CD8 annulus",
+                },
+            }
+        )
+        assert isinstance(cfg.ic_source, IcSourceStructured)
+        assert cfg.ic_source.description == "tumor disc + CD8 annulus"
+
+    def test_unknown_mode_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            SweepConfig.model_validate(
+                {
+                    "parameters": [{"name": "x", "low": 0.0, "high": 1.0}],
+                    "n_parameter_samples": 4,
+                    "n_initial_conditions": 2,
+                    "seed": 0,
+                    "ic_source": {"mode": "made_up", "source_csv": _STUB_SOURCE_CSV},
+                }
+            )
+
+    def test_ic_defaults(self) -> None:
+        cfg = _valid_config()
+        assert cfg.ic_scaffold_strategy == "uniform_random"
+        assert cfg.ic_network_mode == "radius"
+        assert cfg.ic_network_radius_um is None
+        assert isinstance(cfg.ic_sa_params, SAParams)
+        assert cfg.ic_sa_params.initial_temp == 10.0
+        assert cfg.ic_sa_params.final_temp == 0.01
+        assert cfg.ic_sa_params.cooling_rate == 0.9997
+        assert cfg.ic_sa_params.max_iterations == 60_000
 
 
 class TestRoundTrip:
@@ -130,7 +213,7 @@ class TestRoundTrip:
         rebuilt = ParameterSpec.model_validate(dumped)
         assert rebuilt == original
 
-    def test_sweep_config_dict_round_trip(self) -> None:
+    def test_sweep_config_dict_round_trip_own_data(self) -> None:
         original = SweepConfig(
             parameters=[
                 ParameterSpec(name="oxygen_uptake", low=0.1, high=2.0),
@@ -140,6 +223,22 @@ class TestRoundTrip:
             n_initial_conditions=3,
             sampler="scipy-sobol",
             seed=7,
+            ic_source=IcSourceOwnData(source_csv=_STUB_SOURCE_CSV),
+        )
+        rebuilt = SweepConfig.model_validate(original.model_dump())
+        assert rebuilt == original
+
+    def test_sweep_config_dict_round_trip_structured(self) -> None:
+        original = SweepConfig(
+            parameters=[_valid_param()],
+            n_parameter_samples=4,
+            n_initial_conditions=2,
+            seed=0,
+            ic_source=IcSourceStructured(
+                source_csv=_STUB_SOURCE_CSV,
+                description="tumor disc",
+            ),
+            ic_network_radius_um=15.0,
         )
         rebuilt = SweepConfig.model_validate(original.model_dump())
         assert rebuilt == original

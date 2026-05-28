@@ -22,10 +22,18 @@ import pytest
 import xarray as xr
 
 import tmelandscape
-from tmelandscape.config.sweep import ParameterSpec, SweepConfig
+from tmelandscape.config.sweep import IcSourceOwnData, ParameterSpec, SweepConfig
 from tmelandscape.sampling.manifest import SweepManifest, SweepRow
 from tmelandscape.summarize.aggregate import build_ensemble_zarr
 from tmelandscape.summarize.schema import ENSEMBLE_DIMS, manifest_to_coords
+
+_STUB_IC_SOURCE = IcSourceOwnData(source_csv="tests/data/ic_source_structured.csv")
+_STUB_IC_ROW_KWARGS: dict[str, object] = {
+    "ic_scaffold_seed": 0,
+    "ic_sha256": "0" * 64,
+    "ic_sa_final_cost": 0.0,
+    "ic_achieved_proportions": {},
+}
 
 # --- fixture helpers ---------------------------------------------------------
 
@@ -40,6 +48,7 @@ def _build_manifest(n_param_combinations: int = 2, n_ic: int = 2) -> SweepManife
         n_parameter_samples=n_param_combinations,
         n_initial_conditions=n_ic,
         seed=42,
+        ic_source=_STUB_IC_SOURCE,
     )
     rows: list[SweepRow] = []
     for pc_id in range(n_param_combinations):
@@ -55,6 +64,7 @@ def _build_manifest(n_param_combinations: int = 2, n_ic: int = 2) -> SweepManife
                     ic_id=ic_id,
                     parameter_values={"oxygen_uptake": oxy, "cycle_rate": cyc},
                     ic_path=f"ic_{ic_id:03d}.csv",
+                    **_STUB_IC_ROW_KWARGS,
                 )
             )
     return SweepManifest(
@@ -182,6 +192,7 @@ def test_empty_manifest_produces_zero_sim_dim(tmp_path: Path) -> None:
         n_parameter_samples=1,
         n_initial_conditions=1,
         seed=0,
+        ic_source=_STUB_IC_SOURCE,
     )
     manifest = SweepManifest(config=config, initial_conditions_dir="ic", rows=[])
 
@@ -204,6 +215,7 @@ def test_ragged_timepoints_fill_with_nan(tmp_path: Path) -> None:
         n_parameter_samples=2,
         n_initial_conditions=1,
         seed=1,
+        ic_source=_STUB_IC_SOURCE,
     )
     manifest = SweepManifest(
         config=config,
@@ -215,6 +227,7 @@ def test_ragged_timepoints_fill_with_nan(tmp_path: Path) -> None:
                 ic_id=0,
                 parameter_values={"alpha": 0.1},
                 ic_path="ic_000.csv",
+                **_STUB_IC_ROW_KWARGS,
             ),
             SweepRow(
                 simulation_id="sim_B",
@@ -222,6 +235,7 @@ def test_ragged_timepoints_fill_with_nan(tmp_path: Path) -> None:
                 ic_id=0,
                 parameter_values={"alpha": 0.9},
                 ic_path="ic_000.csv",
+                **_STUB_IC_ROW_KWARGS,
             ),
         ],
     )

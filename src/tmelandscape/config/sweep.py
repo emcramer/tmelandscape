@@ -8,7 +8,7 @@ the downstream sampling backends (``tmelandscape.sampling.lhs`` /
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_validator
 
@@ -42,6 +42,66 @@ class ParameterSpec(BaseModel):
         return self
 
 
+class SAParams(BaseModel):
+    """Simulated-annealing parameters forwarded to ``GraphColorizer.colorize``.
+
+    Defaults are tuned for the ~250-2000 node graphs produced by typical TME
+    source tissues; they converge in seconds to a minute on those scales.
+    """
+
+    initial_temp: float = 10.0
+    final_temp: float = 0.01
+    cooling_rate: float = 0.9997
+    max_iterations: int = 60_000
+
+
+class IcSourceOwnData(BaseModel):
+    """Mode A — target statistics from a user-supplied tissue."""
+
+    mode: Literal["own_data"] = "own_data"
+    source_csv: str = Field(
+        ...,
+        description=(
+            "Path to a typed-coordinate CSV with columns "
+            "``x, y, z, radius, cell_type, is_boundary`` (the schema produced "
+            "by ``tissue_simulator.TissueSection.export_to_csv``)."
+        ),
+    )
+
+
+class IcSourceStructured(BaseModel):
+    """Mode B — target statistics from a user-described structured tissue.
+
+    The skill / agent realizes the description into a typed-coordinate CSV
+    upstream (e.g. via PhysiCell ``place_initial_cells``); the wrapper sees the
+    same shape as Mode A — just a typed CSV — and records the mode and the
+    user's description for manifest provenance.
+    """
+
+    mode: Literal["structured"] = "structured"
+    source_csv: str = Field(
+        ...,
+        description=(
+            "Path to a typed-coordinate CSV with columns "
+            "``x, y, z, radius, cell_type, is_boundary``. The agent generates "
+            "this upstream from a user-supplied spatial description."
+        ),
+    )
+    description: str = Field(
+        default="",
+        description=(
+            "Free-text spatial-configuration description provided by the user "
+            "upstream. Stored for manifest provenance; not interpreted here."
+        ),
+    )
+
+
+IcSource = Annotated[
+    IcSourceOwnData | IcSourceStructured,
+    Field(discriminator="mode"),
+]
+
+
 class SweepConfig(BaseModel):
     """Top-level config for ``generate_sweep``."""
 
@@ -60,4 +120,25 @@ class SweepConfig(BaseModel):
     seed: int = Field(
         ...,
         description="RNG seed. Drives both parameter sampling and IC replicate generation.",
+    )
+    ic_source: IcSource = Field(
+        ...,
+        description=(
+            "Source of target statistics for IC generation. Discriminated by "
+            "``mode``: ``own_data`` (user-supplied typed CSV) or "
+            "``structured`` (agent-described structured tissue realized to a "
+            "typed CSV upstream)."
+        ),
+    )
+    ic_scaffold_strategy: Literal["uniform_random", "perturb_source"] = "uniform_random"
+    ic_sa_params: SAParams = Field(default_factory=SAParams)
+    ic_network_mode: Literal["contact", "radius"] = "radius"
+    ic_network_radius_um: float | None = Field(
+        default=None,
+        description=(
+            "Edge-cutoff distance in micrometres for ``ic_network_mode='radius'``. "
+            "When None (default), resolved at call time to "
+            "``2.5 * max(source cell radius)`` — less sensitive to scaffold-vs-"
+            "source packing-density variation than ``contact`` mode."
+        ),
     )

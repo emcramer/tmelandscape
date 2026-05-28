@@ -26,6 +26,11 @@ import tmelandscape
 from tmelandscape.config.sweep import SweepConfig
 
 
+def _proportions_to_json(props: dict[str, float]) -> str:
+    """Serialise a per-type proportion dict with stable key order."""
+    return json.dumps(props, sort_keys=True)
+
+
 def _default_version() -> str:
     return tmelandscape.__version__
 
@@ -44,6 +49,28 @@ class SweepRow(BaseModel):
     ic_path: str = Field(
         ...,
         description="Relative path to the IC csv file (under initial_conditions_dir).",
+    )
+    ic_scaffold_seed: int = Field(
+        ...,
+        description=(
+            "Per-replicate scaffold seed (spawned from SweepConfig.seed via "
+            "numpy.random.SeedSequence); reproduces the scaffold packing."
+        ),
+    )
+    ic_sha256: str = Field(
+        ...,
+        description="SHA-256 hex digest of the IC CSV bytes. Used for content-addressing.",
+    )
+    ic_sa_final_cost: float = Field(
+        ...,
+        description=(
+            "Final cost reported by GraphColorizer.colorize at the end of "
+            "simulated annealing. Lower = closer to source statistics."
+        ),
+    )
+    ic_achieved_proportions: dict[str, float] = Field(
+        ...,
+        description="Per-cell-type proportion achieved in the generated IC (sums to 1.0).",
     )
 
 
@@ -106,7 +133,9 @@ class SweepManifest(BaseModel):
 
         Every parameter named in :class:`SweepConfig` becomes its own float64
         column, guaranteeing a stable schema even when ``rows`` is empty or
-        when a particular row happens to omit a parameter.
+        when a particular row happens to omit a parameter. ``ic_achieved_proportions``
+        is JSON-encoded into ``ic_achieved_proportions_json`` so the schema
+        stays stable across sweeps with different cell-type vocabularies.
         """
         param_names = [p.name for p in self.config.parameters]
         columns: dict[str, list[Any]] = {
@@ -114,6 +143,12 @@ class SweepManifest(BaseModel):
             "parameter_combination_id": [r.parameter_combination_id for r in self.rows],
             "ic_id": [r.ic_id for r in self.rows],
             "ic_path": [r.ic_path for r in self.rows],
+            "ic_scaffold_seed": [r.ic_scaffold_seed for r in self.rows],
+            "ic_sha256": [r.ic_sha256 for r in self.rows],
+            "ic_sa_final_cost": [r.ic_sa_final_cost for r in self.rows],
+            "ic_achieved_proportions_json": [
+                _proportions_to_json(r.ic_achieved_proportions) for r in self.rows
+            ],
         }
         for name in param_names:
             columns[name] = [r.parameter_values.get(name) for r in self.rows]
@@ -124,6 +159,10 @@ class SweepManifest(BaseModel):
                 pa.field("parameter_combination_id", pa.int64()),
                 pa.field("ic_id", pa.int64()),
                 pa.field("ic_path", pa.string()),
+                pa.field("ic_scaffold_seed", pa.int64()),
+                pa.field("ic_sha256", pa.string()),
+                pa.field("ic_sa_final_cost", pa.float64()),
+                pa.field("ic_achieved_proportions_json", pa.string()),
                 *(pa.field(name, pa.float64()) for name in param_names),
             ]
         )
