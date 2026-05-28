@@ -2,6 +2,152 @@
 
 All notable changes to `tmelandscape`. Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The project follows SemVer pre-1.0 (breaking changes are allowed on minor bumps but called out below).
 
+## [0.8.0] — 2026-05-28 — Graph-coloring IC generation (breaking)
+
+Step 1 (`generate_sweep`) now produces per-replicate initial-condition CSVs
+that match a user-supplied typed source tissue in both per-type proportions
+and per-type-pair edge counts. The previous wrapper was a single-type
+plumbing stub built on `tissue_simulator.ReplicateGenerator` with a hardcoded
+400×400×20 µm tissue and one generic `"cell"` type — it ran no
+simulated-annealing type assignment and silently produced uniform-random
+output bearing no relation to the model's cell types or spatial structure.
+The rewrite uses the correct entry points (`load_tissue_from_csv`,
+`SpatialNetworkAnalyzer`, `GraphColorizer.colorize`) and threads scaffold
+strategy, SA schedule, and graph mode through `SweepConfig`.
+
+This is a **breaking change** under pre-1.0 SemVer: old `SweepConfig` JSONs
+and old `SweepManifest` JSONs do not validate (the new fields are
+required). There is no migration shim. See "Migration" below.
+
+### Added
+
+- **`SweepConfig.ic_source`** (required) — discriminated union of
+  `IcSourceOwnData` (mode A: user's typed CSV) and `IcSourceStructured`
+  (mode B: agent-described tissue realized to a typed CSV upstream).
+  Both modes end in a single typed-coordinate CSV; the `mode` field exists
+  for manifest provenance. The upstream `/tme-landscape` skill flow is
+  responsible for producing the structured CSV.
+- **`SweepConfig.ic_scaffold_strategy`** — `"uniform_random"` (default) or
+  `"perturb_source"`. The latter copies source positions and jitters by
+  `Normal(0, 0.5 * min_radius)`; useful for preserving source morphology.
+- **`SweepConfig.ic_sa_params`** (`SAParams` model) — `initial_temp=10.0`,
+  `final_temp=0.01`, `cooling_rate=0.9997`, `max_iterations=60_000`.
+  Tuned empirically against ~250–2000 node TME graphs.
+- **`SweepConfig.ic_network_mode`** (default `"radius"`) and
+  **`ic_network_radius_um`** (default `None` ⇒ `2.5 * max(source cell radius)`
+  at call time).
+- **`SweepRow.ic_scaffold_seed`** — deterministic per-replicate seed
+  (spawned from `SweepConfig.seed` via `numpy.random.SeedSequence`).
+- **`SweepRow.ic_sha256`** — SHA-256 hex digest of the IC CSV bytes.
+  Lets the downstream content-addressing layer in `llm_abm_landscapes`
+  verify byte-level reproducibility without a post-hoc walk of the
+  manifest's IC directory.
+- **`SweepRow.ic_sa_final_cost`** — diagnostic; cost of the SA solution
+  on the matched-N scaffold graph.
+- **`SweepRow.ic_achieved_proportions`** — per-type proportion realized
+  in the generated IC.
+- **`IcGenResult`** dataclass — return type of
+  `generate_initial_conditions`, carrying the five diagnostics above per
+  replicate so the orchestrator does not re-read the CSV.
+- **Parquet sidecar columns** — `ic_scaffold_seed: int64`,
+  `ic_sha256: string`, `ic_sa_final_cost: float64`, and a JSON-encoded
+  `ic_achieved_proportions_json: string` (kept as JSON so the schema stays
+  stable across sweeps with different cell-type vocabularies).
+- **Static test fixture** `tests/data/ic_source_structured.csv` — a
+  30-cell hand-rolled tumor-disc / fibroblast-ring / CD8-annulus tissue
+  with CD8↔tumor edges = 0 under the default radius graph; used by every
+  `tests/unit/test_sampling_tissue_init.py` test.
+- **`tests/integration/conftest.py`** — session-scoped fixture
+  `structured_source_csv` that builds a ~30-cell ringed source tissue via
+  `tissue_simulator.TissueSection.generate_cells` at a fixed seed.
+
+### Changed
+
+- **`tissue_simulator` dependency** pinned to **v0.1.9** (was v0.1.4).
+  v0.1.9 ships explicit `seed=` on `TissueSection` / `SpherePacker` /
+  `GraphColorizer`, so the previous
+  `tissue_simulator.{packing,tissue}.np.random.default_rng` monkey-patch
+  is gone. v0.1.9 also exposes `GraphColorizer`, `SpatialNetworkAnalyzer`,
+  and `load_tissue_from_csv` — the symbols this rewrite needs.
+- **`generate_initial_conditions` signature** rewritten:
+  - **Added** `source_csv`, `scaffold_strategy`, `sa_params`,
+    `network_mode`, `network_radius_um`.
+  - **Removed** `target_n_cells`, `cell_radii_um`, `tissue_dims_um`,
+    `similarity_tolerance` (all physical parameters now come from the
+    source CSV per acceptance criterion #4 of the spec).
+  - **Return type** changed from `list[Path]` to `list[IcGenResult]`.
+
+### Removed (breaking)
+
+- **`generate_sweep` kwargs** `target_n_cells`, `cell_radii_um`,
+  `tissue_dims_um`, `similarity_tolerance` — geometry comes from
+  `config.ic_source.source_csv` now.
+- **MCP `generate_sweep_tool` kwargs** `target_n_cells`,
+  `similarity_tolerance`.
+- **CLI `tmelandscape sample` flags** `--target-n-cells` and
+  `--similarity-tolerance`. The CLI now exposes only `--manifest-out`
+  and `--ic-dir`; all IC knobs live on the JSON config.
+- **`_seeded_default_rng_factory`** and the `ExitStack` /
+  `patch.object` block in `tissue_init.py` — no longer needed now that
+  upstream honours explicit seeds.
+
+### Migration
+
+Adding `ic_source` (required) to every `SweepConfig` JSON is the minimum
+to load an existing config under v0.8.0. Both shapes are valid:
+
+```json
+{
+  "mode": "own_data",
+  "source_csv": "/abs/path/to/your_tissue.csv"
+}
+```
+
+```json
+{
+  "mode": "structured",
+  "source_csv": "/abs/path/to/agent_realised_tissue.csv",
+  "description": "tumor disc + fibroblast ring + CD8 annulus"
+}
+```
+
+Old `SweepManifest` JSONs cannot be loaded; they lack the four new
+`SweepRow` fields. Regenerate them by re-running step 1 against the same
+config (with `ic_source` added).
+
+### Verification snapshot
+
+- `uv run pytest tests/unit tests/integration -q` — **499 passed**
+  (459 unit + 40 integration).
+- End-to-end smoke on the static fixture: per-replicate proportions match
+  source exactly (10 tumor / 12 fibroblast / 8 CD8 → 10/12/8); per-IC
+  CD8↔tumor edges = 0 under `scaffold_strategy="perturb_source"`.
+- Same `(config, seed, source_csv)` produces byte-identical CSVs (same
+  `ic_sha256`) — verified against v0.1.9 `GraphColorizer.seed=`.
+
+### Acceptance criteria coverage (from spec)
+
+1. Multi-type structured source ⇒ matched proportions and preserved
+   CD8↔tumor exclusion: ✅ (`test_proportions_match_source_exactly`,
+   `test_cd8_tumor_edge_fraction_preserved_with_perturb_source`).
+2. Reproducibility: ✅ (`test_same_seed_yields_identical_csvs`).
+3. Manifest carries `ic_sha256` per row: ✅ (parquet test +
+   integration test).
+4. No hardcoded cell type or default dims: ✅ (geometry from source CSV).
+5. MCP `generate_sweep` round-trips new config fields: ✅
+   (`test_mcp_tool_matches_python_api`).
+6. Existing tests pass with extensions for the new fields: ✅
+   (`test_config_sweep.py` round-trip + discriminator dispatch).
+
+### Out of scope (per spec, restated)
+
+- Generation of the structured source CSV upstream (skill flow +
+  PhysiCell `place_initial_cells`).
+- `/tme-landscape` skill prompts for `ic_source` mode and source path.
+- Content-addressing layer (`model_hash` / `sweep_hash` / per-IC
+  `sha256` binding) — lives in `llm_abm_landscapes`. This release just
+  emits `ic_sha256` per row.
+
 ## [0.7.1] — 2026-05-14 — WSS-elbow Option 5 + LCSS-1 schematic generator
 
 Three owner directives received after v0.7.0; all three resolved in

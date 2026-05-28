@@ -17,13 +17,21 @@ from typer.testing import CliRunner
 
 from tmelandscape.cli.main import app
 from tmelandscape.config.summarize import SummarizeConfig
-from tmelandscape.config.sweep import ParameterSpec, SweepConfig
+from tmelandscape.config.sweep import IcSourceOwnData, ParameterSpec, SweepConfig
 from tmelandscape.mcp.tools import summarize_ensemble_tool
 from tmelandscape.sampling.manifest import SweepManifest, SweepRow
 from tmelandscape.summarize import summarize_ensemble
 
 FIXTURE_DIR = Path(__file__).resolve().parent.parent / "data" / "synthetic_physicell"
 SIM_IDS = ("sim_000000_ic_000", "sim_000001_ic_000", "sim_000002_ic_000")
+
+_STUB_IC_SOURCE = IcSourceOwnData(source_csv="tests/data/ic_source_structured.csv")
+_STUB_IC_ROW_KWARGS: dict[str, object] = {
+    "ic_scaffold_seed": 0,
+    "ic_sha256": "0" * 64,
+    "ic_sa_final_cost": 0.0,
+    "ic_achieved_proportions": {},
+}
 
 # Small, parameter-free panel — kept identical across all tests so api/CLI/MCP
 # results are comparable.
@@ -41,6 +49,7 @@ def _fixture_manifest(initial_conditions_dir: Path) -> SweepManifest:
         n_initial_conditions=1,
         sampler="pyDOE3",
         seed=20260513,
+        ic_source=_STUB_IC_SOURCE,
     )
     initial_conditions_dir.mkdir(parents=True, exist_ok=True)
     rows = [
@@ -50,6 +59,7 @@ def _fixture_manifest(initial_conditions_dir: Path) -> SweepManifest:
             ic_id=0,
             parameter_values={"r_exh": 10 ** -(2 + i), "r_adh": 1.0 + i},
             ic_path=f"ic_000{i}.csv",
+            **_STUB_IC_ROW_KWARGS,
         )
         for i, sim_id in enumerate(SIM_IDS)
     ]

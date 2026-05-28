@@ -78,10 +78,6 @@ def generate_sweep(
     config: SweepConfig,
     *,
     initial_conditions_dir: str | Path,
-    target_n_cells: int = 500,
-    cell_radii_um: tuple[float, float] = (8.0, 12.0),
-    tissue_dims_um: tuple[float, float, float] = (400.0, 400.0, 20.0),
-    similarity_tolerance: float = 0.10,
 ) -> SweepManifest:
     """Produce a :class:`SweepManifest` from a :class:`SweepConfig`.
 
@@ -92,7 +88,8 @@ def generate_sweep(
     2. Scale each column into ``[low, high]`` per the matching
        :class:`ParameterSpec` (``linear`` or ``log10`` scale).
     3. Generate ``config.n_initial_conditions`` replicate cell-position CSVs in
-       ``initial_conditions_dir`` via :func:`generate_initial_conditions`.
+       ``initial_conditions_dir`` via :func:`generate_initial_conditions`,
+       driven by ``config.ic_source.source_csv`` and the ``ic_*`` fields.
     4. Form the Cartesian product (parameter_combination, initial_condition) of
        size ``n_parameter_samples * n_initial_conditions`` and emit one
        :class:`SweepRow` per combination.
@@ -100,11 +97,11 @@ def generate_sweep(
     Parameters
     ----------
     config
-        Frozen sweep configuration.
+        Frozen sweep configuration. All IC-generation knobs live on the config
+        (``ic_source``, ``ic_scaffold_strategy``, ``ic_sa_params``,
+        ``ic_network_mode``, ``ic_network_radius_um``).
     initial_conditions_dir
         Directory to write IC CSVs into. Created if missing.
-    target_n_cells, cell_radii_um, tissue_dims_um, similarity_tolerance
-        Passed through to :func:`generate_initial_conditions`.
 
     Returns
     -------
@@ -131,28 +128,33 @@ def generate_sweep(
     )
     scaled = _scale(unit, config.parameters)
 
-    ic_paths = generate_initial_conditions(
+    ic_results = generate_initial_conditions(
         n_replicates=config.n_initial_conditions,
         output_dir=ic_dir,
         seed=config.seed,
-        target_n_cells=target_n_cells,
-        cell_radii_um=cell_radii_um,
-        tissue_dims_um=tissue_dims_um,
-        similarity_tolerance=similarity_tolerance,
+        source_csv=config.ic_source.source_csv,
+        scaffold_strategy=config.ic_scaffold_strategy,
+        sa_params=config.ic_sa_params,
+        network_mode=config.ic_network_mode,
+        network_radius_um=config.ic_network_radius_um,
     )
 
     rows: list[SweepRow] = []
     param_names = [p.name for p in config.parameters]
     for combo_id in range(config.n_parameter_samples):
         values = dict(zip(param_names, scaled[combo_id].tolist(), strict=True))
-        for ic_id, ic_path in enumerate(ic_paths):
+        for ic_id, ic in enumerate(ic_results):
             rows.append(
                 SweepRow(
                     simulation_id=f"sim_{combo_id:06d}_ic_{ic_id:03d}",
                     parameter_combination_id=combo_id,
                     ic_id=ic_id,
                     parameter_values=values,
-                    ic_path=ic_path.name,
+                    ic_path=ic.path.name,
+                    ic_scaffold_seed=ic.scaffold_seed,
+                    ic_sha256=ic.sha256,
+                    ic_sa_final_cost=ic.sa_final_cost,
+                    ic_achieved_proportions=ic.achieved_proportions,
                 )
             )
 

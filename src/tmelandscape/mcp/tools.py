@@ -53,23 +53,27 @@ def generate_sweep_tool(
     *,
     initial_conditions_dir: str,
     manifest_out: str,
-    target_n_cells: int = 500,
-    similarity_tolerance: float = 0.10,
 ) -> dict[str, Any]:
     """Generate a parameter-sweep manifest (step 1 of the pipeline).
+
+    All IC-generation knobs live on the config: ``ic_source`` (discriminated
+    union with ``mode`` ∈ ``{"own_data", "structured"}``, each carrying a
+    ``source_csv`` path), ``ic_scaffold_strategy``, ``ic_sa_params``,
+    ``ic_network_mode``, ``ic_network_radius_um``. Pass them as nested
+    dicts under ``config``.
 
     Parameters
     ----------
     config
         Serialised :class:`tmelandscape.config.sweep.SweepConfig` (JSON-like dict).
+        Must include ``ic_source`` — e.g.
+        ``{"mode": "structured", "source_csv": "/path/to/source.csv",
+        "description": "tumor disc + CD8 annulus"}`` or
+        ``{"mode": "own_data", "source_csv": "/path/to/source.csv"}``.
     initial_conditions_dir
         Directory to write initial-condition CSVs into. Created if missing.
     manifest_out
         Output manifest stem; ``.json`` and ``.parquet`` siblings are written.
-    target_n_cells
-        Soft target for cell count per replicate.
-    similarity_tolerance
-        Per-metric divergence tolerance between replicates (default 0.10 = 10%).
 
     Returns
     -------
@@ -80,8 +84,6 @@ def generate_sweep_tool(
     manifest = generate_sweep(
         sweep_cfg,
         initial_conditions_dir=initial_conditions_dir,
-        target_n_cells=target_n_cells,
-        similarity_tolerance=similarity_tolerance,
     )
     manifest.save(manifest_out)
     return {

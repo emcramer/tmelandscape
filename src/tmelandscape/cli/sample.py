@@ -2,6 +2,9 @@
 
 Reads a :class:`SweepConfig` from a JSON file and writes a
 :class:`SweepManifest` to disk along with the generated initial-condition CSVs.
+All IC-generation knobs (``ic_source``, ``ic_scaffold_strategy``,
+``ic_sa_params``, ``ic_network_mode``, ``ic_network_radius_um``) live on the
+JSON config — this command has no per-flag overrides for them by design.
 """
 
 from __future__ import annotations
@@ -43,22 +46,12 @@ def sample(
             help="Directory to write initial-condition CSVs into.",
         ),
     ] = Path("initial_conditions"),
-    target_n_cells: Annotated[
-        int,
-        typer.Option(help="Soft target for cell count per replicate."),
-    ] = 500,
-    similarity_tolerance: Annotated[
-        float,
-        typer.Option(help="Replicate similarity tolerance (per-metric divergence)."),
-    ] = 0.10,
 ) -> None:
     """Run step 1: parameter sampling + IC replicate generation."""
     config = SweepConfig.model_validate_json(config_path.read_text())
     manifest = generate_sweep(
         config,
         initial_conditions_dir=initial_conditions_dir,
-        target_n_cells=target_n_cells,
-        similarity_tolerance=similarity_tolerance,
     )
     manifest.save(manifest_out)
     summary = {

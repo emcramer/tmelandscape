@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "tmelandscape"
-version = "0.7.1"
+version = "0.8.0"
 description = "Generate tumor microenvironment state landscapes from agent-based model simulation ensembles."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -43,10 +43,12 @@ dependencies = [
     "leidenalg>=0.10",
     "python-igraph>=0.11",
     "networkx>=3.3",
-    # Initial-condition generation: replicates of cell starting positions
-    # with similar spatial statistics (~10% error per metric).
+    # Initial-condition generation: scaffold packing + simulated-annealing
+    # graph coloring against a user-supplied typed source CSV. Brings
+    # GraphColorizer, SpatialNetworkAnalyzer, and load_tissue_from_csv used
+    # by tmelandscape.sampling.tissue_init.
     # No PyPI release; installed from GitHub. Pinned to a tag per ADR 0008.
-    "tissue_simulator @ git+https://github.com/emcramer/tissue_simulator.git@v0.1.4",
+    "tissue_simulator @ git+https://github.com/emcramer/tissue_simulator.git@v0.1.9",
     # Spatial-statistic summarisation of PhysiCell outputs. No PyPI release;
     # pinned to a tag per ADR 0008. Brings native PhysiCell parser and the
     # StatisticsPanel registry used in Step 3 (Phase 3).

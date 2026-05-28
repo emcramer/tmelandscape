@@ -3849,8 +3849,8 @@ wheels = [
 
 [[package]]
 name = "tissue-simulator"
-version = "0.1.4"
-source = { git = "https://github.com/emcramer/tissue_simulator.git?rev=v0.1.4#ea8368671d857431b0d02aeee88533e5c4ab3b2a" }
+version = "0.1.9"
+source = { git = "https://github.com/emcramer/tissue_simulator.git?rev=v0.1.9#3a0d687b297346a0a8518525b09a481fe3a2abb0" }
 dependencies = [
     { name = "matplotlib" },
     { name = "networkx" },
@@ -3863,7 +3863,7 @@ dependencies = [
 
 [[package]]
 name = "tmelandscape"
-version = "0.7.1"
+version = "0.8.0"
 source = { editable = "." }
 dependencies = [
     { name = "dask", extra = ["array"] },
@@ -3965,7 +3965,7 @@ requires-dist = [
     { name = "seaborn", marker = "extra == 'viz'", specifier = ">=0.13" },
     { name = "spatialtissuepy", extras = ["network"], git = "https://github.com/emcramer/spatialtissuepy.git?rev=v0.0.1" },
     { name = "structlog", specifier = ">=24.1" },
-    { name = "tissue-simulator", git = "https://github.com/emcramer/tissue_simulator.git?rev=v0.1.4" },
+    { name = "tissue-simulator", git = "https://github.com/emcramer/tissue_simulator.git?rev=v0.1.9" },
     { name = "tmelandscape", extras = ["viz", "mcp", "dev", "docs"], marker = "extra == 'all'" },
     { name = "typer", specifier = ">=0.12" },
     { name = "umap-learn", marker = "extra == 'viz'", specifier = ">=0.5" },

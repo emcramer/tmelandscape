@@ -22,7 +22,7 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from tmelandscape.config.sweep import ParameterSpec, SweepConfig
+from tmelandscape.config.sweep import IcSourceOwnData, ParameterSpec, SweepConfig
 from tmelandscape.sampling.manifest import SweepManifest, SweepRow
 from tmelandscape.viz.dynamics import (
     plot_attractor_basins,
@@ -33,6 +33,14 @@ from tmelandscape.viz.dynamics import (
 # Force the non-interactive Agg backend so PNG-roundtrip tests work in any CI
 # environment (headless GitHub runners do not have a display).
 matplotlib.use("Agg", force=True)
+
+_STUB_IC_SOURCE = IcSourceOwnData(source_csv="tests/data/ic_source_structured.csv")
+_STUB_IC_ROW_KWARGS: dict[str, object] = {
+    "ic_scaffold_seed": 0,
+    "ic_sha256": "0" * 64,
+    "ic_sa_final_cost": 0.0,
+    "ic_achieved_proportions": {},
+}
 
 
 # -- fixtures ---------------------------------------------------------------
@@ -91,6 +99,7 @@ def _build_manifest(sim_ids: list[str], seed: int = 0) -> SweepManifest:
         n_parameter_samples=len(sim_ids),
         n_initial_conditions=1,
         seed=seed,
+        ic_source=_STUB_IC_SOURCE,
     )
     rng = np.random.default_rng(seed)
     rows = [
@@ -103,6 +112,7 @@ def _build_manifest(sim_ids: list[str], seed: int = 0) -> SweepManifest:
                 "beta": float(rng.uniform(0.0, 1.0)),
             },
             ic_path=f"ic_{i:03d}.csv",
+            **_STUB_IC_ROW_KWARGS,
         )
         for i, sid in enumerate(sim_ids)
     ]

@@ -20,9 +20,17 @@ import numpy as np
 import pytest
 import xarray as xr
 
-from tmelandscape.config.sweep import ParameterSpec, SweepConfig
+from tmelandscape.config.sweep import IcSourceOwnData, ParameterSpec, SweepConfig
 from tmelandscape.landscape import join_manifest_cluster
 from tmelandscape.sampling.manifest import SweepManifest, SweepRow
+
+_STUB_IC_SOURCE = IcSourceOwnData(source_csv="tests/data/ic_source_structured.csv")
+_STUB_IC_ROW_KWARGS: dict[str, object] = {
+    "ic_scaffold_seed": 0,
+    "ic_sha256": "0" * 64,
+    "ic_sa_final_cost": 0.0,
+    "ic_achieved_proportions": {},
+}
 
 
 def _build_manifest(sim_ids: list[str]) -> SweepManifest:
@@ -34,6 +42,7 @@ def _build_manifest(sim_ids: list[str]) -> SweepManifest:
         n_parameter_samples=len(sim_ids),
         n_initial_conditions=1,
         seed=0,
+        ic_source=_STUB_IC_SOURCE,
     )
     rows = [
         SweepRow(
@@ -42,6 +51,7 @@ def _build_manifest(sim_ids: list[str]) -> SweepManifest:
             ic_id=0,
             parameter_values={"alpha": 0.1 * i, "beta": 1.0 + i},
             ic_path=f"ic_{i:03d}.csv",
+            **_STUB_IC_ROW_KWARGS,
         )
         for i, sid in enumerate(sim_ids)
     ]

@@ -27,7 +27,7 @@ import xarray as xr
 from typer.testing import CliRunner
 
 from tmelandscape.cli.main import app
-from tmelandscape.config.sweep import ParameterSpec, SweepConfig
+from tmelandscape.config.sweep import IcSourceOwnData, ParameterSpec, SweepConfig
 from tmelandscape.mcp.tools import (
     list_viz_figures_tool,
     plot_attractor_basins_tool,
@@ -59,6 +59,14 @@ from tmelandscape.viz.trajectories import (
     plot_state_feature_clustermap,
     plot_trajectory_clustergram,
 )
+
+_STUB_IC_SOURCE = IcSourceOwnData(source_csv="tests/data/ic_source_structured.csv")
+_STUB_IC_ROW_KWARGS: dict[str, object] = {
+    "ic_scaffold_seed": 0,
+    "ic_sha256": "0" * 64,
+    "ic_sa_final_cost": 0.0,
+    "ic_achieved_proportions": {},
+}
 
 # `n_embedding_feature` must equal `window_size * n_statistic` so that
 # `plot_state_feature_clustermap`'s repeated-measure collapse can recover
@@ -161,6 +169,7 @@ def _build_manifest(path: Path, *, seed: int = 0) -> None:
         n_parameter_samples=_N_SIMS,
         n_initial_conditions=1,
         seed=seed,
+        ic_source=_STUB_IC_SOURCE,
     )
     rows = []
     for i in range(_N_SIMS):
@@ -174,6 +183,7 @@ def _build_manifest(path: Path, *, seed: int = 0) -> None:
                     "beta": float(np.linspace(0.2, 0.9, _N_SIMS)[i]),
                 },
                 ic_path=f"sim_{i:02d}.csv",
+                **_STUB_IC_ROW_KWARGS,
             )
         )
     manifest = SweepManifest(
