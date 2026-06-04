@@ -6,6 +6,22 @@ Pipeline-step tools land here phase-by-phase. v0.0.1 (Phase 0) only registers
 
 from __future__ import annotations
 
+# MCP tool calls are dispatched on FastMCP worker threads. On macOS,
+# matplotlib's default MacOSX backend requires the main thread and blows
+# up with "Cannot create a GUI FigureManager outside the main thread".
+# Every plot tool here is headless (writes to `save_path`), so force a
+# non-interactive backend before any module that imports matplotlib.
+# `setdefault` honours an operator-supplied MPLBACKEND (e.g. `pdf` / `svg`
+# for batch rendering); we then pass that resolved value to
+# `matplotlib.use(..., force=True)` so the override survives even if
+# another import has already initialised pyplot.
+import os
+
+os.environ.setdefault("MPLBACKEND", "Agg")
+import matplotlib
+
+matplotlib.use(os.environ["MPLBACKEND"], force=True)
+
 from typing import Any
 
 from fastmcp import FastMCP

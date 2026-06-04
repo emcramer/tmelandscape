@@ -32,3 +32,12 @@ def test_mcp_ping_returns_version() -> None:
     payload = ping()
     assert payload["status"] == "ok"
     assert payload["version"] == tmelandscape.__version__
+
+
+def test_mcp_server_forces_agg_backend() -> None:
+    """Importing the MCP server entry must pin matplotlib to Agg so plot
+    tools dispatched on FastMCP worker threads don't crash with the macOS
+    backend's main-thread requirement."""
+    import matplotlib
+
+    assert matplotlib.get_backend().lower() == "agg"
