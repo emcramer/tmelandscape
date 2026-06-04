@@ -2,6 +2,48 @@
 
 All notable changes to `tmelandscape`. Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The project follows SemVer pre-1.0 (breaking changes are allowed on minor bumps but called out below).
 
+## [0.8.1] — 2026-06-04 — Fix: MCP plot tools on macOS (Agg backend)
+
+### Fixed
+
+- **MCP plot tools no longer crash on macOS.** `tmelandscape-mcp` now
+  forces the `Agg` backend before any matplotlib import in
+  `tmelandscape.mcp.server`, so the 11 figure-producing tools (`plot_*`)
+  succeed when FastMCP dispatches them on worker threads. Previously, the
+  default `MacOSX` GUI backend required the main thread and raised
+  "Cannot create a GUI FigureManager outside the main thread..." on the
+  first `plt.figure()` call. Reproduced 2026-06-04 against v0.8.0 on
+  macOS 14.x while running the M00_S01_canary pipeline.
+
+### Unchanged (by design)
+
+- `tmelandscape.viz.*` modules contain no `matplotlib.use(...)` calls.
+  Direct Python callers (Jupyter, scripts) keep whatever backend they
+  chose. The fix is isolated to the MCP server entry.
+- Operator override is honoured: launching with
+  `MPLBACKEND=pdf tmelandscape-mcp` writes PDFs instead of PNGs, since
+  the server uses `os.environ.setdefault(...)` not a hard assignment.
+
+### Verification snapshot
+
+- `uv run pytest tests/unit tests/integration -q` — 500 passed (was 499;
+  the new `test_mcp_server_forces_agg_backend` adds one).
+- `uv run ruff check .` / `uv run ruff format --check .` /
+  `uv run mypy src` — clean.
+- `python -c "from tmelandscape.mcp.server import mcp; import matplotlib;
+  print(matplotlib.get_backend())"` — prints `agg`.
+
+### Known follow-ups (not addressed here)
+
+- `plot_state_feature_clustermap` still fails on Leiden cluster-mean
+  matrices that contain NaN entries (common when `*_by_type` spatial
+  statistics are computed on cell types that start at population 0 and
+  arise via transformations — e.g. M00's CD8 / M1 / M2 / exhausted-T).
+  Open follow-up: decide whether the figure function skips NaN rows /
+  columns automatically, emits a more actionable error, or whether
+  `summarize_ensemble` drops all-NaN stats upstream. Flagged by the
+  M00_S01_canary report; tracked separately.
+
 ## [0.8.0] — 2026-05-28 — Graph-coloring IC generation (breaking)
 
 Step 1 (`generate_sweep`) now produces per-replicate initial-condition CSVs
