@@ -2,6 +2,89 @@
 
 All notable changes to `tmelandscape`. Format loosely follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). The project follows SemVer pre-1.0 (breaking changes are allowed on minor bumps but called out below).
 
+## [0.8.2] — 2026-06-05 — Fix: NaN in `plot_state_feature_clustermap`
+
+Resolves the follow-up flagged in v0.8.1: `plot_state_feature_clustermap`
+no longer crashes on per-Leiden-cluster mean matrices that contain NaN
+entries. The fix is designed to preserve as much data as possible — drop
+only what is unrecoverable, keep partial-signal columns, and render the
+genuinely unknown cells as gray so the viewer can tell observation apart
+from imputation.
+
+### Fixed
+
+- **`plot_state_feature_clustermap` accepts a new `nan_policy` kwarg.**
+  Defaults to `"mask_impute"`: drop columns with no signal anywhere
+  (all-NaN across every Leiden cluster), impute remaining NaN cells with
+  the column median of finite values, and render them as gray via
+  `seaborn.clustermap`'s `mask=` argument. Alternatives: `"drop"` (drop
+  any column with one or more NaN cells; no imputation), `"raise"` (loud
+  error listing NaN-bearing statistic names for diagnostics).
+- **`_collapse_repeated_measures` now uses `np.nanmean`.** Previously a
+  single NaN in any window-repeat of a statistic propagated NaN through
+  the entire post-collapse cell; now it reflects the windows where the
+  statistic was observed.
+- **Single-column edge case handled.** When `nan_policy="drop"` reduces
+  the kept-statistic count to 1, the column dendrogram is skipped
+  (`col_cluster=False`) so seaborn's internal `scipy.pdist` doesn't fail
+  with "empty distance matrix".
+- **MCP tool surfaces the policy and diagnostics.** The tool's summary
+  dict gains `nan_policy: str`, `dropped_statistics: list[str]`, and
+  `imputed_cell_count: int` so the calling agent can see what the viz
+  decision did.
+
+### Hardened (defensive; no observable change for current pipelines)
+
+- **`cluster_ensemble` switches `.mean()` -> `np.nanmean()` for the
+  per-Leiden-cluster mean computation**, and drops all-NaN columns of
+  `leiden_cluster_means` before `scipy.spatial.distance.pdist` to keep
+  the Ward linkage finite. In the current code path, sklearn's
+  `kneighbors_graph` already rejects NaN-bearing embeddings before this
+  code runs, so these changes are no-ops; they harden future paths
+  (alternative clustering strategies, manually constructed cluster Zarrs
+  carrying NaN) without altering existing behaviour. Existing
+  `tests/unit/test_cluster_leiden_ward.py` tests pass unchanged.
+
+### NaN semantics (the rationale)
+
+In every observed source, NaN in this pipeline means *the statistic
+could not be computed because the underlying cells / interactions were
+not present* — a structural absence, not a low-sample noise estimate.
+`mean_nearest_neighbor_distance_by_type` returns NaN when `mask.sum() < 2`
+(can't compute pairwise NN with fewer than 2 cells). `cell_type_ratio`
+returns NaN when both numerator and denominator types are absent.
+`marker_statistics_by_type` produces NaN when the type's population is 0.
+The `summarize/aggregate.py` NaN-fill at line 107 marks the gap when a
+timepoint's panel didn't emit a statistic because the underlying cells
+weren't there.
+
+That semantic rules out zero-fill (claiming "neighbour distance is 0 µm"
+or "ratio is 0" when the cells don't exist is wrong) and any imputation
+that hides the absence. The numerical value placed in a masked cell is a
+*computational sentinel* needed only because seaborn cannot accept NaN;
+the gray mask is the truth-telling layer.
+
+### Unchanged (by design)
+
+- `summarize_ensemble` still emits NaN where a statistic can't be
+  computed (schema stability per ADR 0009 + intentional aggregator
+  NaN-fill).
+- `normalize_ensemble`'s `fill_nan_with` default of 0.0 still handles
+  fully-NaN columns. Operators who want NaN preserved through normalize
+  set it to NaN explicitly.
+- `tmelandscape.viz.*` stays backend-agnostic (per v0.8.1).
+
+### Verification snapshot
+
+- `uv run pytest tests/unit tests/integration -q` — 506 passed (was
+  500; 5 new viz NaN-policy tests + 1 new integration test).
+- `uv run ruff check .` / `uv run ruff format --check .` /
+  `uv run mypy src` — clean.
+- Manual end-to-end against M00_S01 canary cluster zarr:
+  `plot_state_feature_clustermap` produces a PNG with imputed cells
+  rendered gray; the MCP tool summary lists the dropped all-NaN
+  statistics and the imputed cell count.
+
 ## [0.8.1] — 2026-06-04 — Fix: MCP plot tools on macOS (Agg backend)
 
 ### Fixed

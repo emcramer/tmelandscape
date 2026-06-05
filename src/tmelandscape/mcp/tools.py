@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from tmelandscape.cluster import cluster_ensemble
 from tmelandscape.config.cluster import ClusterConfig
@@ -592,16 +592,40 @@ def plot_state_feature_clustermap_tool(
     *,
     z_score: int | None = 1,
     cmap: str = "viridis",
+    nan_policy: Literal["mask_impute", "drop", "raise"] = "mask_impute",
 ) -> dict[str, Any]:
     """TNBC-2a — seaborn clustermap of Leiden cluster means x spatial
     features. Row dendrogram comes from the cluster Zarr's
-    ``linkage_matrix``; rows annotated by Ward-cluster colour bar."""
-    plot_state_feature_clustermap(cluster_zarr, z_score=z_score, cmap=cmap, save_path=save_path)
+    ``linkage_matrix``; rows annotated by Ward-cluster colour bar.
+
+    ``nan_policy`` controls how NaN cells in the collapsed
+    ``(n_leiden_cluster, n_statistic)`` matrix are handled. NaN here means
+    a statistic could not be computed because the underlying cells weren't
+    present (e.g. ``*_by_type`` stats on a type with zero population).
+    ``"mask_impute"`` (default) drops columns with no data anywhere,
+    imputes remaining NaN cells with the column median, and visually masks
+    them as gray. ``"drop"`` drops any column with NaN. ``"raise"`` raises
+    with a list of NaN-bearing statistic names. The returned summary dict
+    includes ``dropped_statistics`` and ``imputed_cell_count`` so the
+    caller sees what the policy did."""
+    fig = plot_state_feature_clustermap(
+        cluster_zarr,
+        z_score=z_score,
+        cmap=cmap,
+        nan_policy=nan_policy,
+        save_path=save_path,
+    )
+    info = getattr(fig, "tmelandscape_clustermap_info", {})
     return _viz_summary(
         save_path,
         "tnbc-2a",
         manuscript="TNBC",
         description="clustermap of Leiden cluster means x spatial features",
+        extra={
+            "nan_policy": nan_policy,
+            "dropped_statistics": info.get("dropped_statistics", []),
+            "imputed_cell_count": info.get("imputed_cell_count", 0),
+        },
     )
 
 

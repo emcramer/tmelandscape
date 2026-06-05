@@ -296,6 +296,42 @@ def test_state_feature_clustermap_api_matches_mcp_tool(cluster_zarr: Path, tmp_p
     assert _png_sha256(api_out) == _png_sha256(mcp_out)
 
 
+def test_state_feature_clustermap_mcp_surfaces_nan_diagnostics(
+    cluster_zarr: Path, tmp_path: Path
+) -> None:
+    """MCP tool returns dropped_statistics + imputed_cell_count for a NaN-bearing Zarr.
+
+    Injects NaN into ``leiden_cluster_means`` (one fully-NaN stat + one
+    partial-NaN cell), then calls the MCP tool with the default nan_policy.
+    Asserts the returned summary dict surfaces what the policy did so the
+    calling agent sees the imputation/drop decisions.
+    """
+    import numpy as np
+    import xarray as xr
+
+    # Mutate the cluster Zarr in place: stat_a fully NaN across all windows
+    # for every Leiden cluster; stat_b NaN at one Leiden cluster.
+    ds = xr.open_zarr(cluster_zarr).load()
+    means = np.asarray(ds["leiden_cluster_means"].values, dtype=np.float64)
+    # cluster fixture has window_size=2, n_stat=2, n_embedding_feature=4
+    # layout per row: [stat_a_w0, stat_b_w0, stat_a_w1, stat_b_w1]
+    means[:, 0] = np.nan  # stat_a, window 0
+    means[:, 2] = np.nan  # stat_a, window 1 -> stat_a fully NaN after collapse
+    means[0, 1] = np.nan  # leiden 0, stat_b, window 0
+    means[0, 3] = np.nan  # leiden 0, stat_b, window 1 -> partial NaN cell
+    ds["leiden_cluster_means"] = (("leiden_cluster", "embedding_feature"), means)
+    ds.close()
+    ds.to_zarr(cluster_zarr, mode="w")
+
+    mcp_out = tmp_path / "mcp_nan.png"
+    result = plot_state_feature_clustermap_tool(str(cluster_zarr), str(mcp_out))
+
+    assert mcp_out.is_file()
+    assert result["nan_policy"] == "mask_impute"
+    assert result["dropped_statistics"] == ["stat_a"]
+    assert result["imputed_cell_count"] == 1
+
+
 def test_trajectory_clustergram_api_matches_mcp_tool(cluster_zarr: Path, tmp_path: Path) -> None:
     api_out = tmp_path / "api.png"
     mcp_out = tmp_path / "mcp.png"
