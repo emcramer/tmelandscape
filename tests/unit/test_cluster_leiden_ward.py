@@ -294,3 +294,17 @@ def test_embedding_not_mutated() -> None:
     after_hash = _hash_arrays(embedding)
     assert before_hash == after_hash
     np.testing.assert_array_equal(embedding, before)
+
+
+# ---------------------------------------------------------------------------
+# NaN handling
+#
+# `cluster_leiden_ward` itself rejects NaN-bearing embeddings via sklearn's
+# `kneighbors_graph` (which raises before our nanmean + pdist guard can run).
+# The defensive changes in v0.8.2 (nanmean for cluster_means, drop-all-NaN
+# columns before pdist) are intentional no-ops for the in-tree path and only
+# fire if a future alternative clustering strategy bypasses sklearn's NaN
+# check. The user-visible NaN handling for the M00_S01 canary lives at the
+# viz layer (plot_state_feature_clustermap nan_policy) — see
+# tests/unit/test_viz_trajectories.py.
+# ---------------------------------------------------------------------------

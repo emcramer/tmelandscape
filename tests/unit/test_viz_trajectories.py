@@ -276,6 +276,113 @@ def test_state_feature_clustermap_raises_on_missing_statistic_coord(tmp_path: Pa
     plt.close("all")
 
 
+# --- nan_policy (v0.8.2) ----------------------------------------------------
+
+
+def _inject_nans_into_cluster_means(
+    zarr_path: Path,
+    *,
+    fully_nan_statistics: tuple[int, ...] = (),
+    partial_nan_cells: tuple[tuple[int, int], ...] = (),
+) -> None:
+    """Mutate the cluster Zarr's `leiden_cluster_means` to inject NaN.
+
+    ``fully_nan_statistics`` lists statistic indices whose embedding-feature
+    repeats are *all* NaN across *every* Leiden cluster — produces an
+    all-NaN column after collapse.
+    ``partial_nan_cells`` is a list of ``(leiden_cluster_idx, statistic_idx)``
+    pairs; every window-stride repeat of that statistic is set to NaN for
+    the targeted Leiden cluster, so the post-collapse cell is NaN. Other
+    Leiden clusters retain finite values in that column.
+    """
+    ds = xr.open_zarr(zarr_path).load()
+    means = np.asarray(ds["leiden_cluster_means"].values, dtype=np.float64)
+    n_features = means.shape[1]
+    n_stat = ds.sizes["statistic"]
+    window_size = n_features // n_stat
+    for s in fully_nan_statistics:
+        for w in range(window_size):
+            means[:, w * n_stat + s] = np.nan
+    for leiden_idx, stat_idx in partial_nan_cells:
+        for w in range(window_size):
+            means[leiden_idx, w * n_stat + stat_idx] = np.nan
+    ds["leiden_cluster_means"] = (("leiden_cluster", "embedding_feature"), means)
+    ds.close()
+    ds.to_zarr(zarr_path, mode="w")
+
+
+def test_state_feature_clustermap_mask_impute_default(tmp_path: Path) -> None:
+    """Default nan_policy drops all-NaN columns, imputes partial NaN, masks them."""
+    from tmelandscape.viz.trajectories import plot_state_feature_clustermap
+
+    zarr_path = _build_cluster_zarr(tmp_path / "cluster.zarr", n_statistic=3)
+    _inject_nans_into_cluster_means(
+        zarr_path,
+        fully_nan_statistics=(0,),
+        partial_nan_cells=((0, 1), (2, 1)),
+    )
+    fig = plot_state_feature_clustermap(zarr_path)
+    info = fig.tmelandscape_clustermap_info
+    assert info["dropped_statistics"] == ["stat_0"]
+    assert info["imputed_cell_count"] == 2
+    plt.close("all")
+
+
+def test_state_feature_clustermap_drop_policy(tmp_path: Path) -> None:
+    """nan_policy='drop' removes any column with a NaN cell."""
+    from tmelandscape.viz.trajectories import plot_state_feature_clustermap
+
+    zarr_path = _build_cluster_zarr(tmp_path / "cluster.zarr", n_statistic=3)
+    _inject_nans_into_cluster_means(
+        zarr_path,
+        fully_nan_statistics=(0,),
+        partial_nan_cells=((0, 1),),
+    )
+    fig = plot_state_feature_clustermap(zarr_path, nan_policy="drop")
+    info = fig.tmelandscape_clustermap_info
+    assert set(info["dropped_statistics"]) == {"stat_0", "stat_1"}
+    assert info["imputed_cell_count"] == 0
+    plt.close("all")
+
+
+def test_state_feature_clustermap_raise_policy(tmp_path: Path) -> None:
+    """nan_policy='raise' surfaces the NaN-bearing statistic names."""
+    from tmelandscape.viz.trajectories import plot_state_feature_clustermap
+
+    zarr_path = _build_cluster_zarr(tmp_path / "cluster.zarr", n_statistic=3)
+    _inject_nans_into_cluster_means(zarr_path, partial_nan_cells=((0, 2),))
+    with pytest.raises(ValueError, match=r"NaN.*stat_2"):
+        plot_state_feature_clustermap(zarr_path, nan_policy="raise")
+    plt.close("all")
+
+
+def test_state_feature_clustermap_all_nan_matrix_raises_for_all_policies(
+    tmp_path: Path,
+) -> None:
+    """Every statistic NaN everywhere => actionable failure regardless of policy."""
+    from tmelandscape.viz.trajectories import plot_state_feature_clustermap
+
+    zarr_path = _build_cluster_zarr(tmp_path / "cluster.zarr", n_statistic=3)
+    _inject_nans_into_cluster_means(zarr_path, fully_nan_statistics=(0, 1, 2))
+
+    for policy in ("mask_impute", "drop", "raise"):
+        with pytest.raises(ValueError):
+            plot_state_feature_clustermap(zarr_path, nan_policy=policy)
+    plt.close("all")
+
+
+def test_state_feature_clustermap_no_nan_returns_empty_info(tmp_path: Path) -> None:
+    """NaN-free input => no dropped statistics, no imputed cells."""
+    from tmelandscape.viz.trajectories import plot_state_feature_clustermap
+
+    zarr_path = _build_cluster_zarr(tmp_path / "cluster.zarr", n_statistic=3)
+    fig = plot_state_feature_clustermap(zarr_path)
+    info = fig.tmelandscape_clustermap_info
+    assert info["dropped_statistics"] == []
+    assert info["imputed_cell_count"] == 0
+    plt.close("all")
+
+
 # --- plot_trajectory_clustergram --------------------------------------------
 
 

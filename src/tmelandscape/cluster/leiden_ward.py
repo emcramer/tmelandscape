@@ -49,6 +49,7 @@ This module is **pure**: no I/O, no global RNG, no mutation of the input
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
 from typing import Any
 
@@ -256,9 +257,18 @@ def cluster_leiden_ward(
     # ----- Stage 2 — Ward on Leiden cluster means --------------------------
     # ``unique_leiden`` is already sorted ascending by np.unique; iterate in
     # that order so ``leiden_to_final[c]`` indexes by community id directly.
-    leiden_cluster_means = np.stack(
-        [arr[leiden_labels == c].mean(axis=0) for c in unique_leiden]
-    ).astype(np.float64, copy=False)
+    # Use nanmean so a single NaN window in a community doesn't propagate to
+    # the whole community's mean for that feature — strict no-op for
+    # NaN-free embeddings, real improvement for mixed-NaN inputs (e.g. a
+    # *_by_type stat that's NaN early when the type's population is 0 and
+    # finite later). All-NaN slices return NaN by design — downstream viz
+    # layers (plot_state_feature_clustermap) handle that sentinel.
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="Mean of empty slice", category=RuntimeWarning)
+        warnings.filterwarnings("ignore", message="All-NaN slice", category=RuntimeWarning)
+        leiden_cluster_means = np.stack(
+            [np.nanmean(arr[leiden_labels == c], axis=0) for c in unique_leiden]
+        ).astype(np.float64, copy=False)
 
     # Ward requires at least 2 observations to produce a non-empty linkage.
     if n_leiden_clusters < 2:
@@ -268,7 +278,30 @@ def cluster_leiden_ward(
             "the embedding."
         )
 
-    distance_matrix = spd.pdist(leiden_cluster_means, metric="euclidean")
+    # pdist + linkage cannot accept NaN. The full leiden_cluster_means matrix
+    # is preserved in the output Zarr (NaN is the truth — feature was never
+    # observed in this community). For the linkage computation we work on a
+    # cleaned copy: drop features that are all-NaN across every community
+    # (no signal anywhere), then impute any remaining NaN cells with the
+    # column median of finite values. This is a computational sentinel for
+    # scipy, not a claim about the cell's value. Downstream viz layers
+    # render the NaN cells with a visual mask so the viewer reads "unknown".
+    linkage_input = leiden_cluster_means
+    if np.isnan(linkage_input).any():
+        all_nan_cols = np.all(np.isnan(linkage_input), axis=0)
+        linkage_input = linkage_input[:, ~all_nan_cols]
+        if linkage_input.shape[1] == 0:
+            raise ValueError(
+                "All embedding features are all-NaN across every Leiden "
+                "community; cannot compute Ward linkage. Check the input "
+                "embedding for missing data."
+            )
+        if np.isnan(linkage_input).any():
+            col_medians = np.nanmedian(linkage_input, axis=0)
+            nan_mask = np.isnan(linkage_input)
+            linkage_input = np.where(nan_mask, col_medians, linkage_input)
+
+    distance_matrix = spd.pdist(linkage_input, metric="euclidean")
     linkage_matrix = sch.linkage(distance_matrix, method="ward").astype(np.float64, copy=False)
 
     if n_final_clusters is None:

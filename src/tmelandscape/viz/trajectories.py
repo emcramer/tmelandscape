@@ -21,9 +21,10 @@ lines 134-305 (clustermap) and 1000-1156 (trajectory clustergram).
 
 from __future__ import annotations
 
+import warnings
 from collections import Counter
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Literal, cast
 
 import matplotlib.figure as mfig
 import matplotlib.pyplot as plt
@@ -37,6 +38,8 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 
 if TYPE_CHECKING:
     from numpy.typing import NDArray
+
+NanPolicy = Literal["mask_impute", "drop", "raise"]
 
 
 _TAB10_MAX_STATES = 10
@@ -57,6 +60,7 @@ def plot_state_feature_clustermap(
     *,
     z_score: int | None = 1,
     cmap: str = "viridis",
+    nan_policy: NanPolicy = "mask_impute",
     save_path: str | Path | None = None,
 ) -> mfig.Figure:
     """TNBC-2a — clustermap of Leiden-cluster means over spatial features.
@@ -78,6 +82,28 @@ def plot_state_feature_clustermap(
         columns, ``0`` z-scores rows, ``None`` leaves values raw.
     cmap
         Matplotlib colormap name for the heatmap. Default ``"viridis"``.
+    nan_policy
+        How to handle NaN cells in the collapsed
+        ``(n_leiden_cluster, n_statistic)`` matrix. NaN here means the
+        statistic could not be computed because the underlying cells /
+        interactions were absent (e.g. ``*_by_type`` stats on a type with
+        zero population), so the rendering choice is between visually
+        marking unknowns and dropping them.
+
+        - ``"mask_impute"`` (default): drop columns with no data anywhere
+          (all-NaN across every Leiden cluster), then impute remaining NaN
+          cells with the column median of finite values and render them as
+          gray via ``seaborn.clustermap``'s ``mask=`` argument. The
+          column-median fill is a computational sentinel for the dendrogram
+          reorder (seaborn cannot accept NaN); the visual mask is the
+          truth-telling layer.
+        - ``"drop"``: drop any column with one or more NaN cells. No
+          imputation; the viewer sees only observed values, at the cost of
+          losing partial-signal columns.
+        - ``"raise"``: raise ``ValueError`` listing the NaN-bearing
+          statistic names. For diagnostic workflows that want to surface
+          the upstream issue rather than silently mask it.
+
     save_path
         If supplied, the returned figure is also saved to this path with
         ``bbox_inches="tight"`` and ``dpi=150``.
@@ -85,7 +111,11 @@ def plot_state_feature_clustermap(
     Returns
     -------
     matplotlib.figure.Figure
-        The seaborn ``clustermap``'s underlying figure (``g.fig``).
+        The seaborn ``clustermap``'s underlying figure (``g.fig``). The
+        figure carries a ``tmelandscape_clustermap_info`` attribute (dict)
+        with keys ``dropped_statistics: list[str]`` and
+        ``imputed_cell_count: int`` so callers (e.g. the MCP wrapper) can
+        introspect what the policy decided.
 
     Raises
     ------
@@ -93,9 +123,11 @@ def plot_state_feature_clustermap(
         If ``cluster_zarr`` lacks ``leiden_cluster_means``,
         ``linkage_matrix``, or ``cluster_labels``; if the embedding-feature
         axis cannot be evenly partitioned into per-statistic groups using
-        the ``statistic`` coord; or if more than ten distinct final TME
+        the ``statistic`` coord; if more than ten distinct final TME
         states are present (``tab10`` would otherwise be silently
-        extended).
+        extended); or if ``nan_policy`` rejects the matrix (``"raise"``
+        with any NaN cell, ``"drop"`` / ``"mask_impute"`` when the entire
+        matrix is NaN).
     """
     cluster_path = Path(cluster_zarr).expanduser().resolve()
     with xr.open_zarr(cluster_path) as ds:
@@ -123,23 +155,42 @@ def plot_state_feature_clustermap(
 
     collapsed = _collapse_repeated_measures(leiden_cluster_means, n_statistic=len(statistic_names))
 
+    collapsed, kept_names, mask, dropped_statistics, imputed_cell_count = _apply_nan_policy(
+        collapsed,
+        statistic_names=statistic_names,
+        policy=nan_policy,
+    )
+
     row_colors = _row_colors_from_modal_state(
         n_leiden_clusters=collapsed.shape[0],
         cluster_labels=cluster_labels,
         leiden_labels=leiden_labels,
     )
 
-    grid = sns.clustermap(
-        collapsed,
-        row_linkage=linkage_matrix,
-        row_colors=row_colors,
-        cmap=cmap,
-        z_score=z_score,
-        xticklabels=statistic_names,
-        yticklabels=False,
-        figsize=(10, 8),
-    )
+    clustermap_kwargs: dict[str, object] = {
+        "row_linkage": linkage_matrix,
+        "row_colors": row_colors,
+        "cmap": cmap,
+        "z_score": z_score,
+        "xticklabels": kept_names,
+        "yticklabels": False,
+        "figsize": (10, 8),
+    }
+    if collapsed.shape[1] < 2:
+        # seaborn's column clustering calls scipy pdist on the column matrix;
+        # with <2 columns scipy raises "empty distance matrix". When the
+        # nan_policy has reduced us to a single column there's nothing to
+        # cluster anyway.
+        clustermap_kwargs["col_cluster"] = False
+    if mask is not None:
+        clustermap_kwargs["mask"] = mask
+
+    grid = sns.clustermap(collapsed, **clustermap_kwargs)
     fig = cast(mfig.Figure, grid.fig)
+    fig.tmelandscape_clustermap_info = {  # type: ignore[attr-defined]
+        "dropped_statistics": dropped_statistics,
+        "imputed_cell_count": imputed_cell_count,
+    }
 
     grid.ax_heatmap.set_xlabel("Spatial statistic")
     grid.ax_heatmap.set_ylabel("Leiden cluster")
@@ -154,6 +205,72 @@ def plot_state_feature_clustermap(
         fig.savefig(Path(save_path), bbox_inches="tight", dpi=150)
 
     return fig
+
+
+def _apply_nan_policy(
+    collapsed: NDArray[np.float64],
+    *,
+    statistic_names: list[str],
+    policy: NanPolicy,
+) -> tuple[NDArray[np.float64], list[str], NDArray[np.bool_] | None, list[str], int]:
+    """Apply ``nan_policy`` to the collapsed Leiden-cluster x statistic matrix.
+
+    Returns the (possibly reduced / imputed) matrix, the kept column names,
+    a boolean mask of imputed cells (or None when no imputation happened),
+    the list of dropped statistic names, and the count of imputed cells.
+    """
+    if not np.isnan(collapsed).any():
+        return collapsed, list(statistic_names), None, [], 0
+
+    nan_per_col = np.asarray(np.isnan(collapsed).any(axis=0), dtype=bool)
+    nan_stat_names = [statistic_names[j] for j in range(len(statistic_names)) if nan_per_col[j]]
+
+    if policy == "raise":
+        raise ValueError(
+            f"plot_state_feature_clustermap: NaN cells found in collapsed "
+            f"Leiden-cluster matrix for statistic(s) {nan_stat_names}. Set "
+            "nan_policy='mask_impute' to impute and visually mask the "
+            "missing cells, 'drop' to drop entire columns, or filter "
+            "upstream via the summarize_ensemble panel."
+        )
+
+    if policy == "drop":
+        keep = ~nan_per_col
+        if not keep.any():
+            raise ValueError(
+                "plot_state_feature_clustermap: every statistic has at least "
+                "one NaN cell under nan_policy='drop'; nothing left to plot. "
+                "Try nan_policy='mask_impute' to preserve partial-signal "
+                "columns, or filter upstream."
+            )
+        kept_names = [s for s, k in zip(statistic_names, keep, strict=True) if k]
+        return collapsed[:, keep], kept_names, None, nan_stat_names, 0
+
+    # policy == "mask_impute": drop fully-NaN columns; impute remaining NaN
+    # cells with the column median (robust to outliers and lands near the
+    # z-score centre under z_score=1, so masked cells don't visually scream
+    # "outlier"); pass the boolean mask to seaborn so the masked cells
+    # render as gray.
+    all_nan = np.asarray(np.all(np.isnan(collapsed), axis=0), dtype=bool)
+    if all_nan.all():
+        raise ValueError(
+            "plot_state_feature_clustermap: every statistic is all-NaN across "
+            "all Leiden clusters; nothing to plot. Check the upstream "
+            "embedding for missing data."
+        )
+    dropped_names = [statistic_names[j] for j in range(len(statistic_names)) if all_nan[j]]
+    keep = ~all_nan
+    reduced = collapsed[:, keep]
+    kept_names = [s for s, k in zip(statistic_names, keep, strict=True) if k]
+    nan_mask = np.isnan(reduced)
+    imputed_cell_count = int(nan_mask.sum())
+    if imputed_cell_count == 0:
+        return reduced, kept_names, None, dropped_names, 0
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="All-NaN slice", category=RuntimeWarning)
+        col_medians = np.nanmedian(reduced, axis=0)
+    imputed = np.where(nan_mask, col_medians, reduced)
+    return imputed, kept_names, nan_mask, dropped_names, imputed_cell_count
 
 
 def plot_trajectory_clustergram(
@@ -322,7 +439,14 @@ def _collapse_repeated_measures(
         )
     window_size = n_features // n_statistic
     reshaped = leiden_cluster_means.reshape(-1, window_size, n_statistic)
-    return cast("NDArray[np.float64]", reshaped.mean(axis=1))
+    # Use nanmean so a single NaN repeated-measure doesn't propagate into the
+    # collapsed (n_leiden, n_statistic) cell. All-NaN slices return NaN,
+    # which downstream nan_policy handles.
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", message="Mean of empty slice", category=RuntimeWarning)
+        warnings.filterwarnings("ignore", message="All-NaN slice", category=RuntimeWarning)
+        collapsed = np.nanmean(reshaped, axis=1)
+    return cast("NDArray[np.float64]", collapsed)
 
 
 def _row_colors_from_modal_state(
